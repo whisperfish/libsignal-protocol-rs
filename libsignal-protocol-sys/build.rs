@@ -4,11 +4,11 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    println!("cargo:rustc-link-lib=signal-protocol");
-    generate_bindings();
-}
+    let dst = cmake::build("libsignal-protocol-c");
+    println!("cargo:rustc-link-search=native={}", dst.display());
+    println!("cargo:rustc-link-search=native={}/lib", dst.display());
+    println!("cargo:rustc-link-lib=signal-protocol-c");
 
-fn generate_bindings() {
     let bindings = bindgen::Builder::default()
         .header("wrapper.h")
         .clang_arg("-Ilibsignal-protocol-c/src")
