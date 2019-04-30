@@ -6,3 +6,5 @@ edition = "2018"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
 
+[dependencies]
+libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }

@@ -199,6 +199,9 @@ dependencies = [
 [[package]]
 name = "libsignal-protocol"
 version = "0.1.0"
+dependencies = [
+ "libsignal-protocol-sys 0.1.0",
+]
 
 [[package]]
 name = "libsignal-protocol-sys"
