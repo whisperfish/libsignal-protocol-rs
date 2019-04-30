@@ -1,0 +1,25 @@
+language: rust
+sudo: false
+cache: cargo
+
+rust:
+  - 1.34.0
+
+script: 
+  - cargo build --all --verbose
+  - cargo test --all --verbose
+  - cargo doc --all --verbose
+
+before_deploy:
+  - cargo doc --all --verbose
+  - echo '<meta http-equiv="refresh" content="0; url=libsignal_protocol/index.html" /> ' > target/doc/index.html
+  - cp -r target/doc public
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN 
+  keep_history: true
+  local_dir: public
+  on:
+    branch: master
