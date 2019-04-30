@@ -1,0 +1,3 @@
+[submodule "libsignal-protocol-sys/libsignal-protocol-c"]
+	path = libsignal-protocol-sys/libsignal-protocol-c
+	url = https://github.com/signalapp/libsignal-protocol-c.git

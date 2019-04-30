@@ -5,3 +5,11 @@ authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
+build = "build.rs"
+links = "signal-protocol"
+
+[build-dependencies]
+bindgen = "0.49.0"
+
+[lib]
+path = "lib.rs"
