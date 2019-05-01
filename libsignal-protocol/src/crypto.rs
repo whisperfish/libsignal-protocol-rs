@@ -4,6 +4,7 @@ use std::ffi::c_void;
 use std::pin::Pin;
 use sys::{signal_buffer, signal_crypto_provider};
 
+/// Cryptography routines used in the signal protocol.
 pub trait Crypto {}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
