@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["InternalError",""]],"struct":[["Context",""],["DefaultCrypto",""],["IdentityKeyPair",""],["PreKeyList",""]],"trait":[["Crypto","Cryptography routines used in the signal protocol."]]});
+initSidebarItems({"enum":[["InternalError",""]],"mod":[["keys",""]],"struct":[["Context",""],["DefaultCrypto",""]],"trait":[["Crypto","Cryptography routines used in the signal protocol."]]});
