@@ -7,6 +7,7 @@ use failure::Error;
 use std::ptr;
 use std::rc::Rc;
 use std::time::{SystemTime, UNIX_EPOCH};
+use sys::AsSignalTypeBase;
 
 pub struct IdentityKeyPair {
     raw: *mut sys::ratchet_identity_key_pair,
@@ -38,14 +39,38 @@ impl IdentityKeyPair {
     }
 }
 
+impl Drop for IdentityKeyPair {
+    fn drop(&mut self) {
+        unsafe {
+            sys::ratchet_identity_key_pair_destroy(self.raw.as_signal_base());
+        }
+    }
+}
+
 pub struct PreKeyList {
     raw: *mut sys::signal_protocol_key_helper_pre_key_list_node,
     ctx: Rc<ContextInner>,
 }
 
+impl Drop for PreKeyList {
+    fn drop(&mut self) {
+        unsafe {
+            sys::signal_protocol_key_helper_key_list_free(self.raw);
+        }
+    }
+}
+
 pub struct SignedPreKey {
     raw: *mut sys::session_signed_pre_key,
     ctx: Rc<ContextInner>,
+}
+
+impl Drop for SignedPreKey {
+    fn drop(&mut self) {
+        unsafe {
+            sys::session_signed_pre_key_destroy(self.raw.as_signal_base());
+        }
+    }
 }
 
 impl_wrapped! {
