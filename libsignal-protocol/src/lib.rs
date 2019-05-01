@@ -3,12 +3,11 @@ mod macros;
 mod context;
 mod crypto;
 mod errors;
-mod keys;
+pub mod keys;
 
 pub use crate::context::Context;
 pub use crate::crypto::{Crypto, DefaultCrypto};
 pub use crate::errors::InternalError;
-pub use crate::keys::{IdentityKeyPair, PreKeyList};
 
 use crate::context::ContextInner;
 use std::rc::Rc;
