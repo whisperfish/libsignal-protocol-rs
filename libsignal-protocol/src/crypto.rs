@@ -1,16 +1,25 @@
 use libsignal_protocol_sys as sys;
 
-use std::ffi::c_void;
+use rand::RngCore;
+use std::os::raw::{c_int, c_void};
 use std::pin::Pin;
+use std::slice;
 use sys::{signal_buffer, signal_crypto_provider};
 
 /// Cryptography routines used in the signal protocol.
-pub trait Crypto {}
+pub trait Crypto {
+    fn fill_random(&self, buffer: &mut [u8]);
+}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct DefaultCrypto;
 
-impl Crypto for DefaultCrypto {}
+impl Crypto for DefaultCrypto {
+    fn fill_random(&self, buffer: &mut [u8]) {
+        let mut rng = rand::thread_rng();
+        rng.fill_bytes(buffer);
+    }
+}
 
 /// A simple vtable ([`signal_crypto_provider`]) and set of trampolines to let C
 /// use our [`Crypto`] trait object.
@@ -32,7 +41,7 @@ impl CryptoProvider {
             hmac_sha256_final_func: Some(hmac_sha256_final_func),
             hmac_sha256_init_func: Some(hmac_sha256_init_func),
             hmac_sha256_update_func: Some(hmac_sha256_update_func),
-            random_func: None,
+            random_func: Some(random_func),
             sha512_digest_cleanup_func: None,
             sha512_digest_final_func: None,
             sha512_digest_init_func: None,
@@ -48,7 +57,9 @@ impl CryptoProvider {
 
 struct State(Pin<Box<dyn Crypto>>);
 
-unsafe extern "C" fn hmac_sha256_cleanup_func(hmac_context: *mut c_void, user_data: *mut c_void) {}
+unsafe extern "C" fn hmac_sha256_cleanup_func(hmac_context: *mut c_void, user_data: *mut c_void) {
+    unimplemented!();
+}
 
 unsafe extern "C" fn hmac_sha256_final_func(
     hmac_context: *mut c_void,
@@ -56,7 +67,7 @@ unsafe extern "C" fn hmac_sha256_final_func(
     user_data: *mut c_void,
 ) -> i32 {
     let state = &mut *(user_data as *mut State);
-    0
+    unimplemented!()
 }
 
 unsafe extern "C" fn hmac_sha256_init_func(
@@ -66,7 +77,7 @@ unsafe extern "C" fn hmac_sha256_init_func(
     user_data: *mut c_void,
 ) -> i32 {
     let state = &mut *(user_data as *mut State);
-    0
+    unimplemented!()
 }
 
 unsafe extern "C" fn hmac_sha256_update_func(
@@ -75,5 +86,15 @@ unsafe extern "C" fn hmac_sha256_update_func(
     data_len: usize,
     user_data: *mut c_void,
 ) -> i32 {
+    unimplemented!()
+}
+
+unsafe extern "C" fn random_func(data: *mut u8, len: usize, user_data: *mut c_void) -> c_int {
+    assert!(!data.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &mut *(user_data as *mut State);
+    let buffer = slice::from_raw_parts_mut(data, len);
+    state.0.fill_random(buffer);
     0
 }

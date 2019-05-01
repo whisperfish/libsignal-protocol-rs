@@ -3,16 +3,16 @@ macro_rules! impl_wrapped {
         impl $crate::Wrapped for $wrapper {
             type Raw = $raw;
 
-            unsafe fn from_raw(raw: *mut Self::Raw) -> Self {
+            unsafe fn from_raw(raw: *mut Self::Raw, ctx: &std::rc::Rc<$crate::ContextInner>) -> Self {
                 assert!(!raw.is_null());
-                $wrapper(raw)
+                $wrapper { raw, ctx: Rc::clone(ctx) }
             }
 
             fn raw(&self) -> *const Self::Raw {
-                self.0
+                self.raw
             }
             fn raw_mut(&mut self) -> *mut Self::Raw {
-                self.0
+                self.raw
             }
         }
     };

@@ -7,16 +7,85 @@ use crate::Wrapped;
 use std::ffi::c_void;
 use std::pin::Pin;
 use std::ptr;
+use std::rc::Rc;
 use sys::signal_context;
 
-pub struct Context {
-    pub(crate) inner: *mut sys::signal_context,
-    crypto: CryptoProvider,
-    state: Pin<Box<State>>,
-}
+pub struct Context(Rc<ContextInner>);
 
 impl Context {
     pub fn new<C: Crypto + 'static>(crypto: C) -> Result<Context, InternalError> {
+        ContextInner::new(crypto).map(|c| Context(Rc::new(c)))
+    }
+
+    pub fn generate_identity_key_pair(&self) -> Result<IdentityKeyPair, InternalError> {
+        unsafe {
+            let mut key_pair = ptr::null_mut();
+            sys::signal_protocol_key_helper_generate_identity_key_pair(&mut key_pair, self.inner())
+                .to_result()?;
+
+            Ok(IdentityKeyPair::from_raw(key_pair, &self.0))
+        }
+    }
+
+    pub fn generate_registration_id(&self, extended_range: i32) -> Result<u32, InternalError> {
+        let mut id = 0;
+        unsafe {
+            sys::signal_protocol_key_helper_generate_registration_id(
+                &mut id,
+                extended_range,
+                self.inner(),
+            )
+            .to_result()?;
+        }
+
+        Ok(id)
+    }
+
+    pub fn generate_pre_keys(&self, start: u32, count: u32) -> Result<PreKeyList, InternalError> {
+        unsafe {
+            let mut pre_keys_head = ptr::null_mut();
+            sys::signal_protocol_key_helper_generate_pre_keys(
+                &mut pre_keys_head,
+                start,
+                count,
+                self.inner(),
+            )
+            .to_result()?;
+
+            Ok(PreKeyList::from_raw(pre_keys_head, &self.0))
+        }
+    }
+
+    fn inner(&self) -> *mut sys::signal_context {
+        self.0.raw()
+    }
+}
+
+impl Default for Context {
+    fn default() -> Context {
+        match Context::new(DefaultCrypto) {
+            Ok(c) => c,
+            Err(e) => panic!("Unable to create a context using the defaults: {}", e),
+        }
+    }
+}
+
+/// Our Rust wrapper around the [`sys::signal_context`].
+///
+/// # Safety
+///
+/// This **must** outlive any data created by the `libsignal-protocol-c` library.
+/// You'll usually do this by adding a `Rc<ContextInner>` to any wrapper types.
+pub(crate) struct ContextInner {
+    raw: *mut sys::signal_context,
+    crypto: CryptoProvider,
+    // A pointer to our [`State`] has been passed to `libsignal-protocol-c`, so
+    // we need to make sure it is never moved.
+    state: Pin<Box<State>>,
+}
+
+impl ContextInner {
+    pub fn new<C: Crypto + 'static>(crypto: C) -> Result<ContextInner, InternalError> {
         unsafe {
             let mut global_context: *mut signal_context = ptr::null_mut();
             let crypto = CryptoProvider::new(crypto);
@@ -32,93 +101,23 @@ impl Context {
             )
             .to_result()?;
 
-            Ok(Context {
-                inner: global_context,
+            Ok(ContextInner {
+                raw: global_context,
                 crypto,
                 state,
             })
         }
     }
 
-    pub fn generate_identity_key_pair(&mut self) -> Result<IdentityKeyPair, InternalError> {
-        unsafe {
-            let mut key_pair = ptr::null_mut();
-            sys::signal_protocol_key_helper_generate_identity_key_pair(&mut key_pair, self.inner)
-                .to_result()?;
-
-            Ok(IdentityKeyPair::from_raw(key_pair))
-        }
-    }
-
-    pub fn generate_registration_id(&mut self, extended_range: i32) -> Result<u32, InternalError> {
-        let mut id = 0;
-        unsafe {
-            sys::signal_protocol_key_helper_generate_registration_id(
-                &mut id,
-                extended_range,
-                self.inner,
-            )
-            .to_result()?;
-        }
-
-        Ok(id)
-    }
-
-    pub fn generate_pre_keys(
-        &mut self,
-        start: u32,
-        count: u32,
-    ) -> Result<PreKeyList, InternalError> {
-        unsafe {
-            let mut pre_keys_head = ptr::null_mut();
-            sys::signal_protocol_key_helper_generate_pre_keys(
-                &mut pre_keys_head,
-                start,
-                count,
-                self.inner,
-            )
-            .to_result()?;
-
-            Ok(PreKeyList::from_raw(pre_keys_head))
-        }
-    }
-
-    pub fn generate_signed_pre_key(
-        &mut self,
-        identity: &IdentityKeyPair,
-        signed_pre_key_id: u32,
-        timestamp: u64,
-    ) -> Result<SignedPreKey, InternalError> {
-        unsafe {
-            let mut signed_pre_key = ptr::null_mut();
-
-            sys::signal_protocol_key_helper_generate_signed_pre_key(
-                &mut signed_pre_key,
-                identity.raw(),
-                signed_pre_key_id,
-                timestamp,
-                self.inner,
-            )
-            .to_result()?;
-
-            Ok(SignedPreKey::from_raw(signed_pre_key))
-        }
+    pub fn raw(&self) -> *mut sys::signal_context {
+        self.raw
     }
 }
 
-impl Drop for Context {
+impl Drop for ContextInner {
     fn drop(&mut self) {
         unsafe {
-            sys::signal_context_destroy(self.inner);
-        }
-    }
-}
-
-impl Default for Context {
-    fn default() -> Context {
-        match Context::new(DefaultCrypto) {
-            Ok(c) => c,
-            Err(e) => panic!("Unable to create a context using the defaults: {}", e),
+            sys::signal_context_destroy(self.raw());
         }
     }
 }
@@ -132,6 +131,14 @@ unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
     unimplemented!("TODO: Implement unlocking");
 }
 
+/// The "user state" we pass to `libsignal-protocol-c` as part of the global
+/// context.
+///
+/// # Safety
+///
+/// A pointer to this [`State`] will be shared throughout the
+/// `libsignal-protocol-c` library, so any mutation **must** be done using the
+/// appropriate synchronisation mechanisms (i.e. `RefCell` or atomics).
 struct State {}
 
 #[cfg(test)]
