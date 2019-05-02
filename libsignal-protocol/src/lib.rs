@@ -5,6 +5,7 @@ mod context;
 mod crypto;
 mod errors;
 pub mod keys;
+mod pre_key_store;
 mod session_store;
 mod store_context;
 
@@ -12,6 +13,7 @@ pub use crate::buffer::Buffer;
 pub use crate::context::Context;
 pub use crate::crypto::{Crypto, DefaultCrypto};
 pub use crate::errors::InternalError;
+pub use crate::pre_key_store::PreKeyStore;
 pub use crate::session_store::SessionStore;
 pub use crate::store_context::StoreContext;
 
