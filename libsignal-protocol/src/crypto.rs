@@ -92,8 +92,8 @@ unsafe extern "C" fn random_func(data: *mut u8, len: usize, user_data: *mut c_vo
     assert!(!data.is_null());
     assert!(!user_data.is_null());
 
-    let state = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     let buffer = slice::from_raw_parts_mut(data, len);
-    state.0.fill_random(buffer);
+    user_data.0.fill_random(buffer);
     0
 }

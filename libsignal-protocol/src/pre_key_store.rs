@@ -1,9 +1,17 @@
 use libsignal_protocol_sys as sys;
 
+use crate::buffer::Buffer;
+use crate::errors::InternalError;
+use std::io::{self, Write};
 use std::os::raw::{c_int, c_void};
 use std::pin::Pin;
 
-pub trait PreKeyStore {}
+pub trait PreKeyStore {
+    fn load_pre_key(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
+    fn store_pre_key(&self, id: u32, body: &[u8]) -> Result<(), InternalError>;
+    fn contains_pre_key(&self, id: u32) -> Result<(), InternalError>;
+    fn remove_pre_key(&self, id: u32) -> Result<(), InternalError>;
+}
 
 pub(crate) struct PreKeyStoreVtable {
     vtable: sys::signal_protocol_pre_key_store,
@@ -30,31 +38,64 @@ impl PreKeyStoreVtable {
 struct State(Box<dyn PreKeyStore>);
 
 unsafe extern "C" fn load_pre_key(
-    _record: *mut *mut sys::signal_buffer,
-    _pre_key_id: u32,
-    _user_data: *mut c_void,
+    record: *mut *mut sys::signal_buffer,
+    pre_key_id: u32,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!user_data.is_null());
+    assert!(!record.is_null());
+    let user_data = &*(user_data as *const State);
+    let mut buffer = Buffer::new();
+
+    match user_data.0.load_pre_key(pre_key_id, &mut buffer) {
+        Ok(_) => {
+            *record = buffer.into_raw();
+            sys::SG_SUCCESS as c_int
+        }
+        Err(e) => InternalError::Unknown.code(),
+    }
 }
 
 unsafe extern "C" fn store_pre_key(
-    _pre_key_id: u32,
-    _record: *mut u8,
-    _record_len: usize,
-    _user_data: *mut c_void,
+    pre_key_id: u32,
+    record: *mut u8,
+    record_len: usize,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!user_data.is_null());
+    assert!(!record.is_null());
+    let user_data = &*(user_data as *const State);
+    let data = std::slice::from_raw_parts(record, record_len);
+
+    match user_data.0.store_pre_key(pre_key_id, data) {
+        Ok(_) => sys::SG_SUCCESS as c_int,
+        Err(e) => e.code(),
+    }
 }
 
-unsafe extern "C" fn contains_pre_key(_pre_key_id: u32, _user_data: *mut c_void) -> c_int {
-    unimplemented!()
+unsafe extern "C" fn contains_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
+    assert!(!user_data.is_null());
+    let user_data = &*(user_data as *const State);
+
+    match user_data.0.contains_pre_key(pre_key_id) {
+        Ok(_) => sys::SG_SUCCESS as c_int,
+        Err(e) => e.code(),
+    }
 }
 
-unsafe extern "C" fn remove_pre_key(_pre_key_id: u32, _user_data: *mut c_void) -> c_int {
-    unimplemented!()
+unsafe extern "C" fn remove_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
+    assert!(!user_data.is_null());
+    let user_data = &*(user_data as *const State);
+
+    match user_data.0.remove_pre_key(pre_key_id) {
+        Ok(_) => sys::SG_SUCCESS as c_int,
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn destroy_func(user_data: *mut c_void) {
-    let user_data = Box::from_raw(user_data as *mut State);
-    drop(user_data);
+    if !user_data.is_null() {
+        let user_data = Box::from_raw(user_data as *mut State);
+        drop(user_data);
+    }
 }

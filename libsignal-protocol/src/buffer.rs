@@ -2,6 +2,7 @@ use libsignal_protocol_sys as sys;
 
 use crate::context::ContextInner;
 use crate::Wrapped;
+use std::io::{self, Write};
 use std::mem;
 use std::ops::{Index, IndexMut};
 use std::rc::Rc;
@@ -14,13 +15,16 @@ pub struct Buffer {
 
 impl Buffer {
     pub fn new() -> Buffer {
-        Buffer::with_capacity(DEFAULT_BUFFER_SIZE)
+        Buffer::with_capacity(0)
+    }
+
+    pub unsafe fn from_raw(raw: *mut sys::signal_buffer) -> Buffer {
+        assert!(!raw.is_null());
+        Buffer { raw }
     }
 
     pub fn with_capacity(capacity: usize) -> Buffer {
-        let raw = unsafe { sys::signal_buffer_alloc(capacity) };
-        assert!(!raw.is_null());
-        Buffer { raw }
+        unsafe { Buffer::from_raw(sys::signal_buffer_alloc(capacity)) }
     }
 
     pub fn len(&self) -> usize {
@@ -52,8 +56,20 @@ impl Buffer {
 
     pub fn append(&mut self, data: &[u8]) {
         unsafe {
-            sys::signal_buffer_append(self.raw, data.as_ptr(), data.len());
+            self.raw = sys::signal_buffer_append(self.raw, data.as_ptr(), data.len());
         }
+    }
+}
+
+impl From<Vec<u8>> for Buffer {
+    fn from(other: Vec<u8>) -> Buffer {
+        Buffer::from(other.as_slice())
+    }
+}
+
+impl<'a> From<&'a [u8]> for Buffer {
+    fn from(other: &'a [u8]) -> Buffer {
+        unsafe { Buffer::from_raw(sys::signal_buffer_create(other.as_ptr(), other.len())) }
     }
 }
 
@@ -86,6 +102,17 @@ where
 {
     fn index_mut(&mut self, ix: T) -> &mut Self::Output {
         self.as_slice_mut().index_mut(ix)
+    }
+}
+
+impl Write for Buffer {
+    fn write(&mut self, data: &[u8]) -> io::Result<usize> {
+        self.append(data);
+        Ok(data.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
     }
 }
 
@@ -142,7 +169,7 @@ mod tests {
 
     #[test]
     fn get_an_item() {
-        let mut buffer = Buffer::new();
+        let mut buffer = Buffer::with_capacity(128);
         buffer[10] = 0xde;
         buffer[11] = 0xad;
         buffer[12] = 0xbe;
@@ -150,5 +177,17 @@ mod tests {
 
         let dead_beef = &buffer[10..14];
         assert_eq!(dead_beef, &[0xde, 0xad, 0xbe, 0xef]);
+    }
+
+    #[test]
+    fn write_to_a_buffer() {
+        let mut buffer = Buffer::new();
+
+        write!(buffer, "Hello").unwrap();
+        write!(buffer, ",").unwrap();
+        writeln!(buffer, " World!").unwrap();
+
+        let got = std::str::from_utf8(buffer.as_slice()).unwrap();
+        assert_eq!("Hello, World!\n", got);
     }
 }
