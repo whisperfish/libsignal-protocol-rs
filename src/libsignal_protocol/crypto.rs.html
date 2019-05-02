@@ -192,9 +192,9 @@
     <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">data</span>.<span class="ident">is_null</span>());
     <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
 
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">State</span>);
+    <span class="kw">let</span> <span class="ident">user_data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">State</span>);
     <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">slice</span>::<span class="ident">from_raw_parts_mut</span>(<span class="ident">data</span>, <span class="ident">len</span>);
-    <span class="ident">state</span>.<span class="number">0</span>.<span class="ident">fill_random</span>(<span class="ident">buffer</span>);
+    <span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">fill_random</span>(<span class="ident">buffer</span>);
     <span class="number">0</span>
 }
 </pre></div>
