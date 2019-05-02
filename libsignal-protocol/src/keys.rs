@@ -217,6 +217,7 @@ impl Drop for SignedPreKey {
 
 pub struct KeyPair {
     raw: *mut sys::ec_key_pair,
+    #[allow(dead_code)]
     ctx: Rc<ContextInner>,
 }
 

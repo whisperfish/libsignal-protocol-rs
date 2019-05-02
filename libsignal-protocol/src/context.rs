@@ -66,6 +66,10 @@ impl Context {
         }
     }
 
+    pub fn crypto(&self) -> &dyn Crypto {
+        self.0.crypto.state()
+    }
+
     fn inner(&self) -> *mut sys::signal_context {
         self.0.raw()
     }
@@ -133,12 +137,10 @@ impl Drop for ContextInner {
     }
 }
 
-unsafe extern "C" fn lock_function(user_data: *mut c_void) {
-    let state = &mut *(user_data as *mut State);
+unsafe extern "C" fn lock_function(_user_data: *mut c_void) {
     unimplemented!("TODO: Implement locking");
 }
-unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
-    let state = &mut *(user_data as *mut State);
+unsafe extern "C" fn unlock_function(_user_data: *mut c_void) {
     unimplemented!("TODO: Implement unlocking");
 }
 

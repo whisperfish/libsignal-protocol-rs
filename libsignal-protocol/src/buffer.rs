@@ -3,6 +3,7 @@ use libsignal_protocol_sys as sys;
 use crate::context::ContextInner;
 use crate::Wrapped;
 use std::mem;
+use std::ops::{Index, IndexMut};
 use std::rc::Rc;
 
 const DEFAULT_BUFFER_SIZE: usize = 1024;
@@ -68,6 +69,26 @@ impl AsMut<[u8]> for Buffer {
     }
 }
 
+impl<T> Index<T> for Buffer
+where
+    [u8]: Index<T>,
+{
+    type Output = <[u8] as Index<T>>::Output;
+
+    fn index(&self, ix: T) -> &Self::Output {
+        self.as_slice().index(ix)
+    }
+}
+
+impl<T> IndexMut<T> for Buffer
+where
+    [u8]: IndexMut<T>,
+{
+    fn index_mut(&mut self, ix: T) -> &mut Self::Output {
+        self.as_slice_mut().index_mut(ix)
+    }
+}
+
 impl Clone for Buffer {
     fn clone(&self) -> Buffer {
         unsafe {
@@ -99,5 +120,35 @@ impl Wrapped for Buffer {
 
     fn raw_mut(&mut self) -> *mut Self::Raw {
         self.raw
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn create_and_delete() {
+        let buffer = Buffer::new();
+        drop(buffer);
+    }
+
+    #[test]
+    fn create_with_capacity() {
+        let cap = 12345;
+        let buffer = Buffer::with_capacity(cap);
+        assert_eq!(buffer.len(), cap);
+    }
+
+    #[test]
+    fn get_an_item() {
+        let mut buffer = Buffer::new();
+        buffer[10] = 0xde;
+        buffer[11] = 0xad;
+        buffer[12] = 0xbe;
+        buffer[13] = 0xef;
+
+        let dead_beef = &buffer[10..14];
+        assert_eq!(dead_beef, &[0xde, 0xad, 0xbe, 0xef]);
     }
 }

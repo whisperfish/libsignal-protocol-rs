@@ -49,6 +49,29 @@ impl InternalError {
         }
     }
 
+    pub fn code(&self) -> i32 {
+        match self {
+            InternalError::NoMemory => sys::SG_ERR_NOMEM,
+            InternalError::InvalidArgument => sys::SG_ERR_INVAL,
+            InternalError::Unknown => sys::SG_ERR_UNKNOWN,
+            InternalError::DuplicateMessage => sys::SG_ERR_DUPLICATE_MESSAGE,
+            InternalError::InvalidKey => sys::SG_ERR_INVALID_KEY,
+            InternalError::InvalidKeyId => sys::SG_ERR_INVALID_KEY_ID,
+            InternalError::InvalidMAC => sys::SG_ERR_INVALID_MAC,
+            InternalError::InvalidMessage => sys::SG_ERR_INVALID_MESSAGE,
+            InternalError::InvalidVersion => sys::SG_ERR_INVALID_VERSION,
+            InternalError::LegacyMessage => sys::SG_ERR_LEGACY_MESSAGE,
+            InternalError::NoSession => sys::SG_ERR_NO_SESSION,
+            InternalError::StaleKeyExchange => sys::SG_ERR_STALE_KEY_EXCHANGE,
+            InternalError::UntrustedIdentity => sys::SG_ERR_UNTRUSTED_IDENTITY,
+            InternalError::VerifySignatureVerificationFailed => sys::SG_ERR_VRF_SIG_VERIF_FAILED,
+            InternalError::InvalidProtoBuf => sys::SG_ERR_INVALID_PROTO_BUF,
+            InternalError::FPVersionMismatch => sys::SG_ERR_FP_VERSION_MISMATCH,
+            InternalError::FPIdentMismatch => sys::SG_ERR_FP_IDENT_MISMATCH,
+            InternalError::Other(c) => *c,
+        }
+    }
+
     pub fn to_result(code: i32) -> Result<(), InternalError> {
         if code == 0 {
             return Ok(());
