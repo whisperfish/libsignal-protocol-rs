@@ -2,7 +2,8 @@ use libsignal_protocol_sys as sys;
 
 use crate::crypto::{Crypto, CryptoProvider, DefaultCrypto};
 use crate::errors::{InternalError, InternalErrorCode};
-use crate::keys::{IdentityKeyPair, PreKeyList, SignedPreKey};
+use crate::keys::{IdentityKeyPair, PreKeyList};
+use crate::store_context::StoreContext;
 use crate::Wrapped;
 use std::ffi::c_void;
 use std::pin::Pin;
@@ -56,6 +57,15 @@ impl Context {
         }
     }
 
+    pub fn new_store_context(&self) -> Result<StoreContext, InternalError> {
+        unsafe {
+            let mut store_ctx = ptr::null_mut();
+            sys::signal_protocol_store_context_create(&mut store_ctx, self.inner()).to_result()?;
+
+            Ok(StoreContext::from_raw(store_ctx, &self.0))
+        }
+    }
+
     fn inner(&self) -> *mut sys::signal_context {
         self.0.raw()
     }
@@ -76,6 +86,7 @@ impl Default for Context {
 ///
 /// This **must** outlive any data created by the `libsignal-protocol-c` library.
 /// You'll usually do this by adding a `Rc<ContextInner>` to any wrapper types.
+#[allow(dead_code)]
 pub(crate) struct ContextInner {
     raw: *mut sys::signal_context,
     crypto: CryptoProvider,
