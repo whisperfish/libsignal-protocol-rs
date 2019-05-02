@@ -152,12 +152,26 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">libsignal_protocol_sys</span> <span class="kw">as</span> <span class="ident">sys</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">crypto</span>::{<span class="ident">Crypto</span>, <span class="ident">CryptoProvider</span>, <span class="ident">DefaultCrypto</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">errors</span>::{<span class="ident">InternalError</span>, <span class="ident">InternalErrorCode</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">keys</span>::{<span class="ident">IdentityKeyPair</span>, <span class="ident">PreKeyList</span>, <span class="ident">SignedPreKey</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">keys</span>::{<span class="ident">IdentityKeyPair</span>, <span class="ident">PreKeyList</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">store_context</span>::<span class="ident">StoreContext</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Wrapped</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ffi</span>::<span class="ident">c_void</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">pin</span>::<span class="ident">Pin</span>;
@@ -211,6 +225,19 @@
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_store_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">StoreContext</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">store_ctx</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
+            <span class="ident">sys</span>::<span class="ident">signal_protocol_store_context_create</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">store_ctx</span>, <span class="self">self</span>.<span class="ident">inner</span>()).<span class="ident">to_result</span>()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(<span class="ident">StoreContext</span>::<span class="ident">from_raw</span>(<span class="ident">store_ctx</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>))
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crypto</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Crypto</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">crypto</span>.<span class="ident">state</span>()
+    }
+
     <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_context</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">raw</span>()
     }
@@ -231,6 +258,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This **must** outlive any data created by the `libsignal-protocol-c` library.</span>
 <span class="doccomment">/// You&#39;ll usually do this by adding a `Rc&lt;ContextInner&gt;` to any wrapper types.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ContextInner</span> {
     <span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_context</span>,
     <span class="ident">crypto</span>: <span class="ident">CryptoProvider</span>,
@@ -277,12 +305,10 @@
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">lock_function</span>(<span class="ident">user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">State</span>);
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">lock_function</span>(<span class="ident">_user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
     <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;TODO: Implement locking&quot;</span>);
 }
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">unlock_function</span>(<span class="ident">user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">State</span>);
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">unlock_function</span>(<span class="ident">_user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
     <span class="macro">unimplemented</span><span class="macro">!</span>(<span class="string">&quot;TODO: Implement unlocking&quot;</span>);
 }
 
