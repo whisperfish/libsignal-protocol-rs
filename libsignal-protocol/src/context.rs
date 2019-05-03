@@ -4,6 +4,8 @@ use crate::crypto::{Crypto, CryptoProvider, DefaultCrypto};
 use crate::errors::{InternalError, InternalErrorCode};
 use crate::keys::{IdentityKeyPair, PreKeyList};
 use crate::pre_key_store::{self as pks, PreKeyStore};
+use crate::session_store::{self as sess, SessionStore};
+use crate::signed_pre_key_store::{self as spks, SignedPreKeyStore};
 use crate::store_context::StoreContext;
 use crate::Wrapped;
 use std::ffi::c_void;
@@ -58,14 +60,35 @@ impl Context {
         }
     }
 
-    pub fn new_store_context<P>(&self, pre_key_store: P) -> Result<StoreContext, InternalError>
+    pub fn new_store_context<P, K, S>(
+        &self,
+        pre_key_store: P,
+        signed_pre_key_store: K,
+        session_store: S,
+    ) -> Result<StoreContext, InternalError>
     where
         P: PreKeyStore + 'static,
+        K: SignedPreKeyStore + 'static,
+        S: SessionStore + 'static,
     {
         unsafe {
             let mut store_ctx = ptr::null_mut();
             sys::signal_protocol_store_context_create(&mut store_ctx, self.inner()).to_result()?;
+
             let pre_key_store = pks::new_vtable(pre_key_store);
+            sys::signal_protocol_store_context_set_pre_key_store(store_ctx, &pre_key_store)
+                .to_result()?;
+
+            let signed_pre_key_store = spks::new_vtable(signed_pre_key_store);
+            sys::signal_protocol_store_context_set_signed_pre_key_store(
+                store_ctx,
+                &signed_pre_key_store,
+            )
+            .to_result()?;
+
+            let session_store = sess::new_vtable(session_store);
+            sys::signal_protocol_store_context_set_session_store(store_ctx, &session_store)
+                .to_result()?;
 
             Ok(StoreContext::from_raw(store_ctx, &self.0))
         }

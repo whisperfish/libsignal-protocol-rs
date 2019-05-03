@@ -44,13 +44,17 @@
 //! [bas]: https://github.com/signalapp/libsignal-protocol-c#building-a-session
 
 use failure::Error;
-use libsignal_protocol::{Context, InternalError, PreKeyStore};
+use libsignal_protocol::{
+    Address, Buffer, Context, InternalError, PreKeyStore, SessionStore, SignedPreKeyStore,
+};
 use std::io::{self, Write};
 
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
     let pre_key_store = BasicPreKeyStore::default();
-    let _store_ctx = ctx.new_store_context(pre_key_store)?;
+    let signed_pre_key_store = BasicSignedPreKeyStore::default();
+    let session_store = BasicSessionStore::default();
+    let _store_ctx = ctx.new_store_context(pre_key_store, signed_pre_key_store, session_store)?;
 
     Ok(())
 }
@@ -72,6 +76,39 @@ impl PreKeyStore for BasicPreKeyStore {
     }
 
     fn remove(&self, _id: u32) -> Result<(), InternalError> {
+        unimplemented!()
+    }
+}
+
+#[derive(Debug, Default)]
+struct BasicSignedPreKeyStore {}
+
+impl SignedPreKeyStore for BasicSignedPreKeyStore {
+    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
+        unimplemented!()
+    }
+
+    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
+        unimplemented!()
+    }
+
+    fn contains(&self, _id: u32) -> bool {
+        unimplemented!()
+    }
+
+    fn remove(&self, _id: u32) -> Result<(), InternalError> {
+        unimplemented!()
+    }
+}
+
+#[derive(Debug, Default)]
+struct BasicSessionStore {}
+
+impl SessionStore for BasicSessionStore {
+    fn load_session(&self, _address: &Address) -> Result<(Buffer, Buffer), InternalError> {
+        unimplemented!()
+    }
+    fn get_sub_devuce_sessions(&self) {
         unimplemented!()
     }
 }

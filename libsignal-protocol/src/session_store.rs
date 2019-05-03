@@ -1,45 +1,28 @@
 use libsignal_protocol_sys as sys;
 
 use crate::errors::InternalError;
-use crate::Buffer;
+use crate::{Address, Buffer};
 use std::os::raw::{c_char, c_int, c_void};
-use std::pin::Pin;
-
-pub struct Address {}
 
 pub trait SessionStore {
     fn load_session(&self, address: &Address) -> Result<(Buffer, Buffer), InternalError>;
     fn get_sub_devuce_sessions(&self);
 }
 
-pub(crate) struct SessionStoreVtable {
-    pub(crate) vtable: sys::signal_protocol_session_store,
-    state: Pin<Box<State>>,
-}
+pub(crate) fn new_vtable<S: SessionStore + 'static>(
+    session_store: S,
+) -> sys::signal_protocol_session_store {
+    let mut state: Box<State> = Box::new(State(Box::new(session_store)));
 
-impl SessionStoreVtable {
-    pub fn new<S: SessionStore + 'static>(session_store: S) -> SessionStoreVtable {
-        let mut state: Pin<Box<State>> = Box::pin(State(Box::new(session_store)));
-
-        let vtable = sys::signal_protocol_session_store {
-            user_data: state.as_mut().get_mut() as *mut State as *mut c_void,
-            load_session_func: Some(load_session_func),
-            get_sub_device_sessions_func: Some(get_sub_device_sessions_func),
-            store_session_func: Some(store_session_func),
-            contains_session_func: Some(contains_session_func),
-            delete_session_func: Some(delete_session_func),
-            delete_all_sessions_func: Some(delete_all_sessions_func),
-            destroy_func: Some(destroy_func),
-        };
-
-        SessionStoreVtable {
-            vtable,
-            state: state,
-        }
-    }
-
-    pub fn state(&self) -> &dyn SessionStore {
-        &*self.state.0
+    sys::signal_protocol_session_store {
+        user_data: state.as_mut() as *mut State as *mut c_void,
+        load_session_func: Some(load_session_func),
+        get_sub_device_sessions_func: Some(get_sub_device_sessions_func),
+        store_session_func: Some(store_session_func),
+        contains_session_func: Some(contains_session_func),
+        delete_session_func: Some(delete_session_func),
+        delete_all_sessions_func: Some(delete_all_sessions_func),
+        destroy_func: Some(destroy_func),
     }
 }
 

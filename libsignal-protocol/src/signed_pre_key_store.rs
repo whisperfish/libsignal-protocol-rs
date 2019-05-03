@@ -1,3 +1,5 @@
+// FIXME: This is almost exactly a copy-paste of the unsigned version...
+
 use libsignal_protocol_sys as sys;
 
 use crate::buffer::Buffer;
@@ -5,29 +7,32 @@ use crate::errors::InternalError;
 use std::io::{self, Write};
 use std::os::raw::{c_int, c_void};
 
-pub trait PreKeyStore {
+pub trait SignedPreKeyStore {
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
     fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError>;
     fn contains(&self, id: u32) -> bool;
     fn remove(&self, id: u32) -> Result<(), InternalError>;
 }
 
-pub(crate) fn new_vtable<P: PreKeyStore + 'static>(store: P) -> sys::signal_protocol_pre_key_store {
+pub(crate) fn new_vtable<P>(store: P) -> sys::signal_protocol_signed_pre_key_store
+where
+    P: SignedPreKeyStore + 'static,
+{
     let mut state: Box<State> = Box::new(State(Box::new(store)));
 
-    sys::signal_protocol_pre_key_store {
+    sys::signal_protocol_signed_pre_key_store {
         user_data: state.as_mut() as *mut State as *mut c_void,
-        load_pre_key: Some(load_pre_key),
-        store_pre_key: Some(store_pre_key),
-        contains_pre_key: Some(contains_pre_key),
-        remove_pre_key: Some(remove_pre_key),
+        load_signed_pre_key: Some(load_signed_pre_key),
+        store_signed_pre_key: Some(store_signed_pre_key),
+        contains_signed_pre_key: Some(contains_signed_pre_key),
+        remove_signed_pre_key: Some(remove_signed_pre_key),
         destroy_func: Some(destroy_func),
     }
 }
 
-struct State(Box<dyn PreKeyStore>);
+struct State(Box<dyn SignedPreKeyStore>);
 
-unsafe extern "C" fn load_pre_key(
+unsafe extern "C" fn load_signed_pre_key(
     record: *mut *mut sys::signal_buffer,
     pre_key_id: u32,
     user_data: *mut c_void,
@@ -46,7 +51,7 @@ unsafe extern "C" fn load_pre_key(
     }
 }
 
-unsafe extern "C" fn store_pre_key(
+unsafe extern "C" fn store_signed_pre_key(
     pre_key_id: u32,
     record: *mut u8,
     record_len: usize,
@@ -63,14 +68,14 @@ unsafe extern "C" fn store_pre_key(
     }
 }
 
-unsafe extern "C" fn contains_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
+unsafe extern "C" fn contains_signed_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
     assert!(!user_data.is_null());
     let user_data = &*(user_data as *const State);
 
     user_data.0.contains(pre_key_id) as c_int
 }
 
-unsafe extern "C" fn remove_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
+unsafe extern "C" fn remove_signed_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
     assert!(!user_data.is_null());
     let user_data = &*(user_data as *const State);
 

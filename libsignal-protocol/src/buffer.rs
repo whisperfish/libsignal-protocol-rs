@@ -7,8 +7,6 @@ use std::mem;
 use std::ops::{Index, IndexMut};
 use std::rc::Rc;
 
-const DEFAULT_BUFFER_SIZE: usize = 1024;
-
 pub struct Buffer {
     raw: *mut sys::signal_buffer,
 }
