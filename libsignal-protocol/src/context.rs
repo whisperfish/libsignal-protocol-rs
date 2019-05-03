@@ -3,6 +3,7 @@ use libsignal_protocol_sys as sys;
 use crate::crypto::{Crypto, CryptoProvider, DefaultCrypto};
 use crate::errors::{InternalError, InternalErrorCode};
 use crate::keys::{IdentityKeyPair, PreKeyList};
+use crate::pre_key_store::{self as pks, PreKeyStore};
 use crate::store_context::StoreContext;
 use crate::Wrapped;
 use std::ffi::c_void;
@@ -57,10 +58,14 @@ impl Context {
         }
     }
 
-    pub fn new_store_context(&self) -> Result<StoreContext, InternalError> {
+    pub fn new_store_context<P>(&self, pre_key_store: P) -> Result<StoreContext, InternalError>
+    where
+        P: PreKeyStore + 'static,
+    {
         unsafe {
             let mut store_ctx = ptr::null_mut();
             sys::signal_protocol_store_context_create(&mut store_ctx, self.inner()).to_result()?;
+            let pre_key_store = pks::new_vtable(pre_key_store);
 
             Ok(StoreContext::from_raw(store_ctx, &self.0))
         }

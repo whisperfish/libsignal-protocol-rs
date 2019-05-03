@@ -4,34 +4,24 @@ use crate::buffer::Buffer;
 use crate::errors::InternalError;
 use std::io::{self, Write};
 use std::os::raw::{c_int, c_void};
-use std::pin::Pin;
 
 pub trait PreKeyStore {
-    fn load_pre_key(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
-    fn store_pre_key(&self, id: u32, body: &[u8]) -> Result<(), InternalError>;
-    fn contains_pre_key(&self, id: u32) -> Result<(), InternalError>;
-    fn remove_pre_key(&self, id: u32) -> Result<(), InternalError>;
+    fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
+    fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError>;
+    fn contains(&self, id: u32) -> bool;
+    fn remove(&self, id: u32) -> Result<(), InternalError>;
 }
 
-pub(crate) struct PreKeyStoreVtable {
-    vtable: sys::signal_protocol_pre_key_store,
-    state: Pin<Box<State>>,
-}
+pub(crate) fn new_vtable<P: PreKeyStore + 'static>(store: P) -> sys::signal_protocol_pre_key_store {
+    let mut state: Box<State> = Box::new(State(Box::new(store)));
 
-impl PreKeyStoreVtable {
-    pub fn new<P: PreKeyStore + 'static>(store: P) -> PreKeyStoreVtable {
-        let mut state: Pin<Box<State>> = Box::pin(State(Box::new(store)));
-
-        let vtable = sys::signal_protocol_pre_key_store {
-            user_data: state.as_mut().get_mut() as *mut State as *mut c_void,
-            load_pre_key: Some(load_pre_key),
-            store_pre_key: Some(store_pre_key),
-            contains_pre_key: Some(contains_pre_key),
-            remove_pre_key: Some(remove_pre_key),
-            destroy_func: Some(destroy_func),
-        };
-
-        PreKeyStoreVtable { vtable, state }
+    sys::signal_protocol_pre_key_store {
+        user_data: state.as_mut() as *mut State as *mut c_void,
+        load_pre_key: Some(load_pre_key),
+        store_pre_key: Some(store_pre_key),
+        contains_pre_key: Some(contains_pre_key),
+        remove_pre_key: Some(remove_pre_key),
+        destroy_func: Some(destroy_func),
     }
 }
 
@@ -47,7 +37,7 @@ unsafe extern "C" fn load_pre_key(
     let user_data = &*(user_data as *const State);
     let mut buffer = Buffer::new();
 
-    match user_data.0.load_pre_key(pre_key_id, &mut buffer) {
+    match user_data.0.load(pre_key_id, &mut buffer) {
         Ok(_) => {
             *record = buffer.into_raw();
             sys::SG_SUCCESS as c_int
@@ -67,7 +57,7 @@ unsafe extern "C" fn store_pre_key(
     let user_data = &*(user_data as *const State);
     let data = std::slice::from_raw_parts(record, record_len);
 
-    match user_data.0.store_pre_key(pre_key_id, data) {
+    match user_data.0.store(pre_key_id, data) {
         Ok(_) => sys::SG_SUCCESS as c_int,
         Err(e) => e.code(),
     }
@@ -77,17 +67,14 @@ unsafe extern "C" fn contains_pre_key(pre_key_id: u32, user_data: *mut c_void) -
     assert!(!user_data.is_null());
     let user_data = &*(user_data as *const State);
 
-    match user_data.0.contains_pre_key(pre_key_id) {
-        Ok(_) => sys::SG_SUCCESS as c_int,
-        Err(e) => e.code(),
-    }
+    user_data.0.contains(pre_key_id) as c_int
 }
 
 unsafe extern "C" fn remove_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
     assert!(!user_data.is_null());
     let user_data = &*(user_data as *const State);
 
-    match user_data.0.remove_pre_key(pre_key_id) {
+    match user_data.0.remove(pre_key_id) {
         Ok(_) => sys::SG_SUCCESS as c_int,
         Err(e) => e.code(),
     }
