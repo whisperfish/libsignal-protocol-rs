@@ -4,6 +4,7 @@ cache: cargo
 
 rust:
   - 1.34.0
+  - stable
 
 script: 
   - cargo build --all --verbose
@@ -14,7 +15,15 @@ before_deploy:
   - cargo doc --all --verbose
   - echo '<meta http-equiv="refresh" content="0; url=libsignal_protocol/index.html" /> ' > target/doc/index.html
   - cp -r target/doc public
-
+matrix:
+  include:
+    - rust: stable
+      before_script:
+        - rustup component add rustfmt
+        - rustup component add clippy
+      script:
+        - cargo fmt --all -- --check
+        - cargo clippy -- -D clippy::all
 deploy:
   provider: pages
   skip_cleanup: true
