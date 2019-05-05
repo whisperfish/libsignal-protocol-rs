@@ -17,7 +17,7 @@ before_deploy:
   - cp -r target/doc public
 matrix:
   include:
-    - rust: stable
+    - rust: nightly
       before_script:
         - rustup component add rustfmt
         - rustup component add clippy
