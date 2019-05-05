@@ -98,10 +98,10 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_vtable</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">SessionStore</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
     <span class="ident">session_store</span>: <span class="ident">S</span>,
 ) <span class="op">-&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_session_store</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">State</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">session_store</span>)));
+    <span class="kw">let</span> <span class="ident">state</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">State</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">session_store</span>)));
 
     <span class="ident">sys</span>::<span class="ident">signal_protocol_session_store</span> {
-        <span class="ident">user_data</span>: <span class="ident">state</span>.<span class="ident">as_mut</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">State</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+        <span class="ident">user_data</span>: <span class="ident">Box</span>::<span class="ident">into_raw</span>(<span class="ident">state</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
         <span class="ident">load_session_func</span>: <span class="prelude-val">Some</span>(<span class="ident">load_session_func</span>),
         <span class="ident">get_sub_device_sessions_func</span>: <span class="prelude-val">Some</span>(<span class="ident">get_sub_device_sessions_func</span>),
         <span class="ident">store_session_func</span>: <span class="prelude-val">Some</span>(<span class="ident">store_session_func</span>),
