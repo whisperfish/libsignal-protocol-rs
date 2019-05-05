@@ -100,7 +100,7 @@ impl Context {
             )
             .to_result()?;
 
-            Ok(StoreContext::from_raw(store_ctx, &self.0))
+            Ok(StoreContext::new(store_ctx, &self.0))
         }
     }
 
