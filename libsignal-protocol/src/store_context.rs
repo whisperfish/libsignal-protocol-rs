@@ -9,4 +9,12 @@ pub struct StoreContext {
     ctx: Rc<ContextInner>,
 }
 
+impl Drop for StoreContext {
+    fn drop(&mut self) {
+        unsafe {
+            sys::signal_protocol_store_context_destroy(self.raw);
+        }
+    }
+}
+
 impl_wrapped!(sys::signal_protocol_store_context as StoreContext);

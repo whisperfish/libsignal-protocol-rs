@@ -54,6 +54,9 @@ unsafe extern "C" fn is_trusted_identity(
     unimplemented!()
 }
 
-unsafe extern "C" fn destroy_func(_user_data: *mut c_void) {
-    unimplemented!()
+unsafe extern "C" fn destroy_func(user_data: *mut c_void) {
+    if !user_data.is_null() {
+        let user_data = Box::from_raw(user_data as *mut State);
+        drop(user_data);
+    }
 }
