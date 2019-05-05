@@ -4,9 +4,7 @@ use crate::context::ContextInner;
 use crate::Wrapped;
 use std::rc::Rc;
 
-pub struct StoreContext {
-    inner: Rc<StoreContextInner>,
-}
+pub struct StoreContext(pub(crate) Rc<StoreContextInner>);
 
 impl StoreContext {
     pub(crate) fn new(
@@ -14,13 +12,15 @@ impl StoreContext {
         ctx: &Rc<ContextInner>,
     ) -> StoreContext {
         let inner = unsafe { StoreContextInner::from_raw(raw, ctx) };
-        StoreContext {
-            inner: Rc::new(inner),
-        }
+        StoreContext(Rc::new(inner))
+    }
+
+    pub(crate) fn raw(&self) -> *mut sys::signal_protocol_store_context {
+        self.0.raw
     }
 }
 
-struct StoreContextInner {
+pub(crate) struct StoreContextInner {
     raw: *mut sys::signal_protocol_store_context,
     #[allow(dead_code)]
     ctx: Rc<ContextInner>,
