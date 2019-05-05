@@ -13,10 +13,10 @@ pub trait PreKeyStore {
 }
 
 pub(crate) fn new_vtable<P: PreKeyStore + 'static>(store: P) -> sys::signal_protocol_pre_key_store {
-    let mut state: Box<State> = Box::new(State(Box::new(store)));
+    let state: Box<State> = Box::new(State(Box::new(store)));
 
     sys::signal_protocol_pre_key_store {
-        user_data: state.as_mut() as *mut State as *mut c_void,
+        user_data: Box::into_raw(state) as *mut c_void,
         load_pre_key: Some(load_pre_key),
         store_pre_key: Some(store_pre_key),
         contains_pre_key: Some(contains_pre_key),

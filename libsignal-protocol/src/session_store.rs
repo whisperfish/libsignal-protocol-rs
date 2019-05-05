@@ -12,10 +12,10 @@ pub trait SessionStore {
 pub(crate) fn new_vtable<S: SessionStore + 'static>(
     session_store: S,
 ) -> sys::signal_protocol_session_store {
-    let mut state: Box<State> = Box::new(State(Box::new(session_store)));
+    let state: Box<State> = Box::new(State(Box::new(session_store)));
 
     sys::signal_protocol_session_store {
-        user_data: state.as_mut() as *mut State as *mut c_void,
+        user_data: Box::into_raw(state) as *mut c_void,
         load_session_func: Some(load_session_func),
         get_sub_device_sessions_func: Some(get_sub_device_sessions_func),
         store_session_func: Some(store_session_func),

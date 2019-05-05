@@ -2,6 +2,7 @@ use libsignal_protocol_sys as sys;
 
 use crate::crypto::{Crypto, CryptoProvider, DefaultCrypto};
 use crate::errors::{InternalError, InternalErrorCode};
+use crate::identity_key_store::{self as iks, IdentityKeyStore};
 use crate::keys::{IdentityKeyPair, PreKeyList};
 use crate::pre_key_store::{self as pks, PreKeyStore};
 use crate::session_store::{self as sess, SessionStore};
@@ -60,16 +61,18 @@ impl Context {
         }
     }
 
-    pub fn new_store_context<P, K, S>(
+    pub fn new_store_context<P, K, S, I>(
         &self,
         pre_key_store: P,
         signed_pre_key_store: K,
         session_store: S,
+        identity_key_store: I,
     ) -> Result<StoreContext, InternalError>
     where
         P: PreKeyStore + 'static,
         K: SignedPreKeyStore + 'static,
         S: SessionStore + 'static,
+        I: IdentityKeyStore + 'static,
     {
         unsafe {
             let mut store_ctx = ptr::null_mut();
@@ -89,6 +92,13 @@ impl Context {
             let session_store = sess::new_vtable(session_store);
             sys::signal_protocol_store_context_set_session_store(store_ctx, &session_store)
                 .to_result()?;
+
+            let identity_key_store = iks::new_vtable(identity_key_store);
+            sys::signal_protocol_store_context_set_identity_key_store(
+                store_ctx,
+                &identity_key_store,
+            )
+            .to_result()?;
 
             Ok(StoreContext::from_raw(store_ctx, &self.0))
         }
