@@ -49,7 +49,7 @@ impl InternalError {
         }
     }
 
-    pub fn code(&self) -> i32 {
+    pub fn code(self) -> i32 {
         match self {
             InternalError::NoMemory => sys::SG_ERR_NOMEM,
             InternalError::InvalidArgument => sys::SG_ERR_INVAL,
@@ -68,11 +68,11 @@ impl InternalError {
             InternalError::InvalidProtoBuf => sys::SG_ERR_INVALID_PROTO_BUF,
             InternalError::FPVersionMismatch => sys::SG_ERR_FP_VERSION_MISMATCH,
             InternalError::FPIdentMismatch => sys::SG_ERR_FP_IDENT_MISMATCH,
-            InternalError::Other(c) => *c,
+            InternalError::Other(c) => c,
         }
     }
 
-    pub fn to_result(code: i32) -> Result<(), InternalError> {
+    pub fn into_result(self, code: i32) -> Result<(), InternalError> {
         if code == 0 {
             return Ok(());
         }
@@ -85,11 +85,11 @@ impl InternalError {
 }
 
 pub(crate) trait InternalErrorCode: Sized {
-    fn to_result(self) -> Result<(), InternalError>;
+    fn into_result(self) -> Result<(), InternalError>;
 }
 
 impl InternalErrorCode for i32 {
-    fn to_result(self) -> Result<(), InternalError> {
+    fn into_result(self) -> Result<(), InternalError> {
         if self == 0 {
             return Ok(());
         }

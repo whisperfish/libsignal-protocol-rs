@@ -1,3 +1,4 @@
+#![allow(clippy::all)]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
@@ -32,5 +33,5 @@ macro_rules! impl_signal_type_base {
 
 impl_signal_type_base! {
     ratchet_identity_key_pair, session_signed_pre_key, ec_public_key,
-    ec_private_key, 
+    ec_private_key,
 }

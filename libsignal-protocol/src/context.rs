@@ -26,7 +26,7 @@ impl Context {
         unsafe {
             let mut key_pair = ptr::null_mut();
             sys::signal_protocol_key_helper_generate_identity_key_pair(&mut key_pair, self.inner())
-                .to_result()?;
+                .into_result()?;
 
             Ok(IdentityKeyPair::from_raw(key_pair, &self.0))
         }
@@ -40,7 +40,7 @@ impl Context {
                 extended_range,
                 self.inner(),
             )
-            .to_result()?;
+            .into_result()?;
         }
 
         Ok(id)
@@ -55,7 +55,7 @@ impl Context {
                 count,
                 self.inner(),
             )
-            .to_result()?;
+            .into_result()?;
 
             Ok(PreKeyList::from_raw(pre_keys_head, &self.0))
         }
@@ -76,29 +76,30 @@ impl Context {
     {
         unsafe {
             let mut store_ctx = ptr::null_mut();
-            sys::signal_protocol_store_context_create(&mut store_ctx, self.inner()).to_result()?;
+            sys::signal_protocol_store_context_create(&mut store_ctx, self.inner())
+                .into_result()?;
 
             let pre_key_store = pks::new_vtable(pre_key_store);
             sys::signal_protocol_store_context_set_pre_key_store(store_ctx, &pre_key_store)
-                .to_result()?;
+                .into_result()?;
 
             let signed_pre_key_store = spks::new_vtable(signed_pre_key_store);
             sys::signal_protocol_store_context_set_signed_pre_key_store(
                 store_ctx,
                 &signed_pre_key_store,
             )
-            .to_result()?;
+            .into_result()?;
 
             let session_store = sess::new_vtable(session_store);
             sys::signal_protocol_store_context_set_session_store(store_ctx, &session_store)
-                .to_result()?;
+                .into_result()?;
 
             let identity_key_store = iks::new_vtable(identity_key_store);
             sys::signal_protocol_store_context_set_identity_key_store(
                 store_ctx,
                 &identity_key_store,
             )
-            .to_result()?;
+            .into_result()?;
 
             Ok(StoreContext::new(store_ctx, &self.0))
         }
@@ -145,14 +146,15 @@ impl ContextInner {
             let mut state = Pin::new(Box::new(State {}));
 
             let user_data = state.as_mut().get_mut() as *mut State as *mut c_void;
-            sys::signal_context_create(&mut global_context, user_data).to_result()?;
-            sys::signal_context_set_crypto_provider(global_context, &crypto.vtable).to_result()?;
+            sys::signal_context_create(&mut global_context, user_data).into_result()?;
+            sys::signal_context_set_crypto_provider(global_context, &crypto.vtable)
+                .into_result()?;
             sys::signal_context_set_locking_functions(
                 global_context,
                 Some(lock_function),
                 Some(unlock_function),
             )
-            .to_result()?;
+            .into_result()?;
 
             Ok(ContextInner {
                 raw: global_context,
