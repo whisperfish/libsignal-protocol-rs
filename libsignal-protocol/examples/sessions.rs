@@ -45,16 +45,25 @@
 
 use failure::Error;
 use libsignal_protocol::{
-    Address, Buffer, Context, InternalError, PreKeyStore, SessionStore, SignedPreKeyStore,
+    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyStore, SessionStore,
+    SignedPreKeyStore,
 };
 use std::io::{self, Write};
 
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
+
     let pre_key_store = BasicPreKeyStore::default();
     let signed_pre_key_store = BasicSignedPreKeyStore::default();
     let session_store = BasicSessionStore::default();
-    let _store_ctx = ctx.new_store_context(pre_key_store, signed_pre_key_store, session_store)?;
+    let identity_key_store = BasicIdentityKeyStore::default();
+
+    let _store_ctx = ctx.new_store_context(
+        pre_key_store,
+        signed_pre_key_store,
+        session_store,
+        identity_key_store,
+    )?;
 
     Ok(())
 }
@@ -112,3 +121,8 @@ impl SessionStore for BasicSessionStore {
         unimplemented!()
     }
 }
+
+#[derive(Debug, Default)]
+struct BasicIdentityKeyStore {}
+
+impl IdentityKeyStore for BasicIdentityKeyStore {}
