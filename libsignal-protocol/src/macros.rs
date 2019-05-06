@@ -11,7 +11,7 @@ macro_rules! impl_wrapped {
             fn raw(&self) -> *const Self::Raw {
                 self.raw
             }
-            fn raw_mut(&mut self) -> *mut Self::Raw {
+            fn raw_mut(&self) -> *mut Self::Raw {
                 self.raw
             }
         }

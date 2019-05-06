@@ -141,7 +141,7 @@ impl Wrapped for Buffer {
         self.raw
     }
 
-    fn raw_mut(&mut self) -> *mut Self::Raw {
+    fn raw_mut(&self) -> *mut Self::Raw {
         self.raw
     }
 }

@@ -1,7 +1,8 @@
+use crate::address::Address;
 use crate::context::{Context, ContextInner};
-use crate::store_context::{StoreContext, StoreContextInner};
 use crate::pre_key_bundle::PreKeyBundle;
-use crate::Address;
+use crate::store_context::{StoreContext, StoreContextInner};
+use crate::Wrapped;
 use std::ptr;
 use std::rc::Rc;
 
@@ -27,7 +28,7 @@ impl SessionBuilder {
 
     pub fn process_pre_key_bundle(&self, pre_key_bundle: &PreKeyBundle) {
         unsafe {
-            sys::session_builder_process_pre_key_bundle(self.raw, true);
+            sys::session_builder_process_pre_key_bundle(self.raw, pre_key_bundle.raw_mut());
         }
     }
 }
