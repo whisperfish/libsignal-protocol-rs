@@ -45,8 +45,8 @@
 
 use failure::Error;
 use libsignal_protocol::{
-    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyStore, SessionStore,
-    SignedPreKeyStore,
+    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyStore, SessionBuilder,
+    SessionStore, SignedPreKeyStore,
 };
 use std::io::{self, Write};
 
@@ -58,12 +58,17 @@ fn main() -> Result<(), Error> {
     let session_store = BasicSessionStore::default();
     let identity_key_store = BasicIdentityKeyStore::default();
 
-    let _store_ctx = ctx.new_store_context(
+    let store_ctx = ctx.new_store_context(
         pre_key_store,
         signed_pre_key_store,
         session_store,
         identity_key_store,
     )?;
+
+    let addr = Address::new("+14159998888", 1);
+
+    // Instantiate a session_builder for a recipient address.
+    let session_builder = SessionBuilder::new(ctx, store_ctx, addr);
 
     Ok(())
 }

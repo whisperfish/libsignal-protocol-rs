@@ -1,5 +1,3 @@
-use libsignal_protocol_sys as sys;
-
 use crate::crypto::{Crypto, CryptoProvider, DefaultCrypto};
 use crate::errors::{InternalError, InternalErrorCode};
 use crate::identity_key_store::{self as iks, IdentityKeyStore};
@@ -15,7 +13,7 @@ use std::ptr;
 use std::rc::Rc;
 use sys::signal_context;
 
-pub struct Context(Rc<ContextInner>);
+pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
     pub fn new<C: Crypto + 'static>(crypto: C) -> Result<Context, InternalError> {
@@ -25,7 +23,7 @@ impl Context {
     pub fn generate_identity_key_pair(&self) -> Result<IdentityKeyPair, InternalError> {
         unsafe {
             let mut key_pair = ptr::null_mut();
-            sys::signal_protocol_key_helper_generate_identity_key_pair(&mut key_pair, self.inner())
+            sys::signal_protocol_key_helper_generate_identity_key_pair(&mut key_pair, self.raw())
                 .into_result()?;
 
             Ok(IdentityKeyPair::from_raw(key_pair, &self.0))
@@ -38,7 +36,7 @@ impl Context {
             sys::signal_protocol_key_helper_generate_registration_id(
                 &mut id,
                 extended_range,
-                self.inner(),
+                self.raw(),
             )
             .into_result()?;
         }
@@ -53,7 +51,7 @@ impl Context {
                 &mut pre_keys_head,
                 start,
                 count,
-                self.inner(),
+                self.raw(),
             )
             .into_result()?;
 
@@ -76,8 +74,7 @@ impl Context {
     {
         unsafe {
             let mut store_ctx = ptr::null_mut();
-            sys::signal_protocol_store_context_create(&mut store_ctx, self.inner())
-                .into_result()?;
+            sys::signal_protocol_store_context_create(&mut store_ctx, self.raw()).into_result()?;
 
             let pre_key_store = pks::new_vtable(pre_key_store);
             sys::signal_protocol_store_context_set_pre_key_store(store_ctx, &pre_key_store)
@@ -109,7 +106,7 @@ impl Context {
         self.0.crypto.state()
     }
 
-    fn inner(&self) -> *mut sys::signal_context {
+    pub(crate) fn raw(&self) -> *mut sys::signal_context {
         self.0.raw()
     }
 }
