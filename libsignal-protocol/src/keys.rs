@@ -1,12 +1,12 @@
-use crate::context::ContextInner;
-use crate::errors::InternalErrorCode;
-use crate::Wrapped;
+use crate::{context::ContextInner, errors::InternalErrorCode, Wrapped};
 use failure::Error;
-use std::marker::PhantomData;
-use std::ptr;
-use std::rc::Rc;
-use std::slice;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::{
+    marker::PhantomData,
+    ptr,
+    rc::Rc,
+    slice,
+    time::{Duration, SystemTime, UNIX_EPOCH},
+};
 use sys::AsSignalTypeBase;
 
 pub struct IdentityKeyPair {
@@ -106,7 +106,9 @@ pub struct PreKeyList {
 }
 
 impl PreKeyList {
-    pub fn iter<'this>(&'this self) -> impl Iterator<Item = SessionPreKeyRef<'this>> + 'this {
+    pub fn iter<'this>(
+        &'this self,
+    ) -> impl Iterator<Item = SessionPreKeyRef<'this>> + 'this {
         PreKeyListIter {
             raw: self.raw,
             _lifetime: PhantomData,
@@ -158,9 +160,7 @@ pub struct SessionPreKeyRef<'a> {
 }
 
 impl<'a> SessionPreKeyRef<'a> {
-    pub fn id(&self) -> u32 {
-        unsafe { sys::session_pre_key_get_id(self.raw) }
-    }
+    pub fn id(&self) -> u32 { unsafe { sys::session_pre_key_get_id(self.raw) } }
 }
 
 pub struct SignedPreKey {
@@ -187,7 +187,8 @@ impl SignedPreKey {
 
     pub fn timestamp(&self) -> SystemTime {
         unsafe {
-            let unix_timestamp = sys::session_signed_pre_key_get_timestamp(self.raw);
+            let unix_timestamp =
+                sys::session_signed_pre_key_get_timestamp(self.raw);
             SystemTime::UNIX_EPOCH + Duration::from_secs(unix_timestamp)
         }
     }

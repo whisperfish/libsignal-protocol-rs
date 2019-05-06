@@ -45,8 +45,8 @@
 
 use failure::Error;
 use libsignal_protocol::{
-    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyStore, SessionBuilder,
-    SessionStore, SignedPreKeyStore,
+    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyStore,
+    SessionBuilder, SessionStore, SignedPreKeyStore,
 };
 use std::io::{self, Write};
 
@@ -85,13 +85,9 @@ impl PreKeyStore for BasicPreKeyStore {
         unimplemented!()
     }
 
-    fn contains(&self, _id: u32) -> bool {
-        unimplemented!()
-    }
+    fn contains(&self, _id: u32) -> bool { unimplemented!() }
 
-    fn remove(&self, _id: u32) -> Result<(), InternalError> {
-        unimplemented!()
-    }
+    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
 }
 
 #[derive(Debug, Default)]
@@ -106,25 +102,23 @@ impl SignedPreKeyStore for BasicSignedPreKeyStore {
         unimplemented!()
     }
 
-    fn contains(&self, _id: u32) -> bool {
-        unimplemented!()
-    }
+    fn contains(&self, _id: u32) -> bool { unimplemented!() }
 
-    fn remove(&self, _id: u32) -> Result<(), InternalError> {
-        unimplemented!()
-    }
+    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
 }
 
 #[derive(Debug, Default)]
 struct BasicSessionStore {}
 
 impl SessionStore for BasicSessionStore {
-    fn load_session(&self, _address: &Address) -> Result<(Buffer, Buffer), InternalError> {
+    fn load_session(
+        &self,
+        _address: &Address,
+    ) -> Result<(Buffer, Buffer), InternalError> {
         unimplemented!()
     }
-    fn get_sub_devuce_sessions(&self) {
-        unimplemented!()
-    }
+
+    fn get_sub_devuce_sessions(&self) { unimplemented!() }
 }
 
 #[derive(Debug, Default)]

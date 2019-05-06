@@ -28,7 +28,9 @@ impl InternalError {
             sys::SG_ERR_NOMEM => Some(InternalError::NoMemory),
             sys::SG_ERR_INVAL => Some(InternalError::InvalidArgument),
             sys::SG_ERR_UNKNOWN => Some(InternalError::Unknown),
-            sys::SG_ERR_DUPLICATE_MESSAGE => Some(InternalError::DuplicateMessage),
+            sys::SG_ERR_DUPLICATE_MESSAGE => {
+                Some(InternalError::DuplicateMessage)
+            },
             sys::SG_ERR_INVALID_KEY => Some(InternalError::InvalidKey),
             sys::SG_ERR_INVALID_KEY_ID => Some(InternalError::InvalidKeyId),
             sys::SG_ERR_INVALID_MAC => Some(InternalError::InvalidMAC),
@@ -36,14 +38,24 @@ impl InternalError {
             sys::SG_ERR_INVALID_VERSION => Some(InternalError::InvalidVersion),
             sys::SG_ERR_LEGACY_MESSAGE => Some(InternalError::LegacyMessage),
             sys::SG_ERR_NO_SESSION => Some(InternalError::NoSession),
-            sys::SG_ERR_STALE_KEY_EXCHANGE => Some(InternalError::StaleKeyExchange),
-            sys::SG_ERR_UNTRUSTED_IDENTITY => Some(InternalError::UntrustedIdentity),
+            sys::SG_ERR_STALE_KEY_EXCHANGE => {
+                Some(InternalError::StaleKeyExchange)
+            },
+            sys::SG_ERR_UNTRUSTED_IDENTITY => {
+                Some(InternalError::UntrustedIdentity)
+            },
             sys::SG_ERR_VRF_SIG_VERIF_FAILED => {
                 Some(InternalError::VerifySignatureVerificationFailed)
-            }
-            sys::SG_ERR_INVALID_PROTO_BUF => Some(InternalError::InvalidProtoBuf),
-            sys::SG_ERR_FP_VERSION_MISMATCH => Some(InternalError::FPVersionMismatch),
-            sys::SG_ERR_FP_IDENT_MISMATCH => Some(InternalError::FPIdentMismatch),
+            },
+            sys::SG_ERR_INVALID_PROTO_BUF => {
+                Some(InternalError::InvalidProtoBuf)
+            },
+            sys::SG_ERR_FP_VERSION_MISMATCH => {
+                Some(InternalError::FPVersionMismatch)
+            },
+            sys::SG_ERR_FP_IDENT_MISMATCH => {
+                Some(InternalError::FPIdentMismatch)
+            },
             _ => None,
         }
     }
@@ -63,7 +75,9 @@ impl InternalError {
             InternalError::NoSession => sys::SG_ERR_NO_SESSION,
             InternalError::StaleKeyExchange => sys::SG_ERR_STALE_KEY_EXCHANGE,
             InternalError::UntrustedIdentity => sys::SG_ERR_UNTRUSTED_IDENTITY,
-            InternalError::VerifySignatureVerificationFailed => sys::SG_ERR_VRF_SIG_VERIF_FAILED,
+            InternalError::VerifySignatureVerificationFailed => {
+                sys::SG_ERR_VRF_SIG_VERIF_FAILED
+            },
             InternalError::InvalidProtoBuf => sys::SG_ERR_INVALID_PROTO_BUF,
             InternalError::FPVersionMismatch => sys::SG_ERR_FP_VERSION_MISMATCH,
             InternalError::FPIdentMismatch => sys::SG_ERR_FP_IDENT_MISMATCH,
@@ -118,9 +132,11 @@ impl Display for InternalError {
             InternalError::UntrustedIdentity => write!(f, "Untrusted identity"),
             InternalError::VerifySignatureVerificationFailed => {
                 write!(f, "Verifying signature failed")
-            }
+            },
             InternalError::InvalidProtoBuf => write!(f, "Invalid protobuf"),
-            InternalError::FPVersionMismatch => write!(f, "FP version mismatched"),
+            InternalError::FPVersionMismatch => {
+                write!(f, "FP version mismatched")
+            },
             InternalError::FPIdentMismatch => write!(f, "FP ident mismatched"),
             InternalError::Other(code) => write!(f, "Unknown error {}", code),
         }
