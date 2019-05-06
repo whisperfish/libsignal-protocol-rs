@@ -1,7 +1,5 @@
 // FIXME: This is almost exactly a copy-paste of the unsigned version...
 
-use libsignal_protocol_sys as sys;
-
 use crate::buffer::Buffer;
 use crate::errors::InternalError;
 use std::io::{self, Write};

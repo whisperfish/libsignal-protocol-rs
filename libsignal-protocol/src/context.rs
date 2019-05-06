@@ -1,5 +1,3 @@
-use libsignal_protocol_sys as sys;
-
 use crate::crypto::{Crypto, CryptoProvider, DefaultCrypto};
 use crate::errors::{InternalError, InternalErrorCode};
 use crate::identity_key_store::{self as iks, IdentityKeyStore};

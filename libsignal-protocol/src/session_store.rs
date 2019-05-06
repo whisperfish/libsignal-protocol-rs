@@ -1,5 +1,3 @@
-use libsignal_protocol_sys as sys;
-
 use crate::errors::InternalError;
 use crate::{Address, Buffer};
 use std::os::raw::{c_char, c_int, c_void};

@@ -1,4 +1,3 @@
-use libsignal_protocol_sys as sys;
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, failure_derive::Fail)]

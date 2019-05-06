@@ -1,5 +1,3 @@
-use libsignal_protocol_sys as sys;
-
 use crate::context::ContextInner;
 use crate::Wrapped;
 use std::io::{self, Write};

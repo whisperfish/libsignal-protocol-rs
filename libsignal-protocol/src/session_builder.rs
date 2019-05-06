@@ -1,15 +1,14 @@
-use libsignal_protocol_sys as sys;
-
 use crate::context::{Context, ContextInner};
 use crate::store_context::{StoreContext, StoreContextInner};
-use crate::{Address, Wrapped};
+use crate::pre_key_bundle::PreKeyBundle;
+use crate::Address;
 use std::ptr;
 use std::rc::Rc;
 
 pub struct SessionBuilder {
     raw: *mut sys::session_builder,
-    _store_context: Rc<StoreContextInner>,
-    _context: Rc<ContextInner>,
+    _store_ctx: Rc<StoreContextInner>,
+    _ctx: Rc<ContextInner>,
 }
 
 impl SessionBuilder {
@@ -20,9 +19,15 @@ impl SessionBuilder {
 
             SessionBuilder {
                 raw,
-                _store_context: store_context.0,
-                _context: ctx.0,
+                _store_ctx: store_context.0,
+                _ctx: ctx.0,
             }
+        }
+    }
+
+    pub fn process_pre_key_bundle(&self, pre_key_bundle: &PreKeyBundle) {
+        unsafe {
+            sys::session_builder_process_pre_key_bundle(self.raw, true);
         }
     }
 }

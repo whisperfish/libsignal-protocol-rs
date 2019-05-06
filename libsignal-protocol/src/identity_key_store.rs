@@ -1,5 +1,3 @@
-use libsignal_protocol_sys as sys;
-
 use std::os::raw::{c_int, c_void};
 
 pub trait IdentityKeyStore {}
