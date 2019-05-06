@@ -28,7 +28,7 @@ impl Buffer {
     }
 
     pub fn is_empty(&self) -> bool {
-        unsafe { sys::signal_buffer_len(self.raw) > 0 }
+        self.len() > 0
     }
 
     pub fn into_raw(self) -> *mut sys::signal_buffer {
