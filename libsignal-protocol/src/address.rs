@@ -1,6 +1,5 @@
 use libsignal_protocol_sys as sys;
-use std::ffi::CString;
-use std::pin::Pin;
+use std::{ffi::CString, pin::Pin};
 
 pub struct Address {
     raw: sys::signal_protocol_address,
@@ -13,8 +12,10 @@ impl Address {
         let name = name.as_ref();
         let len = name.len();
 
-        let name =
-            Pin::new(CString::new(name).expect("The name shouldn't contain any null characters"));
+        let name = Pin::new(
+            CString::new(name)
+                .expect("The name shouldn't contain any null characters"),
+        );
         let raw = sys::signal_protocol_address {
             name: name.as_ptr(),
             name_len: len,

@@ -16,18 +16,20 @@ mod session_store;
 mod signed_pre_key_store;
 mod store_context;
 
-pub use crate::address::Address;
-pub use crate::buffer::Buffer;
-pub use crate::context::Context;
-pub use crate::crypto::{Crypto, DefaultCrypto};
-pub use crate::errors::InternalError;
-pub use crate::identity_key_store::IdentityKeyStore;
-pub use crate::pre_key_bundle::PreKeyBundle;
-pub use crate::pre_key_store::PreKeyStore;
-pub use crate::session_builder::SessionBuilder;
-pub use crate::session_store::SessionStore;
-pub use crate::signed_pre_key_store::SignedPreKeyStore;
-pub use crate::store_context::StoreContext;
+pub use crate::{
+    address::Address,
+    buffer::Buffer,
+    context::Context,
+    crypto::{Crypto, DefaultCrypto},
+    errors::InternalError,
+    identity_key_store::IdentityKeyStore,
+    pre_key_bundle::PreKeyBundle,
+    pre_key_store::PreKeyStore,
+    session_builder::SessionBuilder,
+    session_store::SessionStore,
+    signed_pre_key_store::SignedPreKeyStore,
+    store_context::StoreContext,
+};
 
 use crate::context::ContextInner;
 use std::rc::Rc;

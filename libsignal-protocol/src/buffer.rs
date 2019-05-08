@@ -1,18 +1,17 @@
-use crate::context::ContextInner;
-use crate::Wrapped;
-use std::io::{self, Write};
-use std::mem;
-use std::ops::{Index, IndexMut};
-use std::rc::Rc;
+use crate::{context::ContextInner, Wrapped};
+use std::{
+    io::{self, Write},
+    mem,
+    ops::{Index, IndexMut},
+    rc::Rc,
+};
 
 pub struct Buffer {
     raw: *mut sys::signal_buffer,
 }
 
 impl Buffer {
-    pub fn new() -> Buffer {
-        Buffer::with_capacity(0)
-    }
+    pub fn new() -> Buffer { Buffer::with_capacity(0) }
 
     pub unsafe fn from_raw(raw: *mut sys::signal_buffer) -> Buffer {
         assert!(!raw.is_null());
@@ -23,9 +22,7 @@ impl Buffer {
         unsafe { Buffer::from_raw(sys::signal_buffer_alloc(capacity)) }
     }
 
-    pub fn len(&self) -> usize {
-        unsafe { sys::signal_buffer_len(self.raw) }
-    }
+    pub fn len(&self) -> usize { unsafe { sys::signal_buffer_len(self.raw) } }
 
     pub fn is_empty(&self) -> bool {
         self.len() > 0
@@ -56,7 +53,8 @@ impl Buffer {
 
     pub fn append(&mut self, data: &[u8]) {
         unsafe {
-            self.raw = sys::signal_buffer_append(self.raw, data.as_ptr(), data.len());
+            self.raw =
+                sys::signal_buffer_append(self.raw, data.as_ptr(), data.len());
         }
     }
 }
@@ -68,27 +66,26 @@ impl Default for Buffer {
 }
 
 impl From<Vec<u8>> for Buffer {
-    fn from(other: Vec<u8>) -> Buffer {
-        Buffer::from(other.as_slice())
-    }
+    fn from(other: Vec<u8>) -> Buffer { Buffer::from(other.as_slice()) }
 }
 
 impl<'a> From<&'a [u8]> for Buffer {
     fn from(other: &'a [u8]) -> Buffer {
-        unsafe { Buffer::from_raw(sys::signal_buffer_create(other.as_ptr(), other.len())) }
+        unsafe {
+            Buffer::from_raw(sys::signal_buffer_create(
+                other.as_ptr(),
+                other.len(),
+            ))
+        }
     }
 }
 
 impl AsRef<[u8]> for Buffer {
-    fn as_ref(&self) -> &[u8] {
-        self.as_slice()
-    }
+    fn as_ref(&self) -> &[u8] { self.as_slice() }
 }
 
 impl AsMut<[u8]> for Buffer {
-    fn as_mut(&mut self) -> &mut [u8] {
-        self.as_slice_mut()
-    }
+    fn as_mut(&mut self) -> &mut [u8] { self.as_slice_mut() }
 }
 
 impl<T> Index<T> for Buffer
@@ -97,9 +94,7 @@ where
 {
     type Output = <[u8] as Index<T>>::Output;
 
-    fn index(&self, ix: T) -> &Self::Output {
-        self.as_slice().index(ix)
-    }
+    fn index(&self, ix: T) -> &Self::Output { self.as_slice().index(ix) }
 }
 
 impl<T> IndexMut<T> for Buffer
@@ -117,9 +112,7 @@ impl Write for Buffer {
         Ok(data.len())
     }
 
-    fn flush(&mut self) -> io::Result<()> {
-        Ok(())
-    }
+    fn flush(&mut self) -> io::Result<()> { Ok(()) }
 }
 
 impl Clone for Buffer {
@@ -147,13 +140,9 @@ impl Wrapped for Buffer {
         Buffer { raw }
     }
 
-    fn raw(&self) -> *const Self::Raw {
-        self.raw
-    }
+    fn raw(&self) -> *const Self::Raw { self.raw }
 
-    fn raw_mut(&self) -> *mut Self::Raw {
-        self.raw
-    }
+    fn raw_mut(&self) -> *mut Self::Raw { self.raw }
 }
 
 #[cfg(test)]

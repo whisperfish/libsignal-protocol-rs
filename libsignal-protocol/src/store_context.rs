@@ -1,5 +1,4 @@
-use crate::context::ContextInner;
-use crate::Wrapped;
+use crate::{context::ContextInner, Wrapped};
 use std::rc::Rc;
 
 pub struct StoreContext(pub(crate) Rc<StoreContextInner>);

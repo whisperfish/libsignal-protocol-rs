@@ -1,7 +1,9 @@
 use rand::RngCore;
-use std::os::raw::{c_int, c_void};
-use std::pin::Pin;
-use std::slice;
+use std::{
+    os::raw::{c_int, c_void},
+    pin::Pin,
+    slice,
+};
 use sys::{signal_buffer, signal_crypto_provider};
 
 /// Cryptography routines used in the signal protocol.
@@ -49,14 +51,15 @@ impl CryptoProvider {
         CryptoProvider { vtable, state }
     }
 
-    pub fn state(&self) -> &dyn Crypto {
-        &*self.state.0
-    }
+    pub fn state(&self) -> &dyn Crypto { &*self.state.0 }
 }
 
 struct State(Box<dyn Crypto>);
 
-unsafe extern "C" fn hmac_sha256_cleanup_func(_hmac_context: *mut c_void, _user_data: *mut c_void) {
+unsafe extern "C" fn hmac_sha256_cleanup_func(
+    _hmac_context: *mut c_void,
+    _user_data: *mut c_void,
+) {
     unimplemented!();
 }
 
@@ -86,7 +89,11 @@ unsafe extern "C" fn hmac_sha256_update_func(
     unimplemented!()
 }
 
-unsafe extern "C" fn random_func(data: *mut u8, len: usize, user_data: *mut c_void) -> c_int {
+unsafe extern "C" fn random_func(
+    data: *mut u8,
+    len: usize,
+    user_data: *mut c_void,
+) -> c_int {
     assert!(!data.is_null());
     assert!(!user_data.is_null());
 

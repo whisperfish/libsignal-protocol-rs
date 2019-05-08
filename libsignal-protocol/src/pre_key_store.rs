@@ -1,7 +1,8 @@
-use crate::buffer::Buffer;
-use crate::errors::InternalError;
-use std::io::{self, Write};
-use std::os::raw::{c_int, c_void};
+use crate::{buffer::Buffer, errors::InternalError};
+use std::{
+    io::{self, Write},
+    os::raw::{c_int, c_void},
+};
 
 pub trait PreKeyStore {
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
@@ -10,7 +11,9 @@ pub trait PreKeyStore {
     fn remove(&self, id: u32) -> Result<(), InternalError>;
 }
 
-pub(crate) fn new_vtable<P: PreKeyStore + 'static>(store: P) -> sys::signal_protocol_pre_key_store {
+pub(crate) fn new_vtable<P: PreKeyStore + 'static>(
+    store: P,
+) -> sys::signal_protocol_pre_key_store {
     let state: Box<State> = Box::new(State(Box::new(store)));
 
     sys::signal_protocol_pre_key_store {
@@ -39,7 +42,7 @@ unsafe extern "C" fn load_pre_key(
         Ok(_) => {
             *record = buffer.into_raw();
             sys::SG_SUCCESS as c_int
-        }
+        },
         Err(_) => InternalError::Unknown.code(),
     }
 }
@@ -61,14 +64,20 @@ unsafe extern "C" fn store_pre_key(
     }
 }
 
-unsafe extern "C" fn contains_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
+unsafe extern "C" fn contains_pre_key(
+    pre_key_id: u32,
+    user_data: *mut c_void,
+) -> c_int {
     assert!(!user_data.is_null());
     let user_data = &*(user_data as *const State);
 
     user_data.0.contains(pre_key_id) as c_int
 }
 
-unsafe extern "C" fn remove_pre_key(pre_key_id: u32, user_data: *mut c_void) -> c_int {
+unsafe extern "C" fn remove_pre_key(
+    pre_key_id: u32,
+    user_data: *mut c_void,
+) -> c_int {
     assert!(!user_data.is_null());
     let user_data = &*(user_data as *const State);
 

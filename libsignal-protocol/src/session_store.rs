@@ -1,9 +1,11 @@
-use crate::errors::InternalError;
-use crate::{Address, Buffer};
+use crate::{errors::InternalError, Address, Buffer};
 use std::os::raw::{c_char, c_int, c_void};
 
 pub trait SessionStore {
-    fn load_session(&self, address: &Address) -> Result<(Buffer, Buffer), InternalError>;
+    fn load_session(
+        &self,
+        address: &Address,
+    ) -> Result<(Buffer, Buffer), InternalError>;
     fn get_sub_devuce_sessions(&self);
 }
 

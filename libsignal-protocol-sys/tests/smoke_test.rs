@@ -1,7 +1,6 @@
 extern crate libsignal_protocol_sys as sys;
 
-use std::ffi::c_void;
-use std::ptr;
+use std::{ffi::c_void, ptr, sync::Mutex};
 use sys::signal_context;
 
 #[test]
@@ -23,9 +22,11 @@ fn library_initialization() {
             sha512_digest_update_func: None,
         };
 
-        let ret = sys::signal_context_create(&mut global_context, ptr::null_mut());
+        let ret =
+            sys::signal_context_create(&mut global_context, ptr::null_mut());
         assert_eq!(ret, 0);
-        let ret = sys::signal_context_set_crypto_provider(global_context, &provider);
+        let ret =
+            sys::signal_context_set_crypto_provider(global_context, &provider);
         assert_eq!(ret, 0);
         let ret = sys::signal_context_set_locking_functions(
             global_context,
@@ -39,7 +40,11 @@ fn library_initialization() {
 unsafe extern "C" fn lock_function(_: *mut c_void) {}
 unsafe extern "C" fn unlock_function(_: *mut c_void) {}
 
-unsafe extern "C" fn hmac_sha256_cleanup_func(_: *mut std::ffi::c_void, _: *mut std::ffi::c_void) {}
+unsafe extern "C" fn hmac_sha256_cleanup_func(
+    _: *mut std::ffi::c_void,
+    _: *mut std::ffi::c_void,
+) {
+}
 
 unsafe extern "C" fn hmac_sha256_final_func(
     _: *mut c_void,
