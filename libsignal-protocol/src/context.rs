@@ -9,6 +9,9 @@ use crate::{
     store_context::StoreContext,
     Wrapped,
 };
+
+use lock_api::RawMutex as _;
+use parking_lot::RawMutex;
 use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
 use sys::signal_context;
 
@@ -163,7 +166,10 @@ impl ContextInner {
         unsafe {
             let mut global_context: *mut signal_context = ptr::null_mut();
             let crypto = CryptoProvider::new(crypto);
-            let mut state = Pin::new(Box::new(State {}));
+            let mut state = Pin::new(Box::new(State {
+                mux: RawMutex::INIT,
+            }));
+
             let user_data =
                 state.as_mut().get_mut() as *mut State as *mut c_void;
             sys::signal_context_create(&mut global_context, user_data)
@@ -199,11 +205,14 @@ impl Drop for ContextInner {
     }
 }
 
-unsafe extern "C" fn lock_function(_user_data: *mut c_void) {
-    unimplemented!("TODO: Implement locking");
+unsafe extern "C" fn lock_function(user_data: *mut c_void) {
+    let state = &*(user_data as *const State);
+    state.mux.lock();
 }
-unsafe extern "C" fn unlock_function(_user_data: *mut c_void) {
-    unimplemented!("TODO: Implement unlocking");
+
+unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
+    let state = &*(user_data as *const State);
+    state.mux.unlock();
 }
 
 /// The "user state" we pass to `libsignal-protocol-c` as part of the global
@@ -214,7 +223,9 @@ unsafe extern "C" fn unlock_function(_user_data: *mut c_void) {
 /// A pointer to this [`State`] will be shared throughout the
 /// `libsignal-protocol-c` library, so any mutation **must** be done using the
 /// appropriate synchronisation mechanisms (i.e. `RefCell` or atomics).
-struct State {}
+struct State {
+    mux: RawMutex,
+}
 
 #[cfg(test)]
 mod tests {
