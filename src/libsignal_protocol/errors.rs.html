@@ -126,6 +126,22 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
 
@@ -157,7 +173,9 @@
             <span class="ident">sys</span>::<span class="ident">SG_ERR_NOMEM</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">NoMemory</span>),
             <span class="ident">sys</span>::<span class="ident">SG_ERR_INVAL</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">InvalidArgument</span>),
             <span class="ident">sys</span>::<span class="ident">SG_ERR_UNKNOWN</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">Unknown</span>),
-            <span class="ident">sys</span>::<span class="ident">SG_ERR_DUPLICATE_MESSAGE</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">DuplicateMessage</span>),
+            <span class="ident">sys</span>::<span class="ident">SG_ERR_DUPLICATE_MESSAGE</span> <span class="op">=&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">DuplicateMessage</span>)
+            },
             <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_KEY</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">InvalidKey</span>),
             <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_KEY_ID</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">InvalidKeyId</span>),
             <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_MAC</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">InvalidMAC</span>),
@@ -165,14 +183,24 @@
             <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_VERSION</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">InvalidVersion</span>),
             <span class="ident">sys</span>::<span class="ident">SG_ERR_LEGACY_MESSAGE</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">LegacyMessage</span>),
             <span class="ident">sys</span>::<span class="ident">SG_ERR_NO_SESSION</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">NoSession</span>),
-            <span class="ident">sys</span>::<span class="ident">SG_ERR_STALE_KEY_EXCHANGE</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">StaleKeyExchange</span>),
-            <span class="ident">sys</span>::<span class="ident">SG_ERR_UNTRUSTED_IDENTITY</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">UntrustedIdentity</span>),
+            <span class="ident">sys</span>::<span class="ident">SG_ERR_STALE_KEY_EXCHANGE</span> <span class="op">=&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">StaleKeyExchange</span>)
+            },
+            <span class="ident">sys</span>::<span class="ident">SG_ERR_UNTRUSTED_IDENTITY</span> <span class="op">=&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">UntrustedIdentity</span>)
+            },
             <span class="ident">sys</span>::<span class="ident">SG_ERR_VRF_SIG_VERIF_FAILED</span> <span class="op">=&gt;</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">VerifySignatureVerificationFailed</span>)
-            }
-            <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_PROTO_BUF</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">InvalidProtoBuf</span>),
-            <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_VERSION_MISMATCH</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">FPVersionMismatch</span>),
-            <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_IDENT_MISMATCH</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">FPIdentMismatch</span>),
+            },
+            <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_PROTO_BUF</span> <span class="op">=&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">InvalidProtoBuf</span>)
+            },
+            <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_VERSION_MISMATCH</span> <span class="op">=&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">FPVersionMismatch</span>)
+            },
+            <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_IDENT_MISMATCH</span> <span class="op">=&gt;</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">FPIdentMismatch</span>)
+            },
             <span class="kw">_</span> <span class="op">=&gt;</span> <span class="prelude-val">None</span>,
         }
     }
@@ -192,7 +220,9 @@
             <span class="ident">InternalError</span>::<span class="ident">NoSession</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_NO_SESSION</span>,
             <span class="ident">InternalError</span>::<span class="ident">StaleKeyExchange</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_STALE_KEY_EXCHANGE</span>,
             <span class="ident">InternalError</span>::<span class="ident">UntrustedIdentity</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_UNTRUSTED_IDENTITY</span>,
-            <span class="ident">InternalError</span>::<span class="ident">VerifySignatureVerificationFailed</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_VRF_SIG_VERIF_FAILED</span>,
+            <span class="ident">InternalError</span>::<span class="ident">VerifySignatureVerificationFailed</span> <span class="op">=&gt;</span> {
+                <span class="ident">sys</span>::<span class="ident">SG_ERR_VRF_SIG_VERIF_FAILED</span>
+            },
             <span class="ident">InternalError</span>::<span class="ident">InvalidProtoBuf</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_PROTO_BUF</span>,
             <span class="ident">InternalError</span>::<span class="ident">FPVersionMismatch</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_VERSION_MISMATCH</span>,
             <span class="ident">InternalError</span>::<span class="ident">FPIdentMismatch</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_IDENT_MISMATCH</span>,
@@ -247,9 +277,11 @@
             <span class="ident">InternalError</span>::<span class="ident">UntrustedIdentity</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Untrusted identity&quot;</span>),
             <span class="ident">InternalError</span>::<span class="ident">VerifySignatureVerificationFailed</span> <span class="op">=&gt;</span> {
                 <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Verifying signature failed&quot;</span>)
-            }
+            },
             <span class="ident">InternalError</span>::<span class="ident">InvalidProtoBuf</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid protobuf&quot;</span>),
-            <span class="ident">InternalError</span>::<span class="ident">FPVersionMismatch</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;FP version mismatched&quot;</span>),
+            <span class="ident">InternalError</span>::<span class="ident">FPVersionMismatch</span> <span class="op">=&gt;</span> {
+                <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;FP version mismatched&quot;</span>)
+            },
             <span class="ident">InternalError</span>::<span class="ident">FPIdentMismatch</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;FP ident mismatched&quot;</span>),
             <span class="ident">InternalError</span>::<span class="ident">Other</span>(<span class="ident">code</span>) <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Unknown error {}&quot;</span>, <span class="ident">code</span>),
         }

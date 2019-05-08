@@ -32,10 +32,8 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
-<span id="35">35</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">context</span>::<span class="ident">ContextInner</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Wrapped</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context</span>::<span class="ident">ContextInner</span>, <span class="ident">Wrapped</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StoreContext</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">StoreContextInner</span><span class="op">&gt;</span>);

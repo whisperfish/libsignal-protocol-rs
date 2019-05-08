@@ -227,16 +227,17 @@
 <span id="227">227</span>
 <span id="228">228</span>
 <span id="229">229</span>
+<span id="230">230</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">context</span>::<span class="ident">ContextInner</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">errors</span>::<span class="ident">InternalErrorCode</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">Wrapped</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context</span>::<span class="ident">ContextInner</span>, <span class="ident">errors</span>::<span class="ident">InternalErrorCode</span>, <span class="ident">Wrapped</span>};
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">slice</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>, <span class="ident">UNIX_EPOCH</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">marker</span>::<span class="ident">PhantomData</span>,
+    <span class="ident">ptr</span>,
+    <span class="ident">rc</span>::<span class="ident">Rc</span>,
+    <span class="ident">slice</span>,
+    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">SystemTime</span>, <span class="ident">UNIX_EPOCH</span>},
+};
 <span class="kw">use</span> <span class="ident">sys</span>::<span class="ident">AsSignalTypeBase</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdentityKeyPair</span> {
@@ -336,7 +337,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PreKeyList</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;this</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;this</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">SessionPreKeyRef</span><span class="op">&lt;</span><span class="lifetime">&#39;this</span><span class="op">&gt;&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;this</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;this</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;this</span> <span class="self">self</span>,
+    ) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">SessionPreKeyRef</span><span class="op">&lt;</span><span class="lifetime">&#39;this</span><span class="op">&gt;&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;this</span> {
         <span class="ident">PreKeyListIter</span> {
             <span class="ident">raw</span>: <span class="self">self</span>.<span class="ident">raw</span>,
             <span class="ident">_lifetime</span>: <span class="ident">PhantomData</span>,
@@ -388,9 +391,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SessionPreKeyRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">session_pre_key_get_id</span>(<span class="self">self</span>.<span class="ident">raw</span>) }
-    }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> { <span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">session_pre_key_get_id</span>(<span class="self">self</span>.<span class="ident">raw</span>) } }
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignedPreKey</span> {
@@ -417,7 +418,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">SystemTime</span> {
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">unix_timestamp</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">session_signed_pre_key_get_timestamp</span>(<span class="self">self</span>.<span class="ident">raw</span>);
+            <span class="kw">let</span> <span class="ident">unix_timestamp</span> <span class="op">=</span>
+                <span class="ident">sys</span>::<span class="ident">session_signed_pre_key_get_timestamp</span>(<span class="self">self</span>.<span class="ident">raw</span>);
             <span class="ident">SystemTime</span>::<span class="ident">UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="ident">unix_timestamp</span>)
         }
     }
