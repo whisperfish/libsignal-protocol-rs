@@ -1,7 +1,6 @@
 extern crate bindgen;
 
-use std::env;
-use std::path::PathBuf;
+use std::{env, path::PathBuf};
 
 fn main() {
     let dst = cmake::build("libsignal-protocol-c");
@@ -55,7 +54,6 @@ fn main_library_bindings() {
 }
 
 fn protobuf_bindings() {
-
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindgen::Builder::default()
         .header("libsignal-protocol-c/src/protobuf-c/protobuf-c.h")

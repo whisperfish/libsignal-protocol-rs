@@ -1,36 +1,45 @@
-use crate::crypto::{Crypto, CryptoProvider, DefaultCrypto};
-use crate::errors::{InternalError, InternalErrorCode};
-use crate::identity_key_store::{self as iks, IdentityKeyStore};
-use crate::keys::{IdentityKeyPair, PreKeyList};
-use crate::pre_key_store::{self as pks, PreKeyStore};
-use crate::session_store::{self as sess, SessionStore};
-use crate::signed_pre_key_store::{self as spks, SignedPreKeyStore};
-use crate::store_context::StoreContext;
-use crate::Wrapped;
-use std::ffi::c_void;
-use std::pin::Pin;
-use std::ptr;
-use std::rc::Rc;
+use crate::{
+    crypto::{Crypto, CryptoProvider, DefaultCrypto},
+    errors::{InternalError, InternalErrorCode},
+    identity_key_store::{self as iks, IdentityKeyStore},
+    keys::{IdentityKeyPair, PreKeyList},
+    pre_key_store::{self as pks, PreKeyStore},
+    session_store::{self as sess, SessionStore},
+    signed_pre_key_store::{self as spks, SignedPreKeyStore},
+    store_context::StoreContext,
+    Wrapped,
+};
+use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
 use sys::signal_context;
 
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
-    pub fn new<C: Crypto + 'static>(crypto: C) -> Result<Context, InternalError> {
+    pub fn new<C: Crypto + 'static>(
+        crypto: C,
+    ) -> Result<Context, InternalError> {
         ContextInner::new(crypto).map(|c| Context(Rc::new(c)))
     }
 
-    pub fn generate_identity_key_pair(&self) -> Result<IdentityKeyPair, InternalError> {
+    pub fn generate_identity_key_pair(
+        &self,
+    ) -> Result<IdentityKeyPair, InternalError> {
         unsafe {
             let mut key_pair = ptr::null_mut();
-            sys::signal_protocol_key_helper_generate_identity_key_pair(&mut key_pair, self.raw())
-                .to_result()?;
+            sys::signal_protocol_key_helper_generate_identity_key_pair(
+                &mut key_pair,
+                self.raw(),
+            )
+            .to_result()?;
 
             Ok(IdentityKeyPair::from_raw(key_pair, &self.0))
         }
     }
 
-    pub fn generate_registration_id(&self, extended_range: i32) -> Result<u32, InternalError> {
+    pub fn generate_registration_id(
+        &self,
+        extended_range: i32,
+    ) -> Result<u32, InternalError> {
         let mut id = 0;
         unsafe {
             sys::signal_protocol_key_helper_generate_registration_id(
@@ -44,7 +53,11 @@ impl Context {
         Ok(id)
     }
 
-    pub fn generate_pre_keys(&self, start: u32, count: u32) -> Result<PreKeyList, InternalError> {
+    pub fn generate_pre_keys(
+        &self,
+        start: u32,
+        count: u32,
+    ) -> Result<PreKeyList, InternalError> {
         unsafe {
             let mut pre_keys_head = ptr::null_mut();
             sys::signal_protocol_key_helper_generate_pre_keys(
@@ -74,11 +87,18 @@ impl Context {
     {
         unsafe {
             let mut store_ctx = ptr::null_mut();
-            sys::signal_protocol_store_context_create(&mut store_ctx, self.raw()).to_result()?;
+            sys::signal_protocol_store_context_create(
+                &mut store_ctx,
+                self.raw(),
+            )
+            .to_result()?;
 
             let pre_key_store = pks::new_vtable(pre_key_store);
-            sys::signal_protocol_store_context_set_pre_key_store(store_ctx, &pre_key_store)
-                .to_result()?;
+            sys::signal_protocol_store_context_set_pre_key_store(
+                store_ctx,
+                &pre_key_store,
+            )
+            .to_result()?;
 
             let signed_pre_key_store = spks::new_vtable(signed_pre_key_store);
             sys::signal_protocol_store_context_set_signed_pre_key_store(
@@ -88,8 +108,11 @@ impl Context {
             .to_result()?;
 
             let session_store = sess::new_vtable(session_store);
-            sys::signal_protocol_store_context_set_session_store(store_ctx, &session_store)
-                .to_result()?;
+            sys::signal_protocol_store_context_set_session_store(
+                store_ctx,
+                &session_store,
+            )
+            .to_result()?;
 
             let identity_key_store = iks::new_vtable(identity_key_store);
             sys::signal_protocol_store_context_set_identity_key_store(
@@ -102,20 +125,18 @@ impl Context {
         }
     }
 
-    pub fn crypto(&self) -> &dyn Crypto {
-        self.0.crypto.state()
-    }
+    pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
 
-    pub(crate) fn raw(&self) -> *mut sys::signal_context {
-        self.0.raw()
-    }
+    pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
 }
 
 impl Default for Context {
     fn default() -> Context {
         match Context::new(DefaultCrypto) {
             Ok(c) => c,
-            Err(e) => panic!("Unable to create a context using the defaults: {}", e),
+            Err(e) => {
+                panic!("Unable to create a context using the defaults: {}", e)
+            },
         }
     }
 }
@@ -124,8 +145,9 @@ impl Default for Context {
 ///
 /// # Safety
 ///
-/// This **must** outlive any data created by the `libsignal-protocol-c` library.
-/// You'll usually do this by adding a `Rc<ContextInner>` to any wrapper types.
+/// This **must** outlive any data created by the `libsignal-protocol-c`
+/// library. You'll usually do this by adding a `Rc<ContextInner>` to any
+/// wrapper types.
 #[allow(dead_code)]
 pub(crate) struct ContextInner {
     raw: *mut sys::signal_context,
@@ -136,15 +158,23 @@ pub(crate) struct ContextInner {
 }
 
 impl ContextInner {
-    pub fn new<C: Crypto + 'static>(crypto: C) -> Result<ContextInner, InternalError> {
+    pub fn new<C: Crypto + 'static>(
+        crypto: C,
+    ) -> Result<ContextInner, InternalError> {
         unsafe {
             let mut global_context: *mut signal_context = ptr::null_mut();
             let crypto = CryptoProvider::new(crypto);
             let mut state = Pin::new(Box::new(State {}));
 
-            let user_data = state.as_mut().get_mut() as *mut State as *mut c_void;
-            sys::signal_context_create(&mut global_context, user_data).to_result()?;
-            sys::signal_context_set_crypto_provider(global_context, &crypto.vtable).to_result()?;
+            let user_data =
+                state.as_mut().get_mut() as *mut State as *mut c_void;
+            sys::signal_context_create(&mut global_context, user_data)
+                .to_result()?;
+            sys::signal_context_set_crypto_provider(
+                global_context,
+                &crypto.vtable,
+            )
+            .to_result()?;
             sys::signal_context_set_locking_functions(
                 global_context,
                 Some(lock_function),
@@ -160,9 +190,7 @@ impl ContextInner {
         }
     }
 
-    pub fn raw(&self) -> *mut sys::signal_context {
-        self.raw
-    }
+    pub fn raw(&self) -> *mut sys::signal_context { self.raw }
 }
 
 impl Drop for ContextInner {

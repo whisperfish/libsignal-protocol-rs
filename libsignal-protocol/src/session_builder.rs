@@ -1,10 +1,11 @@
-use crate::address::Address;
-use crate::context::{Context, ContextInner};
-use crate::pre_key_bundle::PreKeyBundle;
-use crate::store_context::{StoreContext, StoreContextInner};
-use crate::Wrapped;
-use std::ptr;
-use std::rc::Rc;
+use crate::{
+    address::Address,
+    context::{Context, ContextInner},
+    pre_key_bundle::PreKeyBundle,
+    store_context::{StoreContext, StoreContextInner},
+    Wrapped,
+};
+use std::{ptr, rc::Rc};
 
 pub struct SessionBuilder {
     raw: *mut sys::session_builder,
@@ -13,10 +14,19 @@ pub struct SessionBuilder {
 }
 
 impl SessionBuilder {
-    pub fn new(ctx: Context, store_context: StoreContext, address: Address) -> SessionBuilder {
+    pub fn new(
+        ctx: Context,
+        store_context: StoreContext,
+        address: Address,
+    ) -> SessionBuilder {
         unsafe {
             let mut raw = ptr::null_mut();
-            sys::session_builder_create(&mut raw, store_context.raw(), address.raw(), ctx.raw());
+            sys::session_builder_create(
+                &mut raw,
+                store_context.raw(),
+                address.raw(),
+                ctx.raw(),
+            );
 
             SessionBuilder {
                 raw,
@@ -28,7 +38,10 @@ impl SessionBuilder {
 
     pub fn process_pre_key_bundle(&self, pre_key_bundle: &PreKeyBundle) {
         unsafe {
-            sys::session_builder_process_pre_key_bundle(self.raw, pre_key_bundle.raw_mut());
+            sys::session_builder_process_pre_key_bundle(
+                self.raw,
+                pre_key_bundle.raw_mut(),
+            );
         }
     }
 }
