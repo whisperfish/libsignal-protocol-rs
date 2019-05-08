@@ -205,7 +205,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InternalError</span>::<span class="ident">NoMemory</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_NOMEM</span>,
             <span class="ident">InternalError</span>::<span class="ident">InvalidArgument</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_INVAL</span>,
@@ -226,11 +226,11 @@
             <span class="ident">InternalError</span>::<span class="ident">InvalidProtoBuf</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_INVALID_PROTO_BUF</span>,
             <span class="ident">InternalError</span>::<span class="ident">FPVersionMismatch</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_VERSION_MISMATCH</span>,
             <span class="ident">InternalError</span>::<span class="ident">FPIdentMismatch</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_FP_IDENT_MISMATCH</span>,
-            <span class="ident">InternalError</span>::<span class="ident">Other</span>(<span class="ident">c</span>) <span class="op">=&gt;</span> <span class="kw-2">*</span><span class="ident">c</span>,
+            <span class="ident">InternalError</span>::<span class="ident">Other</span>(<span class="ident">c</span>) <span class="op">=&gt;</span> <span class="ident">c</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_result</span>(<span class="ident">code</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>, <span class="ident">code</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
@@ -243,11 +243,11 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">InternalErrorCode</span>: <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">to_result</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">InternalErrorCode</span> <span class="kw">for</span> <span class="ident">i32</span> {
-    <span class="kw">fn</span> <span class="ident">to_result</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
