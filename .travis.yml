@@ -15,6 +15,7 @@ before_deploy:
   - cargo doc --all --verbose
   - echo '<meta http-equiv="refresh" content="0; url=libsignal_protocol/index.html" /> ' > target/doc/index.html
   - cp -r target/doc public
+
 matrix:
   include:
     - rust: nightly
@@ -24,6 +25,7 @@ matrix:
       script:
         - cargo fmt --all -- --check
         - cargo clippy -- -D clippy::all
+
 deploy:
   provider: pages
   skip_cleanup: true
@@ -32,3 +34,4 @@ deploy:
   local_dir: public
   on:
     branch: master
+    condition: "$TRAVIS_RUST_VERSION == stable"
