@@ -1,5 +1,3 @@
-// FIXME: This is almost exactly a copy-paste of the unsigned version...
-
 use crate::{buffer::Buffer, errors::InternalError};
 use std::{
     io::{self, Write},
