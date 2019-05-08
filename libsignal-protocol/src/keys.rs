@@ -32,7 +32,7 @@ impl IdentityKeyPair {
                 time_since_epoch.as_secs(),
                 self.ctx.raw(),
             )
-            .to_result()?;
+            .into_result()?;
 
             Ok(SignedPreKey::from_raw(signed_pre_key, &self.ctx))
         }

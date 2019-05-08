@@ -24,6 +24,8 @@ impl Buffer {
 
     pub fn len(&self) -> usize { unsafe { sys::signal_buffer_len(self.raw) } }
 
+    pub fn is_empty(&self) -> bool { self.len() > 0 }
+
     pub fn into_raw(self) -> *mut sys::signal_buffer {
         let raw = self.raw;
         mem::forget(self);
@@ -53,6 +55,10 @@ impl Buffer {
                 sys::signal_buffer_append(self.raw, data.as_ptr(), data.len());
         }
     }
+}
+
+impl Default for Buffer {
+    fn default() -> Self { Self::new() }
 }
 
 impl From<Vec<u8>> for Buffer {
