@@ -2,12 +2,12 @@ use crate::{
     crypto::{Crypto, CryptoProvider, DefaultCrypto},
     errors::{InternalError, InternalErrorCode},
     identity_key_store::{self as iks, IdentityKeyStore},
-    keys::{IdentityKeyPair, PreKeyList},
+    keys::{IdentityKeyPair, KeyPair, PreKeyList},
     pre_key_store::{self as pks, PreKeyStore},
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
     store_context::StoreContext,
-    Wrapped,
+    PreKey, Wrapped,
 };
 
 use lock_api::RawMutex as _;
@@ -124,6 +124,21 @@ impl Context {
             .into_result()?;
 
             Ok(StoreContext::new(store_ctx, &self.0))
+        }
+    }
+
+    pub fn create_pre_key(
+        &self,
+        signing_pair: &KeyPair,
+        id: u32,
+    ) -> Result<PreKey, InternalError> {
+        let mut raw = ptr::null_mut();
+
+        unsafe {
+            sys::session_pre_key_create(&mut raw, id, signing_pair.raw_mut())
+                .into_result()?;
+
+            Ok(PreKey::from_raw(raw, &self.0))
         }
     }
 

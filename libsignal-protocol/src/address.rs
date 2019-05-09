@@ -1,28 +1,23 @@
 use libsignal_protocol_sys as sys;
-use std::{ffi::CString, pin::Pin};
+use std::{marker::PhantomData, os::raw::c_char};
 
-pub struct Address {
+pub struct Address<'a> {
     raw: sys::signal_protocol_address,
-    // Note: self.raw has a raw pointer into this field.
-    _name: Pin<CString>,
+    _string_lifetime: PhantomData<&'a ()>,
 }
 
-impl Address {
-    pub fn new<S: AsRef<str>>(name: S, device_id: i32) -> Address {
-        let name = name.as_ref();
-        let len = name.len();
-
-        let name = Pin::new(
-            CString::new(name)
-                .expect("The name shouldn't contain any null characters"),
-        );
+impl<'a> Address<'a> {
+    pub fn new(name: &'a str, device_id: i32) -> Address<'a> {
         let raw = sys::signal_protocol_address {
-            name: name.as_ptr(),
-            name_len: len,
+            name: name.as_ptr() as *const c_char,
+            name_len: name.len(),
             device_id,
         };
 
-        Address { raw, _name: name }
+        Address {
+            raw,
+            _string_lifetime: PhantomData,
+        }
     }
 
     pub(crate) fn raw(&self) -> *const sys::signal_protocol_address {

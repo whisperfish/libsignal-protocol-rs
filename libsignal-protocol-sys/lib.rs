@@ -33,5 +33,5 @@ macro_rules! impl_signal_type_base {
 
 impl_signal_type_base! {
     ratchet_identity_key_pair, session_signed_pre_key, ec_public_key,
-    ec_private_key,
+    ec_private_key, session_pre_key,
 }

@@ -9,9 +9,12 @@ mod crypto;
 mod errors;
 mod identity_key_store;
 pub mod keys;
-mod pre_key_bundle;
-mod pre_key_store;
+mod pre_key;
 mod session_builder;
+
+mod pre_key_store;
+
+mod pre_key_bundle;
 mod session_store;
 mod signed_pre_key_store;
 mod store_context;
@@ -24,6 +27,7 @@ pub use crate::{
     errors::InternalError,
     identity_key_store::IdentityKeyStore,
     pre_key_bundle::PreKeyBundle,
+    pre_key::PreKey,
     pre_key_store::PreKeyStore,
     session_builder::SessionBuilder,
     session_store::SessionStore,
