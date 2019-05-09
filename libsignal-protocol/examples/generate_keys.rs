@@ -28,7 +28,7 @@ use libsignal_protocol::{Context, DefaultCrypto};
 use std::time::SystemTime;
 
 fn main() -> Result<(), Error> {
-    let ctx = Context::new(DefaultCrypto)?;
+    let ctx = Context::new(DefaultCrypto::default())?;
     let extended_range = 0;
     let start = 123;
     let pre_key_count = 20;

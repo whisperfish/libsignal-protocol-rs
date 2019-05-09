@@ -68,7 +68,7 @@ fn main() -> Result<(), Error> {
     let addr = Address::new("+14159998888", 1);
 
     // Instantiate a session_builder for a recipient address.
-    let session_builder = SessionBuilder::new(ctx, store_ctx, addr);
+    let _session_builder = SessionBuilder::new(ctx, store_ctx, addr);
 
     Ok(())
 }

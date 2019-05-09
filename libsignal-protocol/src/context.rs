@@ -134,7 +134,7 @@ impl Context {
 
 impl Default for Context {
     fn default() -> Context {
-        match Context::new(DefaultCrypto) {
+        match Context::new(DefaultCrypto::default()) {
             Ok(c) => c,
             Err(e) => {
                 panic!("Unable to create a context using the defaults: {}", e)
@@ -233,7 +233,7 @@ mod tests {
 
     #[test]
     fn library_initialization_example_from_readme() {
-        let ctx = Context::new(DefaultCrypto).unwrap();
+        let ctx = Context::new(DefaultCrypto::default()).unwrap();
 
         drop(ctx);
     }

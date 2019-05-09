@@ -1,3 +1,4 @@
+use core::any::Any;
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, failure_derive::Fail)]
@@ -99,6 +100,7 @@ impl InternalError {
 
 pub(crate) trait InternalErrorCode: Sized {
     fn into_result(self) -> Result<(), InternalError>;
+    fn into_code(self) -> i32;
 }
 
 impl InternalErrorCode for i32 {
@@ -110,6 +112,22 @@ impl InternalErrorCode for i32 {
         match InternalError::from_error_code(self) {
             None => Err(InternalError::Other(self)),
             Some(e) => Err(e),
+        }
+    }
+
+    fn into_code(self) -> i32 { self }
+}
+
+impl<T> InternalErrorCode for Result<T, InternalError>
+where
+    T: Any,
+{
+    fn into_result(self) -> Result<(), InternalError> { self.map(|_| ()) }
+
+    fn into_code(self) -> i32 {
+        match self {
+            Ok(_) => 0,
+            Err(e) => e.code(),
         }
     }
 }

@@ -13,3 +13,6 @@ failure_derive = "0.1.5"
 rand = "0.6.5"
 parking_lot = "0.8.0"
 lock_api = "0.2.0"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+openssl = "0.10"
