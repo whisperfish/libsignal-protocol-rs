@@ -60,11 +60,18 @@ pub use crate::crypto::DefaultCrypto;
 #[cfg(feature = "crypto-openssl")]
 pub use crate::crypto::OpenSSLCrypto;
 pub use crate::{
-    address::Address, buffer::Buffer, context::Context, crypto::Crypto,
-    errors::InternalError, identity_key_store::IdentityKeyStore,
-    pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder}, pre_key_store::PreKeyStore,
-    session_builder::SessionBuilder, session_store::SessionStore,
-    signed_pre_key_store::SignedPreKeyStore, store_context::StoreContext,
+    address::Address,
+    buffer::Buffer,
+    context::Context,
+    crypto::Crypto,
+    errors::InternalError,
+    identity_key_store::IdentityKeyStore,
+    pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
+    pre_key_store::PreKeyStore,
+    session_builder::SessionBuilder,
+    session_store::SessionStore,
+    signed_pre_key_store::SignedPreKeyStore,
+    store_context::StoreContext,
 };
 
 #[macro_use]
