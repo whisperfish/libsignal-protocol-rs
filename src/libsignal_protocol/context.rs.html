@@ -253,6 +253,11 @@
 <span id="253">253</span>
 <span id="254">254</span>
 <span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">crypto</span>::{<span class="ident">Crypto</span>, <span class="ident">CryptoProvider</span>, <span class="ident">DefaultCrypto</span>},
@@ -263,7 +268,7 @@
     <span class="ident">session_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sess</span>, <span class="ident">SessionStore</span>},
     <span class="ident">signed_pre_key_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">spks</span>, <span class="ident">SignedPreKeyStore</span>},
     <span class="ident">store_context</span>::<span class="ident">StoreContext</span>,
-    <span class="ident">PreKey</span>, <span class="ident">Wrapped</span>,
+    <span class="ident">PreKey</span>, <span class="ident">PreKeyBundle</span>, <span class="ident">PreKeyBundleBuilder</span>, <span class="ident">Wrapped</span>,
 };
 
 <span class="kw">use</span> <span class="ident">lock_api</span>::<span class="ident">RawMutex</span> <span class="kw">as</span> <span class="kw">_</span>;
@@ -271,6 +276,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ffi</span>::<span class="ident">c_void</span>, <span class="ident">pin</span>::<span class="ident">Pin</span>, <span class="ident">ptr</span>, <span class="ident">rc</span>::<span class="ident">Rc</span>};
 <span class="kw">use</span> <span class="ident">sys</span>::<span class="ident">signal_context</span>;
 
+<span class="doccomment">/// Global state and callbacks used by the library.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">ContextInner</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">Context</span> {
@@ -399,6 +405,10 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crypto</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Crypto</span> { <span class="self">self</span>.<span class="number">0</span>.<span class="ident">crypto</span>.<span class="ident">state</span>() }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pre_key_bundle_builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">PreKeyBundleBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">PreKeyBundle</span>::<span class="ident">builder</span>(<span class="self">self</span>)
+    }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_context</span> { <span class="self">self</span>.<span class="number">0</span>.<span class="ident">raw</span>() }
 }
