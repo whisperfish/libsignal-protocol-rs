@@ -1,6 +1,13 @@
+use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
+
+use lock_api::RawMutex as _;
+use parking_lot::RawMutex;
+
+use sys::signal_context;
+
 use crate::{
     crypto::{Crypto, CryptoProvider, DefaultCrypto},
-    errors::{InternalError, InternalErrorCode},
+    errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
     keys::{IdentityKeyPair, PreKeyList},
     pre_key_store::{self as pks, PreKeyStore},
@@ -9,11 +16,6 @@ use crate::{
     store_context::StoreContext,
     Wrapped,
 };
-
-use lock_api::RawMutex as _;
-use parking_lot::RawMutex;
-use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
-use sys::signal_context;
 
 pub struct Context(pub(crate) Rc<ContextInner>);
 

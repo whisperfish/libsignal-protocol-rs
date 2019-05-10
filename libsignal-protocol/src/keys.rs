@@ -1,5 +1,3 @@
-use crate::{context::ContextInner, errors::InternalErrorCode, Wrapped};
-use failure::Error;
 use std::{
     marker::PhantomData,
     ptr,
@@ -7,7 +5,12 @@ use std::{
     slice,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
+
+use failure::Error;
+
 use sys::AsSignalTypeBase;
+
+use crate::{context::ContextInner, errors::FromInternalErrorCode, Wrapped};
 
 pub struct IdentityKeyPair {
     raw: *mut sys::ratchet_identity_key_pair,

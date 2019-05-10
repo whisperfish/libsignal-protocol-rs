@@ -10,7 +10,7 @@ use sys::{signal_buffer, signal_crypto_provider};
 
 use crate::{
     buffer::Buffer,
-    errors::{InternalError, InternalErrorCode},
+    errors::{InternalError, IntoInternalErrorCode},
 };
 
 #[derive(Debug, Clone)]
