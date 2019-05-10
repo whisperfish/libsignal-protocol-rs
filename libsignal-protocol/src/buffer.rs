@@ -1,16 +1,19 @@
 use crate::{context::ContextInner, Wrapped};
 use std::{
-    io::{self, Write},
+    cmp::{Ord, Ordering},
     mem,
     ops::{Index, IndexMut},
     rc::Rc,
+    io::{self, Write},
 };
 
+/// A byte buffer (e.g. `Vec<u8>`).
 pub struct Buffer {
     raw: *mut sys::signal_buffer,
 }
 
 impl Buffer {
+    /// Create a new empty buffer.
     pub fn new() -> Buffer { Buffer::with_capacity(0) }
 
     pub unsafe fn from_raw(raw: *mut sys::signal_buffer) -> Buffer {
@@ -18,20 +21,30 @@ impl Buffer {
         Buffer { raw }
     }
 
+    /// Create a new buffer with the provided size.
     pub fn with_capacity(capacity: usize) -> Buffer {
         unsafe { Buffer::from_raw(sys::signal_buffer_alloc(capacity)) }
     }
 
+    /// How many bytes are in this buffer?
     pub fn len(&self) -> usize { unsafe { sys::signal_buffer_len(self.raw) } }
 
+    /// Is the buffer empty?
     pub fn is_empty(&self) -> bool { self.len() > 0 }
 
+    /// Extract the underlying raw pointer.
+    /// 
+    /// # Note
+    /// 
+    /// It is the user's responsibility to ensure the buffer is later free'd
+    /// (e.g. with [`Buffer::from_raw`] or [`sys::signal_buffer_free`]).
     pub fn into_raw(self) -> *mut sys::signal_buffer {
         let raw = self.raw;
         mem::forget(self);
         raw
     }
 
+    /// Get an immutable reference to the underlying data.
     pub fn as_slice(&self) -> &[u8] {
         unsafe {
             let ptr = sys::signal_buffer_data(self.raw);
@@ -40,6 +53,7 @@ impl Buffer {
         }
     }
 
+    /// Get a mutable reference to the underlying data.
     pub fn as_slice_mut(&mut self) -> &mut [u8] {
         unsafe {
             let len = self.len();
@@ -49,6 +63,11 @@ impl Buffer {
         }
     }
 
+    /// Append some data to this buffer.
+    /// 
+    /// # Note
+    /// 
+    /// Every append results in a re-allocation of the underlying buffer.
     pub fn append(&mut self, data: &[u8]) {
         unsafe {
             self.raw =
@@ -56,6 +75,34 @@ impl Buffer {
         }
     }
 }
+
+impl Ord for Buffer {
+    fn cmp(&self, other: &Buffer) -> Ordering {
+        let ret = unsafe { sys::signal_buffer_compare(self.raw, other.raw) };
+
+        if ret < 0 {
+            Ordering::Less
+        } else if ret > 0 {
+            Ordering::Greater
+        } else {
+            Ordering::Equal
+        }
+    }
+}
+
+impl PartialOrd for Buffer {
+    fn partial_cmp(&self, other: &Buffer) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for Buffer {
+    fn eq(&self, other: &Buffer) -> bool {
+        self.cmp(other) == Ordering::Equal
+    }
+}
+
+impl Eq for Buffer {}
 
 impl Default for Buffer {
     fn default() -> Self { Self::new() }

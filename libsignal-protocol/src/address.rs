@@ -23,4 +23,21 @@ impl<'a> Address<'a> {
     pub(crate) fn raw(&self) -> *const sys::signal_protocol_address {
         &self.raw
     }
+
+    pub fn bytes(&self) -> &[u8] {
+        unsafe {
+            std::slice::from_raw_parts(
+                self.raw.name as *const u8,
+                self.raw.name_len,
+            )
+        }
+    }
+
+    pub fn as_str(&self) -> Result<&str, std::str::Utf8Error> {
+        std::str::from_utf8(self.bytes())
+    }
+
+    pub fn device_id(&self) -> i32 {
+        self.raw.device_id
+    }
 }

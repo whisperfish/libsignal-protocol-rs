@@ -77,7 +77,7 @@ pub use crate::{
     errors::InternalError,
     identity_key_store::IdentityKeyStore,
     pre_key::PreKey,
-    pre_key_bundle::PreKeyBundle,
+    pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
     pre_key_store::PreKeyStore,
     session_builder::SessionBuilder,
     session_store::SessionStore,

@@ -7,7 +7,7 @@ use crate::{
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
     store_context::StoreContext,
-    PreKey, Wrapped,
+    PreKey, PreKeyBundle, PreKeyBundleBuilder, Wrapped,
 };
 
 use lock_api::RawMutex as _;
@@ -15,6 +15,7 @@ use parking_lot::RawMutex;
 use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
 use sys::signal_context;
 
+/// Global state and callbacks used by the library.
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
@@ -143,6 +144,10 @@ impl Context {
     }
 
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
+
+    pub fn new_pre_key_bundle_builder<'a>(&self) -> PreKeyBundleBuilder<'a> {
+        PreKeyBundle::builder(self)
+    }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
 }
