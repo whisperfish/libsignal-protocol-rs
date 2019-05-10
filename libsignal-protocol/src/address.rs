@@ -37,7 +37,5 @@ impl<'a> Address<'a> {
         std::str::from_utf8(self.bytes())
     }
 
-    pub fn device_id(&self) -> i32 {
-        self.raw.device_id
-    }
+    pub fn device_id(&self) -> i32 { self.raw.device_id }
 }

@@ -1,10 +1,10 @@
 use crate::{context::ContextInner, Wrapped};
 use std::{
     cmp::{Ord, Ordering},
+    io::{self, Write},
     mem,
     ops::{Index, IndexMut},
     rc::Rc,
-    io::{self, Write},
 };
 
 /// A byte buffer (e.g. `Vec<u8>`).
@@ -33,9 +33,9 @@ impl Buffer {
     pub fn is_empty(&self) -> bool { self.len() > 0 }
 
     /// Extract the underlying raw pointer.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// It is the user's responsibility to ensure the buffer is later free'd
     /// (e.g. with [`Buffer::from_raw`] or [`sys::signal_buffer_free`]).
     pub fn into_raw(self) -> *mut sys::signal_buffer {
@@ -64,9 +64,9 @@ impl Buffer {
     }
 
     /// Append some data to this buffer.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// Every append results in a re-allocation of the underlying buffer.
     pub fn append(&mut self, data: &[u8]) {
         unsafe {
@@ -97,9 +97,7 @@ impl PartialOrd for Buffer {
 }
 
 impl PartialEq for Buffer {
-    fn eq(&self, other: &Buffer) -> bool {
-        self.cmp(other) == Ordering::Equal
-    }
+    fn eq(&self, other: &Buffer) -> bool { self.cmp(other) == Ordering::Equal }
 }
 
 impl Eq for Buffer {}
