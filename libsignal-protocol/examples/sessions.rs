@@ -68,27 +68,11 @@ fn main() -> Result<(), Error> {
     let addr = Address::new("+14159998888", 1);
 
     // Instantiate a session_builder for a recipient address.
-    let session_builder = SessionBuilder::new(ctx, store_ctx, addr);
+    let session_builder = SessionBuilder::new(&ctx, store_ctx, addr);
 
     // Build a session with a pre key retrieved from the server.
-    let pre_key_bundle = PreKeyBundle::new(
-        1,
-        2,
-        3,
-        unimplemented!(),
-        4,
-        unimplemented!(),
-        &[],
-        unimplemented!(),
-    )?;
-    // registration_id: u32,
-    // device_id: u32,
-    // pre_key_id: u32,
-    // pre_key_public: &PublicKey,
-    // signed_pre_key_id: u32,
-    // signed_pre_key_public: &PublicKey,
-    // signature: &[u8],
-    // identity_key: &PublicKey,
+    let pre_key_bundle = ctx.new_pre_key_bundle_builder().build()?;
+
     session_builder.process_pre_key_bundle(&pre_key_bundle);
 
     Ok(())

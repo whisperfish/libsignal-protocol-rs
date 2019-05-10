@@ -15,7 +15,7 @@ pub struct SessionBuilder {
 
 impl SessionBuilder {
     pub fn new(
-        ctx: Context,
+        ctx: &Context,
         store_context: StoreContext,
         address: Address,
     ) -> SessionBuilder {
@@ -31,7 +31,7 @@ impl SessionBuilder {
             SessionBuilder {
                 raw,
                 _store_ctx: store_context.0,
-                _ctx: ctx.0,
+                _ctx: Rc::clone(&ctx.0),
             }
         }
     }
