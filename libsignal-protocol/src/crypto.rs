@@ -1,7 +1,9 @@
 use std::{
+    convert::TryFrom,
     os::raw::{c_int, c_void},
     pin::Pin,
     slice,
+    sync::{Arc, Mutex},
 };
 
 use sys::{signal_buffer, signal_crypto_provider};
@@ -11,37 +13,45 @@ use crate::{
     errors::{InternalError, InternalErrorCode},
 };
 
+#[derive(Debug, Clone)]
+pub struct SignalCipherTypeError(i32);
+
+#[derive(Copy, Clone)]
+pub enum CipherMode {
+    Encrypt,
+    Decrypt,
+}
 pub enum SignalCipherType {
     AesCtrNoPadding,
     AesCbcPkcs5,
 }
 
-impl From<i32> for SignalCipherType {
-    fn from(v: i32) -> Self {
+impl TryFrom<i32> for SignalCipherType {
+    type Error = SignalCipherTypeError;
+
+    #[inline]
+    fn try_from(v: i32) -> Result<Self, Self::Error> {
         match v as u32 {
             sys::SG_CIPHER_AES_CTR_NOPADDING => {
-                SignalCipherType::AesCtrNoPadding
+                Ok(SignalCipherType::AesCtrNoPadding)
             },
-            sys::SG_CIPHER_AES_CBC_PKCS5 => SignalCipherType::AesCbcPkcs5,
-            _ => unimplemented!("Unimplemented Signal Cipher Type"),
+            sys::SG_CIPHER_AES_CBC_PKCS5 => Ok(SignalCipherType::AesCbcPkcs5),
+            _ => Err(SignalCipherTypeError(v)),
         }
     }
 }
 /// Cryptography routines used in the signal protocol.
 pub trait Crypto {
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError>;
-    fn hmac_sha256_init(&mut self, key: &[u8]) -> Result<(), InternalError>;
-    fn hmac_sha256_update(&mut self, data: &[u8]) -> Result<(), InternalError>;
-    fn hmac_sha256_final(&mut self) -> Result<Vec<u8>, InternalError>;
-    fn hmac_sha256_cleanup(&mut self) {}
+    fn hmac_sha256_init(&self, key: &[u8]) -> Result<(), InternalError>;
+    fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError>;
+    fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError>;
+    fn hmac_sha256_cleanup(&self) {}
 
-    fn sha512_digest_init(&mut self) -> Result<(), InternalError>;
-    fn sha512_digest_update(
-        &mut self,
-        data: &[u8],
-    ) -> Result<(), InternalError>;
-    fn sha512_digest_final(&mut self) -> Result<Vec<u8>, InternalError>;
-    fn sha512_digest_cleanup(&mut self) {}
+    fn sha512_digest_init(&self) -> Result<(), InternalError>;
+    fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError>;
+    fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError>;
+    fn sha512_digest_cleanup(&self) {}
 
     fn encrypt(
         &self,
@@ -64,10 +74,9 @@ pub trait Crypto {
 pub struct DefaultCrypto;
 
 #[cfg(target_os = "linux")]
-#[derive(Clone)]
 pub struct DefaultCrypto {
-    hmac_ctx: Option<openssl::hash::Hasher>,
-    sha512_ctx: Option<openssl::hash::Hasher>,
+    hmac_ctx: Arc<Mutex<Option<openssl::hash::Hasher>>>,
+    sha512_ctx: Arc<Mutex<Option<openssl::hash::Hasher>>>,
 }
 
 #[cfg(not(target_os = "linux"))]
@@ -136,8 +145,8 @@ impl Default for DefaultCrypto {
 impl Default for DefaultCrypto {
     fn default() -> Self {
         Self {
-            hmac_ctx: None,
-            sha512_ctx: None,
+            hmac_ctx: Arc::new(Mutex::new(None)),
+            sha512_ctx: Arc::new(Mutex::new(None)),
         }
     }
 }
@@ -183,31 +192,38 @@ impl DefaultCrypto {
         Ok(result)
     }
 }
+
 #[cfg(target_os = "linux")]
 impl Crypto for DefaultCrypto {
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError> {
         openssl::rand::rand_bytes(buffer).map_err(|_e| InternalError::Unknown)
     }
 
-    fn hmac_sha256_init(&mut self, _key: &[u8]) -> Result<(), InternalError> {
+    fn hmac_sha256_init(&self, _key: &[u8]) -> Result<(), InternalError> {
         let nid = openssl::nid::Nid::HMACWITHSHA256;
         let ty = openssl::hash::MessageDigest::from_nid(nid)
             .ok_or_else(|| InternalError::Unknown)?;
         let ctx = openssl::hash::Hasher::new(ty)
             .map_err(|_e| InternalError::Unknown)?;
-        self.hmac_ctx = Some(ctx);
+        let hmac_ctx = self.hmac_ctx.clone();
+        let mut guard = hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        *guard = Some(ctx);
         Ok(())
     }
 
-    fn hmac_sha256_update(&mut self, data: &[u8]) -> Result<(), InternalError> {
-        if let Some(ref mut ctx) = self.hmac_ctx {
+    fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError> {
+        let hmac_ctx = self.hmac_ctx.clone();
+        let mut guard = hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        if let Some(ref mut ctx) = *guard {
             ctx.update(data).map_err(|_e| InternalError::Unknown)?;
         }
         Ok(())
     }
 
-    fn hmac_sha256_final(&mut self) -> Result<Vec<u8>, InternalError> {
-        if let Some(ref mut ctx) = self.hmac_ctx {
+    fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError> {
+        let hmac_ctx = self.hmac_ctx.clone();
+        let mut guard = hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        if let Some(ref mut ctx) = *guard {
             ctx.finish()
                 .map(|buf| buf.as_ref().to_owned())
                 .map_err(|_e| InternalError::Unknown)
@@ -216,26 +232,32 @@ impl Crypto for DefaultCrypto {
         }
     }
 
-    fn sha512_digest_init(&mut self) -> Result<(), InternalError> {
+    fn sha512_digest_init(&self) -> Result<(), InternalError> {
         let ty = openssl::hash::MessageDigest::sha512();
         let ctx = openssl::hash::Hasher::new(ty)
             .map_err(|_e| InternalError::Unknown)?;
-        self.sha512_ctx = Some(ctx);
+        let sha512_ctx = self.sha512_ctx.clone();
+        let mut guard =
+            sha512_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        *guard = Some(ctx);
         Ok(())
     }
 
-    fn sha512_digest_update(
-        &mut self,
-        data: &[u8],
-    ) -> Result<(), InternalError> {
-        if let Some(ref mut ctx) = self.sha512_ctx {
+    fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError> {
+        let sha512_ctx = self.sha512_ctx.clone();
+        let mut guard =
+            sha512_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        if let Some(ref mut ctx) = *guard {
             ctx.update(data).map_err(|_e| InternalError::Unknown)?;
         }
         Ok(())
     }
 
-    fn sha512_digest_final(&mut self) -> Result<Vec<u8>, InternalError> {
-        if let Some(ref mut ctx) = self.sha512_ctx {
+    fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError> {
+        let sha512_ctx = self.sha512_ctx.clone();
+        let mut guard =
+            sha512_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        if let Some(ref mut ctx) = *guard {
             ctx.finish()
                 .map(|buf| buf.as_ref().to_owned())
                 .map_err(|_e| InternalError::Unknown)
@@ -321,7 +343,7 @@ unsafe extern "C" fn hmac_sha256_cleanup_func(
 ) {
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     user_data.0.hmac_sha256_cleanup();
 }
 
@@ -334,7 +356,7 @@ unsafe extern "C" fn hmac_sha256_final_func(
     assert!(!output.is_null());
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     match user_data.0.hmac_sha256_final() {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
@@ -354,7 +376,7 @@ unsafe extern "C" fn hmac_sha256_init_func(
     assert!(!key.is_null());
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     let buffer = slice::from_raw_parts(key, key_len);
     user_data.0.hmac_sha256_init(buffer).into_code()
 }
@@ -368,7 +390,7 @@ unsafe extern "C" fn hmac_sha256_update_func(
     assert!(!data.is_null());
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     let buffer = slice::from_raw_parts(data, data_len);
     user_data.0.hmac_sha256_update(buffer).into_code()
 }
@@ -379,7 +401,7 @@ unsafe extern "C" fn sha512_digest_init_func(
 ) -> c_int {
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     user_data.0.sha512_digest_init().into_code()
 }
 
@@ -392,7 +414,7 @@ unsafe extern "C" fn sha512_digest_update_func(
     assert!(!data.is_null());
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     let buffer = slice::from_raw_parts(data, data_len);
     user_data.0.sha512_digest_update(buffer).into_code()
 }
@@ -406,7 +428,7 @@ unsafe extern "C" fn sha512_digest_final_func(
     assert!(!output.is_null());
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     match user_data.0.sha512_digest_final() {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
@@ -423,7 +445,7 @@ unsafe extern "C" fn sha512_digest_cleanup_func(
 ) {
     assert!(!user_data.is_null());
 
-    let user_data = &mut *(user_data as *mut State);
+    let user_data = &*(user_data as *const State);
     user_data.0.sha512_digest_cleanup();
 }
 
@@ -438,26 +460,18 @@ unsafe extern "C" fn encrypt_func(
     plaintext_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    // just to make sure that the c ffi gave us a valid buffer to write to.
-    assert!(!output.is_null());
-    assert!(!user_data.is_null());
-    assert!(!key.is_null());
-    assert!(!iv.is_null());
-    assert!(!plaintext.is_null());
-
-    let key = slice::from_raw_parts(key, key_len);
-    let iv = slice::from_raw_parts(iv, iv_len);
-    let data = slice::from_raw_parts(plaintext, plaintext_len);
-    let signal_cipher_type = SignalCipherType::from(cipher);
-    let user_data = &mut *(user_data as *mut State);
-    match user_data.0.encrypt(signal_cipher_type, key, iv, data) {
-        Ok(buf) => {
-            let buffer = Buffer::from(buf);
-            *output = buffer.into_raw();
-            sys::SG_SUCCESS as c_int
-        },
-        Err(e) => e.code(),
-    }
+    internal_cipher(
+        CipherMode::Encrypt,
+        output,
+        cipher,
+        key,
+        key_len,
+        iv,
+        iv_len,
+        plaintext,
+        plaintext_len,
+        user_data,
+    )
 }
 
 unsafe extern "C" fn decrypt_func(
@@ -471,19 +485,59 @@ unsafe extern "C" fn decrypt_func(
     ciphertext_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
+    internal_cipher(
+        CipherMode::Decrypt,
+        output,
+        cipher,
+        key,
+        key_len,
+        iv,
+        iv_len,
+        ciphertext,
+        ciphertext_len,
+        user_data,
+    )
+}
+
+#[inline]
+unsafe extern "C" fn internal_cipher(
+    mode: CipherMode,
+    output: *mut *mut signal_buffer,
+    cipher: c_int,
+    key: *const u8,
+    key_len: usize,
+    iv: *const u8,
+    iv_len: usize,
+    data: *const u8,
+    data_len: usize,
+    user_data: *mut c_void,
+) -> c_int {
+    use self::CipherMode::*;
     // just to make sure that the c ffi gave us a valid buffer to write to.
     assert!(!output.is_null());
     assert!(!user_data.is_null());
     assert!(!key.is_null());
     assert!(!iv.is_null());
-    assert!(!ciphertext.is_null());
+    assert!(!data.is_null());
 
+    let signal_cipher_type = match SignalCipherType::try_from(cipher) {
+        Ok(ty) => ty,
+        // return early of the function with invalid arg instead of unknown
+        // error, cuz we know it xD
+        Err(_) => return InternalError::InvalidArgument.code(),
+    };
     let key = slice::from_raw_parts(key, key_len);
     let iv = slice::from_raw_parts(iv, iv_len);
-    let data = slice::from_raw_parts(ciphertext, ciphertext_len);
-    let signal_cipher_type = SignalCipherType::from(cipher);
-    let user_data = &mut *(user_data as *mut State);
-    match user_data.0.decrypt(signal_cipher_type, key, iv, data) {
+    let data = slice::from_raw_parts(data, data_len);
+
+    let user_data = &*(user_data as *const State);
+
+    let result = match mode {
+        Encrypt => user_data.0.encrypt(signal_cipher_type, key, iv, data),
+        Decrypt => user_data.0.decrypt(signal_cipher_type, key, iv, data),
+    };
+
+    match result {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
             *output = buffer.into_raw();
