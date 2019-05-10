@@ -11,14 +11,20 @@ use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
-    keys::{IdentityKeyPair, PreKeyList},
+    keys::{IdentityKeyPair, KeyPair, PreKeyList},
     pre_key_store::{self as pks, PreKeyStore},
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
     store_context::StoreContext,
-    Wrapped,
+    PreKey, PreKeyBundle, PreKeyBundleBuilder, Wrapped,
 };
 
+use lock_api::RawMutex as _;
+use parking_lot::RawMutex;
+use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
+use sys::signal_context;
+
+/// Global state and callbacks used by the library.
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
@@ -131,7 +137,26 @@ impl Context {
         }
     }
 
+    pub fn create_pre_key(
+        &self,
+        signing_pair: &KeyPair,
+        id: u32,
+    ) -> Result<PreKey, InternalError> {
+        let mut raw = ptr::null_mut();
+
+        unsafe {
+            sys::session_pre_key_create(&mut raw, id, signing_pair.raw_mut())
+                .into_result()?;
+
+            Ok(PreKey::from_raw(raw, &self.0))
+        }
+    }
+
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
+
+    pub fn new_pre_key_bundle_builder<'a>(&self) -> PreKeyBundleBuilder<'a> {
+        PreKeyBundle::builder(self)
+    }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
 }

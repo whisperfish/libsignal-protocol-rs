@@ -68,7 +68,12 @@ fn main() -> Result<(), Error> {
     let addr = Address::new("+14159998888", 1);
 
     // Instantiate a session_builder for a recipient address.
-    let _session_builder = SessionBuilder::new(ctx, store_ctx, addr);
+    let session_builder = SessionBuilder::new(&ctx, store_ctx, addr);
+
+    // Build a session with a pre key retrieved from the server.
+    let pre_key_bundle = ctx.new_pre_key_bundle_builder().build()?;
+
+    session_builder.process_pre_key_bundle(&pre_key_bundle);
 
     Ok(())
 }
