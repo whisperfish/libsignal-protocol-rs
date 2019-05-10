@@ -1,13 +1,16 @@
-use crate::{
-    buffer::Buffer,
-    errors::{InternalError, InternalErrorCode},
-};
 use std::{
     os::raw::{c_int, c_void},
     pin::Pin,
     slice,
 };
+
 use sys::{signal_buffer, signal_crypto_provider};
+
+use crate::{
+    buffer::Buffer,
+    errors::{InternalError, InternalErrorCode},
+};
+
 pub enum SignalCipherType {
     AesCtrNoPadding,
     AesCbcPkcs5,
@@ -140,7 +143,7 @@ impl Default for DefaultCrypto {
 }
 #[cfg(target_os = "linux")]
 impl DefaultCrypto {
-    pub fn crypter(
+    fn crypter(
         &self,
         mode: openssl::symm::Mode,
         cipher: SignalCipherType,
@@ -148,8 +151,8 @@ impl DefaultCrypto {
         iv: &[u8],
         data: &[u8],
     ) -> Result<Vec<u8>, InternalError> {
+        use self::SignalCipherType::*;
         use openssl::symm::{Cipher, Crypter};
-        use SignalCipherType::*;
         let signal_cipher_type = match (cipher, key.len()) {
             (AesCtrNoPadding, 16) => Cipher::aes_128_ctr(),
             (AesCtrNoPadding, 24) => {
@@ -327,13 +330,15 @@ unsafe extern "C" fn hmac_sha256_final_func(
     output: *mut *mut signal_buffer,
     user_data: *mut c_void,
 ) -> i32 {
+    // just to make sure that the c ffi gave us a valid buffer to write to.
+    assert!(!output.is_null());
     assert!(!user_data.is_null());
 
     let user_data = &mut *(user_data as *mut State);
     match user_data.0.hmac_sha256_final() {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
-            output.write(buffer.into_raw());
+            *output = buffer.into_raw();
             sys::SG_SUCCESS as c_int
         },
         Err(e) => e.code(),
@@ -397,13 +402,15 @@ unsafe extern "C" fn sha512_digest_final_func(
     output: *mut *mut signal_buffer,
     user_data: *mut c_void,
 ) -> c_int {
+    // just to make sure that the c ffi gave us a valid buffer to write to.
+    assert!(!output.is_null());
     assert!(!user_data.is_null());
 
     let user_data = &mut *(user_data as *mut State);
     match user_data.0.sha512_digest_final() {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
-            output.write(buffer.into_raw());
+            *output = buffer.into_raw();
             sys::SG_SUCCESS as c_int
         },
         Err(e) => e.code(),
@@ -431,6 +438,8 @@ unsafe extern "C" fn encrypt_func(
     plaintext_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
+    // just to make sure that the c ffi gave us a valid buffer to write to.
+    assert!(!output.is_null());
     assert!(!user_data.is_null());
     assert!(!key.is_null());
     assert!(!iv.is_null());
@@ -444,7 +453,7 @@ unsafe extern "C" fn encrypt_func(
     match user_data.0.encrypt(signal_cipher_type, key, iv, data) {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
-            output.write(buffer.into_raw());
+            *output = buffer.into_raw();
             sys::SG_SUCCESS as c_int
         },
         Err(e) => e.code(),
@@ -462,6 +471,8 @@ unsafe extern "C" fn decrypt_func(
     ciphertext_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
+    // just to make sure that the c ffi gave us a valid buffer to write to.
+    assert!(!output.is_null());
     assert!(!user_data.is_null());
     assert!(!key.is_null());
     assert!(!iv.is_null());
@@ -475,7 +486,7 @@ unsafe extern "C" fn decrypt_func(
     match user_data.0.decrypt(signal_cipher_type, key, iv, data) {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
-            output.write(buffer.into_raw());
+            *output = buffer.into_raw();
             sys::SG_SUCCESS as c_int
         },
         Err(e) => e.code(),
