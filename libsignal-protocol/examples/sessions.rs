@@ -45,8 +45,8 @@
 
 use failure::Error;
 use libsignal_protocol::{
-    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyBundle,
-    PreKeyStore, SessionBuilder, SessionStore, SignedPreKeyStore,
+    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyStore,
+    SessionBuilder, SessionStore, SignedPreKeyStore,
 };
 use std::io::{self, Write};
 

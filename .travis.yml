@@ -34,4 +34,5 @@ deploy:
   local_dir: public
   on:
     branch: master
-    condition: "$TRAVIS_RUST_VERSION == stable"
+    # nightly gives us better docs (intra-doc links)
+    condition: "$TRAVIS_RUST_VERSION == nightly"
