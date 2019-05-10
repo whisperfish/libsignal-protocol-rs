@@ -41,6 +41,10 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libsignal_protocol_sys</span> <span class="kw">as</span> <span class="ident">sys</span>;
 
@@ -53,9 +57,12 @@
 <span class="kw">mod</span> <span class="ident">errors</span>;
 <span class="kw">mod</span> <span class="ident">identity_key_store</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">keys</span>;
-<span class="kw">mod</span> <span class="ident">pre_key_bundle</span>;
-<span class="kw">mod</span> <span class="ident">pre_key_store</span>;
+<span class="kw">mod</span> <span class="ident">pre_key</span>;
 <span class="kw">mod</span> <span class="ident">session_builder</span>;
+
+<span class="kw">mod</span> <span class="ident">pre_key_store</span>;
+
+<span class="kw">mod</span> <span class="ident">pre_key_bundle</span>;
 <span class="kw">mod</span> <span class="ident">session_store</span>;
 <span class="kw">mod</span> <span class="ident">signed_pre_key_store</span>;
 <span class="kw">mod</span> <span class="ident">store_context</span>;
@@ -68,6 +75,7 @@
     <span class="ident">errors</span>::<span class="ident">InternalError</span>,
     <span class="ident">identity_key_store</span>::<span class="ident">IdentityKeyStore</span>,
     <span class="ident">pre_key_bundle</span>::<span class="ident">PreKeyBundle</span>,
+    <span class="ident">pre_key</span>::<span class="ident">PreKey</span>,
     <span class="ident">pre_key_store</span>::<span class="ident">PreKeyStore</span>,
     <span class="ident">session_builder</span>::<span class="ident">SessionBuilder</span>,
     <span class="ident">session_store</span>::<span class="ident">SessionStore</span>,
