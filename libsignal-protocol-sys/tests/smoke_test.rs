@@ -1,6 +1,7 @@
 extern crate libsignal_protocol_sys as sys;
 
-use std::{ffi::c_void, ptr, sync::Mutex};
+use std::{ffi::c_void, ptr};
+
 use sys::signal_context;
 
 #[test]

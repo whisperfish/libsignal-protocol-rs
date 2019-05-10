@@ -90,11 +90,11 @@ impl Crypto for DefaultCrypto {
         Ok(())
     }
 
-    fn hmac_sha256_init(&self, key: &[u8]) -> Result<(), InternalError> {
+    fn hmac_sha256_init(&self, _key: &[u8]) -> Result<(), InternalError> {
         unimplemented!()
     }
 
-    fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError> {
+    fn hmac_sha256_update(&self, _data: &[u8]) -> Result<(), InternalError> {
         unimplemented!()
     }
 
@@ -106,7 +106,7 @@ impl Crypto for DefaultCrypto {
         unimplemented!()
     }
 
-    fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError> {
+    fn sha512_digest_update(&self, _data: &[u8]) -> Result<(), InternalError> {
         unimplemented!()
     }
 
@@ -116,20 +116,20 @@ impl Crypto for DefaultCrypto {
 
     fn encrypt(
         &self,
-        cipher: SignalCipherType,
-        key: &[u8],
-        iv: &[u8],
-        data: &[u8],
+        _cipher: SignalCipherType,
+        _key: &[u8],
+        _iv: &[u8],
+        _data: &[u8],
     ) -> Result<Vec<u8>, InternalError> {
         unimplemented!()
     }
 
     fn decrypt(
         &self,
-        cipher: SignalCipherType,
-        key: &[u8],
-        iv: &[u8],
-        data: &[u8],
+        _cipher: SignalCipherType,
+        _key: &[u8],
+        _iv: &[u8],
+        _data: &[u8],
     ) -> Result<Vec<u8>, InternalError> {
         unimplemented!()
     }

@@ -12,17 +12,13 @@ use crate::{
     errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
     keys::{IdentityKeyPair, KeyPair, PreKeyList},
+    pre_key::PreKey,
     pre_key_store::{self as pks, PreKeyStore},
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
     store_context::StoreContext,
-    PreKey, PreKeyBundle, PreKeyBundleBuilder, Wrapped,
+    PreKeyBundle, PreKeyBundleBuilder, Wrapped,
 };
-
-use lock_api::RawMutex as _;
-use parking_lot::RawMutex;
-use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
-use sys::signal_context;
 
 /// Global state and callbacks used by the library.
 pub struct Context(pub(crate) Rc<ContextInner>);
