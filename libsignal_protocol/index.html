@@ -3,7 +3,7 @@
 asynchronous messaging environments.</p>
 <h1 id="key-concepts" class="section-header"><a href="#key-concepts">Key Concepts</a></h1><h2 id="prekeys" class="section-header"><a href="#prekeys">PreKeys</a></h2>
 <p>This protocol uses a concept called &quot;<em>PreKeys</em>&quot;. A PreKey is a
-[<code>keys::PublicKey</code>] and an associated unique ID which are stored together by
+<a href="../libsignal_protocol/keys/struct.PublicKey.html" title="`keys::PublicKey`"><code>keys::PublicKey</code></a> and an associated unique ID which are stored together by
 a server. PreKeys can also be signed.</p>
 <p>At install time, clients generate a single signed PreKey, as well as a large
 list of unsigned PreKeys, and transmit all of them to the server.</p>
@@ -13,7 +13,7 @@ which is then used for all subsequent encrypt/decrypt operations. There is
 no need to ever tear down a session once one has been established.</p>
 <p>Sessions are established in one of three ways:</p>
 <ol>
-<li>[<code>PreKeyBundle</code>]. A client that wishes to send a message to a recipient
+<li><a href="../libsignal_protocol/struct.PreKeyBundle.html" title="`PreKeyBundle`"><code>PreKeyBundle</code></a>. A client that wishes to send a message to a recipient
 can establish a session by retrieving a PreKeyBundle for that recipient
 from the server.</li>
 <li>PreKeySignalMessages.  A client can receive a PreKeySignalMessage from a
@@ -29,13 +29,13 @@ the session.</p>
 <ol>
 <li>Identity State. Clients will need to maintain the state of their own
 identity key pair, as well as identity keys received from other clients
-(saved in an [<code>IdentityKeyStore</code>]).</li>
+(saved in an <a href="../libsignal_protocol/trait.IdentityKeyStore.html" title="`IdentityKeyStore`"><code>IdentityKeyStore</code></a>).</li>
 <li>PreKey State. Clients will need to maintain the state of their generated
-PreKeys in a [<code>PreKeyStore</code>].</li>
+PreKeys in a <a href="../libsignal_protocol/trait.PreKeyStore.html" title="`PreKeyStore`"><code>PreKeyStore</code></a>.</li>
 <li>Signed PreKey States. Clients will need to maintain the state of their
-signed PreKeys using a [<code>SignedPreKeyStore</code>].</li>
+signed PreKeys using a <a href="../libsignal_protocol/trait.SignedPreKeyStore.html" title="`SignedPreKeyStore`"><code>SignedPreKeyStore</code></a>.</li>
 <li>Session State. Clients will need to maintain the state of the sessions
-they have established using a [<code>SessionStore</code>].</li>
+they have established using a <a href="../libsignal_protocol/trait.SessionStore.html" title="`SessionStore`"><code>SessionStore</code></a>.</li>
 </ol>
 </div><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
 <table><tr class='module-item'><td><a class="mod" href="keys/index.html" title='libsignal_protocol::keys mod'>keys</a></td><td class='docblock-short'></td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>

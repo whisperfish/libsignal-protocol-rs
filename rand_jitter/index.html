@@ -11,16 +11,16 @@ predict.</p>
 <code>OsRng</code> is not available.</p>
 <p><code>JitterRng</code> can be used without the standard library, but not conveniently,
 you must provide a high-precision timer and carefully have to follow the
-instructions of [<code>JitterRng::new_with_timer</code>].</p>
+instructions of <a href="../rand_jitter/struct.JitterRng.html#method.new_with_timer" title="`JitterRng::new_with_timer`"><code>JitterRng::new_with_timer</code></a>.</p>
 <p>This implementation is based on <a href="http://www.chronox.de/jent.html">Jitterentropy</a> version 2.1.0.</p>
 <p>Note: There is no accurate timer available on WASM platforms, to help
 prevent fingerprinting or timing side-channel attacks. Therefore
-[<code>JitterRng::new()</code>] is not available on WASM. It is also unavailable
+<a href="../rand_jitter/struct.JitterRng.html#method.new" title="`JitterRng::new()`"><code>JitterRng::new()</code></a> is not available on WASM. It is also unavailable
 with disabled <code>std</code> feature.</p>
 </div><h2 id='reexports' class='section-header'><a href="#reexports">Re-exports</a></h2>
 <table><tr><td><code>pub extern crate <a class="mod" href="../rand_core/index.html" title="mod rand_core">rand_core</a>;</code></td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
 <table><tr class='module-item'><td><a class="struct" href="struct.JitterRng.html" title='rand_jitter::JitterRng struct'>JitterRng</a></td><td class='docblock-short'><p>A true random number generator based on jitter in the CPU execution time,
 and jitter in memory access time.</p>
 </td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
-<table><tr class='module-item'><td><a class="enum" href="enum.TimerError.html" title='rand_jitter::TimerError enum'>TimerError</a></td><td class='docblock-short'><p>An error that can occur when <a href="crate::JitterRng::test_timer"><code>JitterRng::test_timer</code></a> fails.</p>
+<table><tr class='module-item'><td><a class="enum" href="enum.TimerError.html" title='rand_jitter::TimerError enum'>TimerError</a></td><td class='docblock-short'><p>An error that can occur when <a href="../rand_jitter/struct.JitterRng.html#method.test_timer"><code>JitterRng::test_timer</code></a> fails.</p>
 </td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../";window.currentCrate = "rand_jitter";</script><script src="../aliases.js"></script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>
