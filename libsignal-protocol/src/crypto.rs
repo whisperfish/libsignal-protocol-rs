@@ -1,9 +1,10 @@
+#[cfg(feature = "crypto-openssl")]
+use std::sync::{Arc, Mutex};
 use std::{
     convert::TryFrom,
     os::raw::{c_int, c_void},
     pin::Pin,
     slice,
-    sync::{Arc, Mutex},
 };
 
 use sys::{signal_buffer, signal_crypto_provider};
@@ -40,6 +41,7 @@ impl TryFrom<i32> for SignalCipherType {
         }
     }
 }
+
 /// Cryptography routines used in the signal protocol.
 pub trait Crypto {
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError>;
@@ -69,17 +71,17 @@ pub trait Crypto {
     ) -> Result<Vec<u8>, InternalError>;
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(feature = "crypto-native")]
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct DefaultCrypto;
 
-#[cfg(target_os = "linux")]
-pub struct DefaultCrypto {
+#[cfg(feature = "crypto-openssl")]
+pub struct OpenSSLCrypto {
     hmac_ctx: Arc<Mutex<Option<openssl::hash::Hasher>>>,
     sha512_ctx: Arc<Mutex<Option<openssl::hash::Hasher>>>,
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(feature = "crypto-native")]
 impl Crypto for DefaultCrypto {
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError> {
         use rand::RngCore;
@@ -88,30 +90,27 @@ impl Crypto for DefaultCrypto {
         Ok(())
     }
 
-    fn hmac_sha256_init(&mut self, key: &[u8]) -> Result<(), InternalError> {
+    fn hmac_sha256_init(&self, key: &[u8]) -> Result<(), InternalError> {
         unimplemented!()
     }
 
-    fn hmac_sha256_update(&mut self, data: &[u8]) -> Result<(), InternalError> {
+    fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError> {
         unimplemented!()
     }
 
-    fn hmac_sha256_final(&mut self) -> Result<Vec<u8>, InternalError> {
+    fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError> {
         unimplemented!()
     }
 
-    fn sha512_digest_init(&mut self) -> Result<(), InternalError> {
+    fn sha512_digest_init(&self) -> Result<(), InternalError> {
         unimplemented!()
     }
 
-    fn sha512_digest_update(
-        &mut self,
-        data: &[u8],
-    ) -> Result<(), InternalError> {
+    fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError> {
         unimplemented!()
     }
 
-    fn sha512_digest_final(&mut self) -> Result<Vec<u8>, InternalError> {
+    fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError> {
         unimplemented!()
     }
 
@@ -136,13 +135,13 @@ impl Crypto for DefaultCrypto {
     }
 }
 
-#[cfg(not(target_os = "linux"))]
+#[cfg(feature = "crypto-native")]
 impl Default for DefaultCrypto {
     fn default() -> Self { Self }
 }
 
-#[cfg(target_os = "linux")]
-impl Default for DefaultCrypto {
+#[cfg(feature = "crypto-openssl")]
+impl Default for OpenSSLCrypto {
     fn default() -> Self {
         Self {
             hmac_ctx: Arc::new(Mutex::new(None)),
@@ -150,8 +149,9 @@ impl Default for DefaultCrypto {
         }
     }
 }
-#[cfg(target_os = "linux")]
-impl DefaultCrypto {
+
+#[cfg(feature = "crypto-openssl")]
+impl OpenSSLCrypto {
     fn crypter(
         &self,
         mode: openssl::symm::Mode,
@@ -193,8 +193,8 @@ impl DefaultCrypto {
     }
 }
 
-#[cfg(target_os = "linux")]
-impl Crypto for DefaultCrypto {
+#[cfg(feature = "crypto-openssl")]
+impl Crypto for OpenSSLCrypto {
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError> {
         openssl::rand::rand_bytes(buffer).map_err(|_e| InternalError::Unknown)
     }

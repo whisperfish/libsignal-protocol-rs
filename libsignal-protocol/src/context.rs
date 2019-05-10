@@ -5,8 +5,10 @@ use parking_lot::RawMutex;
 
 use sys::signal_context;
 
+#[cfg(feature = "crypto-native")]
+use crate::crypto::DefaultCrypto;
 use crate::{
-    crypto::{Crypto, CryptoProvider, DefaultCrypto},
+    crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
     keys::{IdentityKeyPair, PreKeyList},
@@ -134,6 +136,7 @@ impl Context {
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
 }
 
+#[cfg(feature = "crypto-native")]
 impl Default for Context {
     fn default() -> Context {
         match Context::new(DefaultCrypto::default()) {
@@ -229,7 +232,7 @@ struct State {
     mux: RawMutex,
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "crypto-native"))]
 mod tests {
     use super::*;
 

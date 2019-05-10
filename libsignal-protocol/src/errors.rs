@@ -1,4 +1,3 @@
-use core::any::Any;
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, failure_derive::Fail)]
