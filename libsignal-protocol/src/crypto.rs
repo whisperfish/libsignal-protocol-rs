@@ -1,5 +1,5 @@
 #[cfg(feature = "crypto-openssl")]
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 use std::{
     convert::TryFrom,
     os::raw::{c_int, c_void},
@@ -77,8 +77,8 @@ pub struct DefaultCrypto;
 
 #[cfg(feature = "crypto-openssl")]
 pub struct OpenSSLCrypto {
-    hmac_ctx: Arc<Mutex<Option<openssl::hash::Hasher>>>,
-    sha512_ctx: Arc<Mutex<Option<openssl::hash::Hasher>>>,
+    hmac_ctx: Mutex<Option<openssl::hash::Hasher>>,
+    sha512_ctx: Mutex<Option<openssl::hash::Hasher>>,
 }
 
 #[cfg(feature = "crypto-native")]
@@ -144,8 +144,8 @@ impl Default for DefaultCrypto {
 impl Default for OpenSSLCrypto {
     fn default() -> Self {
         Self {
-            hmac_ctx: Arc::new(Mutex::new(None)),
-            sha512_ctx: Arc::new(Mutex::new(None)),
+            hmac_ctx: Mutex::new(None),
+            sha512_ctx: Mutex::new(None),
         }
     }
 }
@@ -205,15 +205,15 @@ impl Crypto for OpenSSLCrypto {
             .ok_or_else(|| InternalError::Unknown)?;
         let ctx = openssl::hash::Hasher::new(ty)
             .map_err(|_e| InternalError::Unknown)?;
-        let hmac_ctx = self.hmac_ctx.clone();
-        let mut guard = hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        let mut guard =
+            self.hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
         *guard = Some(ctx);
         Ok(())
     }
 
     fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError> {
-        let hmac_ctx = self.hmac_ctx.clone();
-        let mut guard = hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        let mut guard =
+            self.hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
         if let Some(ref mut ctx) = *guard {
             ctx.update(data).map_err(|_e| InternalError::Unknown)?;
         }
@@ -221,8 +221,8 @@ impl Crypto for OpenSSLCrypto {
     }
 
     fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError> {
-        let hmac_ctx = self.hmac_ctx.clone();
-        let mut guard = hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        let mut guard =
+            self.hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
         if let Some(ref mut ctx) = *guard {
             ctx.finish()
                 .map(|buf| buf.as_ref().to_owned())
@@ -236,17 +236,19 @@ impl Crypto for OpenSSLCrypto {
         let ty = openssl::hash::MessageDigest::sha512();
         let ctx = openssl::hash::Hasher::new(ty)
             .map_err(|_e| InternalError::Unknown)?;
-        let sha512_ctx = self.sha512_ctx.clone();
-        let mut guard =
-            sha512_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        let mut guard = self
+            .sha512_ctx
+            .lock()
+            .map_err(|_e| InternalError::Unknown)?;
         *guard = Some(ctx);
         Ok(())
     }
 
     fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError> {
-        let sha512_ctx = self.sha512_ctx.clone();
-        let mut guard =
-            sha512_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        let mut guard = self
+            .sha512_ctx
+            .lock()
+            .map_err(|_e| InternalError::Unknown)?;
         if let Some(ref mut ctx) = *guard {
             ctx.update(data).map_err(|_e| InternalError::Unknown)?;
         }
@@ -254,9 +256,10 @@ impl Crypto for OpenSSLCrypto {
     }
 
     fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError> {
-        let sha512_ctx = self.sha512_ctx.clone();
-        let mut guard =
-            sha512_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+        let mut guard = self
+            .sha512_ctx
+            .lock()
+            .map_err(|_e| InternalError::Unknown)?;
         if let Some(ref mut ctx) = *guard {
             ctx.finish()
                 .map(|buf| buf.as_ref().to_owned())
@@ -522,7 +525,7 @@ unsafe extern "C" fn internal_cipher(
 
     let signal_cipher_type = match SignalCipherType::try_from(cipher) {
         Ok(ty) => ty,
-        // return early of the function with invalid arg instead of unknown
+        // return early from the function with invalid arg instead of unknown
         // error, cuz we know it xD
         Err(_) => return InternalError::InvalidArgument.code(),
     };
