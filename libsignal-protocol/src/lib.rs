@@ -52,6 +52,28 @@
 
 extern crate libsignal_protocol_sys as sys;
 
+use std::rc::Rc;
+
+use crate::context::ContextInner;
+#[cfg(feature = "crypto-native")]
+pub use crate::crypto::DefaultCrypto;
+#[cfg(feature = "crypto-openssl")]
+pub use crate::crypto::OpenSSLCrypto;
+pub use crate::{
+    address::Address,
+    buffer::Buffer,
+    context::Context,
+    crypto::Crypto,
+    errors::InternalError,
+    identity_key_store::IdentityKeyStore,
+    pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
+    pre_key_store::PreKeyStore,
+    session_builder::SessionBuilder,
+    session_store::SessionStore,
+    signed_pre_key_store::SignedPreKeyStore,
+    store_context::StoreContext,
+};
+
 #[macro_use]
 mod macros;
 mod address;
@@ -68,25 +90,6 @@ mod session_builder;
 mod session_store;
 mod signed_pre_key_store;
 mod store_context;
-
-pub use crate::{
-    address::Address,
-    buffer::Buffer,
-    context::Context,
-    crypto::{Crypto, DefaultCrypto},
-    errors::InternalError,
-    identity_key_store::IdentityKeyStore,
-    pre_key::PreKey,
-    pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
-    pre_key_store::PreKeyStore,
-    session_builder::SessionBuilder,
-    session_store::SessionStore,
-    signed_pre_key_store::SignedPreKeyStore,
-    store_context::StoreContext,
-};
-
-use crate::context::ContextInner;
-use std::rc::Rc;
 
 pub(crate) trait Wrapped: Sized {
     type Raw: ?Sized;

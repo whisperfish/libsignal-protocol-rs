@@ -97,11 +97,15 @@ impl InternalError {
     }
 }
 
-pub(crate) trait InternalErrorCode: Sized {
+pub(crate) trait FromInternalErrorCode: Sized {
     fn into_result(self) -> Result<(), InternalError>;
 }
 
-impl InternalErrorCode for i32 {
+pub(crate) trait IntoInternalErrorCode: Sized {
+    fn into_code(self) -> i32;
+}
+
+impl FromInternalErrorCode for i32 {
     fn into_result(self) -> Result<(), InternalError> {
         if self == 0 {
             return Ok(());
@@ -110,6 +114,15 @@ impl InternalErrorCode for i32 {
         match InternalError::from_error_code(self) {
             None => Err(InternalError::Other(self)),
             Some(e) => Err(e),
+        }
+    }
+}
+
+impl<T> IntoInternalErrorCode for Result<T, InternalError> {
+    fn into_code(self) -> i32 {
+        match self {
+            Ok(_) => 0,
+            Err(e) => e.code(),
         }
     }
 }

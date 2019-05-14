@@ -1,19 +1,24 @@
+use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
+
+use lock_api::RawMutex as _;
+use parking_lot::RawMutex;
+
+use sys::signal_context;
+
+#[cfg(feature = "crypto-native")]
+use crate::crypto::DefaultCrypto;
 use crate::{
-    crypto::{Crypto, CryptoProvider, DefaultCrypto},
-    errors::{InternalError, InternalErrorCode},
+    crypto::{Crypto, CryptoProvider},
+    errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
     keys::{IdentityKeyPair, KeyPair, PreKeyList},
+    pre_key::PreKey,
     pre_key_store::{self as pks, PreKeyStore},
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
     store_context::StoreContext,
-    PreKey, PreKeyBundle, PreKeyBundleBuilder, Wrapped,
+    PreKeyBundle, PreKeyBundleBuilder, Wrapped,
 };
-
-use lock_api::RawMutex as _;
-use parking_lot::RawMutex;
-use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
-use sys::signal_context;
 
 /// Global state and callbacks used by the library.
 pub struct Context(pub(crate) Rc<ContextInner>);
@@ -152,9 +157,10 @@ impl Context {
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
 }
 
+#[cfg(feature = "crypto-native")]
 impl Default for Context {
     fn default() -> Context {
-        match Context::new(DefaultCrypto) {
+        match Context::new(DefaultCrypto::default()) {
             Ok(c) => c,
             Err(e) => {
                 panic!("Unable to create a context using the defaults: {}", e)
@@ -247,13 +253,13 @@ struct State {
     mux: RawMutex,
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "crypto-native"))]
 mod tests {
     use super::*;
 
     #[test]
     fn library_initialization_example_from_readme() {
-        let ctx = Context::new(DefaultCrypto).unwrap();
+        let ctx = Context::new(DefaultCrypto::default()).unwrap();
 
         drop(ctx);
     }
