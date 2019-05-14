@@ -2,10 +2,6 @@ language: rust
 sudo: false
 cache: cargo
 
-rust:
-  - 1.34.0
-  - stable
-
 script: 
   - cargo build --all --verbose
   - cargo test --all --verbose
@@ -18,6 +14,8 @@ before_deploy:
 
 matrix:
   include:
+    - rust: stable
+    - rust: 1.34.0
     - rust: nightly
       before_script:
         - rustup component add rustfmt
@@ -25,6 +23,8 @@ matrix:
       script:
         - cargo fmt --all -- --check
         - cargo clippy -- -D clippy::all
+  allow_failures:
+    - rust: nightly
 
 deploy:
   provider: pages
