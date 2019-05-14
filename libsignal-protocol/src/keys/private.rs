@@ -1,4 +1,6 @@
-use crate::{errors::FromInternalErrorCode, raw_ptr::Raw, Context};
+use crate::{
+    errors::FromInternalErrorCode, keys::PublicKey, raw_ptr::Raw, Context,
+};
 use failure::Error;
 use std::{
     cmp::{Ord, Ordering},
@@ -25,6 +27,18 @@ impl PrivateKey {
             .into_result()?;
 
             Ok(PrivateKey {
+                raw: Raw::from_ptr(raw),
+            })
+        }
+    }
+
+    pub fn generate_public_key(&self) -> Result<PublicKey, Error> {
+        unsafe {
+            let raw = ptr::null_mut();
+            sys::curve_generate_public_key(&mut raw, self.raw.as_const_ptr())
+                .into_result()?;
+
+            Ok(PublicKey {
                 raw: Raw::from_ptr(raw),
             })
         }
