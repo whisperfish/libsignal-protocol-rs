@@ -83,13 +83,13 @@ mod crypto;
 mod errors;
 mod identity_key_store;
 pub mod keys;
-mod pre_key;
 mod pre_key_bundle;
 mod pre_key_store;
 mod raw_ptr;
 mod session_store;
 mod signed_pre_key_store;
 mod store_context;
+mod session_builder;
 
 
 pub(crate) trait Wrapped: Sized {

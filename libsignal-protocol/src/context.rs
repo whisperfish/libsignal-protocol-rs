@@ -11,13 +11,12 @@ use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
-    keys::{IdentityKeyPair, KeyPair, PreKeyList},
-    pre_key::PreKey,
+    keys::{IdentityKeyPair, KeyPair, PreKey, PreKeyList},
     pre_key_store::{self as pks, PreKeyStore},
+    raw_ptr::Raw,
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
-    store_context::StoreContext,
-    PreKeyBundle, PreKeyBundleBuilder, Wrapped,
+    PreKeyBundle, PreKeyBundleBuilder, StoreContext, Wrapped,
 };
 
 /// Global state and callbacks used by the library.
@@ -40,7 +39,9 @@ impl Context {
                 self.raw(),
             )
             .into_result()?;
-            Ok(IdentityKeyPair::from_raw(key_pair, &self.0))
+            Ok(IdentityKeyPair {
+                raw: Raw::from_ptr(key_pair),
+            })
         }
     }
 
@@ -76,7 +77,7 @@ impl Context {
             )
             .into_result()?;
 
-            Ok(PreKeyList::from_raw(pre_keys_head, &self.0))
+            Ok(PreKeyList::from_raw(pre_keys_head))
         }
     }
 
@@ -130,21 +131,6 @@ impl Context {
             .into_result()?;
 
             Ok(StoreContext::new(store_ctx, &self.0))
-        }
-    }
-
-    pub fn create_pre_key(
-        &self,
-        signing_pair: &KeyPair,
-        id: u32,
-    ) -> Result<PreKey, InternalError> {
-        let mut raw = ptr::null_mut();
-
-        unsafe {
-            sys::session_pre_key_create(&mut raw, id, signing_pair.raw_mut())
-                .into_result()?;
-
-            Ok(PreKey::from_raw(raw, &self.0))
         }
     }
 
