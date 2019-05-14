@@ -86,10 +86,11 @@ pub mod keys;
 mod pre_key;
 mod pre_key_bundle;
 mod pre_key_store;
-mod session_builder;
+mod raw_ptr;
 mod session_store;
 mod signed_pre_key_store;
 mod store_context;
+
 
 pub(crate) trait Wrapped: Sized {
     type Raw: ?Sized;

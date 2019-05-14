@@ -1,0 +1,65 @@
+use crate::{errors::FromInternalErrorCode, raw_ptr::Raw, Context};
+use failure::Error;
+use std::{
+    cmp::{Ord, Ordering},
+    ptr,
+};
+
+pub struct PrivateKey {
+    pub(crate) raw: Raw<sys::ec_private_key>,
+}
+
+impl PrivateKey {
+    pub fn decode_point(
+        ctx: &Context,
+        data: &[u8],
+    ) -> Result<PrivateKey, Error> {
+        unsafe {
+            let mut raw = ptr::null_mut();
+            sys::curve_decode_private_point(
+                &mut raw,
+                data.as_ptr(),
+                data.len(),
+                ctx.raw(),
+            )
+            .into_result()?;
+
+            Ok(PrivateKey {
+                raw: Raw::from_ptr(raw),
+            })
+        }
+    }
+}
+
+impl Ord for PrivateKey {
+    fn cmp(&self, other: &PrivateKey) -> Ordering {
+        let cmp = unsafe {
+            sys::ec_private_key_compare(
+                self.raw.as_const_ptr(),
+                other.raw.as_const_ptr(),
+            )
+        };
+
+        if cmp < 0 {
+            Ordering::Less
+        } else if cmp > 0 {
+            Ordering::Greater
+        } else {
+            Ordering::Equal
+        }
+    }
+}
+
+impl PartialEq for PrivateKey {
+    fn eq(&self, other: &PrivateKey) -> bool {
+        self.cmp(other) == Ordering::Equal
+    }
+}
+
+impl Eq for PrivateKey {}
+
+impl PartialOrd for PrivateKey {
+    fn partial_cmp(&self, other: &PrivateKey) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}

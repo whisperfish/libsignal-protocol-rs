@@ -4,16 +4,19 @@ use std::{
     rc::Rc,
     slice,
     time::{Duration, SystemTime, UNIX_EPOCH},
+    cmp::{Ord, Ordering},
 };
 
 use failure::Error;
 
 use sys::AsSignalTypeBase;
 
-use crate::{context::ContextInner, errors::FromInternalErrorCode, Wrapped};
+use crate::{
+    context::ContextInner, errors::FromInternalErrorCode, raw_ptr::Raw, Wrapped,
+};
 
 pub struct IdentityKeyPair {
-    raw: *mut sys::ratchet_identity_key_pair,
+    raw: Raw<sys::ratchet_identity_key_pair>,
     ctx: Rc<ContextInner>,
 }
 
@@ -37,11 +40,11 @@ impl IdentityKeyPair {
             )
             .into_result()?;
 
-            Ok(SignedPreKey::from_raw(signed_pre_key, &self.ctx))
+            Ok(SignedPreKey::from_raw(Raw::new(signed_pre_key), &self.ctx))
         }
     }
 
-    pub fn public_key(&self) -> Result<PublicKey, Error> {
+    pub fn public_key(&self) -> Result<Pubstruct ec_public_keylicKey, Error> {
         unsafe {
             let key = sys::ratchet_identity_key_pair_get_public(self.raw);
 
@@ -62,42 +65,6 @@ impl IdentityKeyPair {
             } else {
                 Ok(PrivateKey::from_raw(key, &self.ctx))
             }
-        }
-    }
-}
-
-impl Drop for IdentityKeyPair {
-    fn drop(&mut self) {
-        unsafe {
-            sys::ratchet_identity_key_pair_destroy(self.raw.as_signal_base());
-        }
-    }
-}
-
-pub struct PublicKey {
-    raw: *mut sys::ec_public_key,
-    #[allow(dead_code)]
-    ctx: Rc<ContextInner>,
-}
-
-impl Drop for PublicKey {
-    fn drop(&mut self) {
-        unsafe {
-            sys::ec_public_key_destroy(self.raw.as_signal_base());
-        }
-    }
-}
-
-pub struct PrivateKey {
-    raw: *mut sys::ec_private_key,
-    #[allow(dead_code)]
-    ctx: Rc<ContextInner>,
-}
-
-impl Drop for PrivateKey {
-    fn drop(&mut self) {
-        unsafe {
-            sys::ec_private_key_destroy(self.raw.as_signal_base());
         }
     }
 }
