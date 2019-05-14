@@ -74,12 +74,12 @@ impl<'a> PreKeyBundleBuilder<'a> {
                     registration_id,
                     device_id.try_into().unwrap(),
                     pre_key_id,
-                    pre_key_public.raw_mut(),
+                    pre_key_public.raw.as_ptr(),
                     signed_pre_key_id,
-                    signed_pre_key_public.raw_mut(),
+                    signed_pre_key_public.raw.as_ptr(),
                     signature.as_ptr(),
                     signature.len(),
-                    identity_key.raw_mut(),
+                    identity_key.raw.as_ptr(),
                 );
                 Ok(PreKeyBundle::from_raw(raw, &ctx))
             }

@@ -31,7 +31,7 @@ impl PublicKey {
         }
     }
 
-    pub fn serialize<W: Write>(&self, writer: W) -> Result<(), Error> {
+    pub fn serialize<W: Write>(&self, mut writer: W) -> Result<(), Error> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::ec_public_key_serialize(&mut buffer, self.raw.as_const_ptr())

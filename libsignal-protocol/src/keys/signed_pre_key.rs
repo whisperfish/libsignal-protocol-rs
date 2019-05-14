@@ -39,7 +39,7 @@ impl SessionSignedPreKey {
         }
     }
 
-    pub fn serialize<W: Write>(&self, writer: W) -> Result<(), Error> {
+    pub fn serialize<W: Write>(&self, mut writer: W) -> Result<(), Error> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::session_signed_pre_key_serialize(

@@ -5,7 +5,7 @@ use failure::Error;
 use std::{io::Write, ptr};
 
 pub struct PreKey {
-    raw: Raw<sys::session_pre_key>,
+    pub(crate) raw: Raw<sys::session_pre_key>,
 }
 
 impl PreKey {
@@ -21,7 +21,7 @@ impl PreKey {
         }
     }
 
-    pub fn serialize<W: Write>(&self, writer: W) -> Result<(), Error> {
+    pub fn serialize<W: Write>(&self, mut writer: W) -> Result<(), Error> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::session_pre_key_serialize(
