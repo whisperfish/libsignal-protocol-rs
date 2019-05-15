@@ -14,14 +14,14 @@ pub struct PublicKey {
 impl PublicKey {
     pub fn decode_point(
         ctx: &Context,
-        data: &[u8],
+        key: &[u8],
     ) -> Result<PublicKey, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::curve_decode_point(
                 &mut raw,
-                data.as_ptr(),
-                data.len(),
+                key.as_ptr(),
+                key.len(),
                 ctx.raw(),
             )
             .into_result()?;
