@@ -34,7 +34,7 @@ impl PrivateKey {
 
     pub fn generate_public_key(&self) -> Result<PublicKey, Error> {
         unsafe {
-            let raw = ptr::null_mut();
+            let mut raw = ptr::null_mut();
             sys::curve_generate_public_key(&mut raw, self.raw.as_const_ptr())
                 .into_result()?;
 

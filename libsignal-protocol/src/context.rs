@@ -11,12 +11,12 @@ use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
-    keys::{IdentityKeyPair, KeyPair, PreKey, PreKeyList},
+    keys::{IdentityKeyPair, PreKeyList},
     pre_key_store::{self as pks, PreKeyStore},
     raw_ptr::Raw,
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
-    PreKeyBundle, PreKeyBundleBuilder, StoreContext, Wrapped,
+    PreKeyBundle, PreKeyBundleBuilder, StoreContext,
 };
 
 /// Global state and callbacks used by the library.
