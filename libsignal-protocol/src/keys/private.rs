@@ -7,6 +7,7 @@ use std::{
     ptr,
 };
 
+#[derive(Clone)]
 pub struct PrivateKey {
     pub(crate) raw: Raw<sys::ec_private_key>,
 }

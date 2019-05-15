@@ -3,12 +3,12 @@ use crate::{
     context::{Context, ContextInner},
     pre_key_bundle::PreKeyBundle,
     store_context::{StoreContext, StoreContextInner},
-    Wrapped,
 };
 use std::{ptr, rc::Rc};
 
 pub struct SessionBuilder {
     raw: *mut sys::session_builder,
+    // both these fields must outlive `session_builder`
     _store_ctx: Rc<StoreContextInner>,
     _ctx: Rc<ContextInner>,
 }
@@ -40,7 +40,7 @@ impl SessionBuilder {
         unsafe {
             sys::session_builder_process_pre_key_bundle(
                 self.raw,
-                pre_key_bundle.raw_mut(),
+                pre_key_bundle.raw.as_ptr(),
             );
         }
     }

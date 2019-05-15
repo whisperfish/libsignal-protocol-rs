@@ -1,9 +1,9 @@
 
 use failure::Error;
-use std::{ffi::c_void, pin::Pin, ptr, rc::Rc, time::SystemTime};
+
 use lock_api::RawMutex as _;
 use parking_lot::RawMutex;
-use sys::signal_context;
+use std::{ffi::c_void, pin::Pin, ptr, rc::Rc, time::SystemTime};
 
 #[cfg(feature = "crypto-native")]
 use crate::crypto::DefaultCrypto;
@@ -16,7 +16,7 @@ use crate::{
     raw_ptr::Raw,
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
-    PreKeyBundle, PreKeyBundleBuilder, StoreContext,
+    StoreContext,
 };
 
 /// Global state and callbacks used by the library.
@@ -163,10 +163,6 @@ impl Context {
 
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
 
-    pub fn new_pre_key_bundle_builder<'a>(&self) -> PreKeyBundleBuilder<'a> {
-        PreKeyBundle::builder(self)
-    }
-
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
 }
 
@@ -203,7 +199,7 @@ impl ContextInner {
         crypto: C,
     ) -> Result<ContextInner, InternalError> {
         unsafe {
-            let mut global_context: *mut signal_context = ptr::null_mut();
+            let mut global_context: *mut sys::signal_context = ptr::null_mut();
             let crypto = CryptoProvider::new(crypto);
             let mut state = Pin::new(Box::new(State {
                 mux: RawMutex::INIT,

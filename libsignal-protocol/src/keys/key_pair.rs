@@ -6,6 +6,7 @@ use crate::{
 use failure::Error;
 use std::ptr;
 
+#[derive(Clone)]
 pub struct KeyPair {
     pub(crate) raw: Raw<sys::ec_key_pair>,
 }

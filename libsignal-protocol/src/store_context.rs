@@ -1,4 +1,4 @@
-use crate::{context::ContextInner, Wrapped};
+use crate::context::ContextInner;
 use std::rc::Rc;
 
 pub struct StoreContext(pub(crate) Rc<StoreContextInner>);
@@ -8,8 +8,10 @@ impl StoreContext {
         raw: *mut sys::signal_protocol_store_context,
         ctx: &Rc<ContextInner>,
     ) -> StoreContext {
-        let inner = unsafe { StoreContextInner::from_raw(raw, ctx) };
-        StoreContext(Rc::new(inner))
+        StoreContext(Rc::new(StoreContextInner {
+            raw,
+            ctx: Rc::clone(ctx),
+        }))
     }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_protocol_store_context {
@@ -19,6 +21,7 @@ impl StoreContext {
 
 pub(crate) struct StoreContextInner {
     raw: *mut sys::signal_protocol_store_context,
+    // the global context must outlive `signal_protocol_store_context`
     #[allow(dead_code)]
     ctx: Rc<ContextInner>,
 }
@@ -30,5 +33,3 @@ impl Drop for StoreContextInner {
         }
     }
 }
-
-impl_wrapped!(sys::signal_protocol_store_context as StoreContextInner);

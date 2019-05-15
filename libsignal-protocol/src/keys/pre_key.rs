@@ -4,6 +4,7 @@ use crate::{
 use failure::Error;
 use std::{io::Write, ptr};
 
+#[derive(Clone)]
 pub struct PreKey {
     pub(crate) raw: Raw<sys::session_pre_key>,
 }

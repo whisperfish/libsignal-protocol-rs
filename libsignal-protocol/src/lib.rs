@@ -52,9 +52,6 @@
 
 extern crate libsignal_protocol_sys as sys;
 
-use std::rc::Rc;
-
-use crate::context::ContextInner;
 #[cfg(feature = "crypto-native")]
 pub use crate::crypto::DefaultCrypto;
 #[cfg(feature = "crypto-openssl")]
@@ -74,8 +71,6 @@ pub use crate::{
     store_context::StoreContext,
 };
 
-#[macro_use]
-mod macros;
 mod address;
 mod buffer;
 mod context;
@@ -90,12 +85,3 @@ mod session_store;
 mod signed_pre_key_store;
 mod store_context;
 mod session_builder;
-
-
-pub(crate) trait Wrapped: Sized {
-    type Raw: ?Sized;
-
-    unsafe fn from_raw(raw: *mut Self::Raw, ctx: &Rc<ContextInner>) -> Self;
-    fn raw(&self) -> *const Self::Raw;
-    fn raw_mut(&self) -> *mut Self::Raw;
-}
