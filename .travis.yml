@@ -23,8 +23,6 @@ matrix:
       script:
         - cargo fmt --all -- --check
         - cargo clippy -- -D clippy::all
-  allow_failures:
-    - rust: nightly
 
 deploy:
   provider: pages
