@@ -1,8 +1,8 @@
-use std::{ffi::c_void, pin::Pin, ptr, rc::Rc};
 
+use failure::Error;
+use std::{ffi::c_void, pin::Pin, ptr, rc::Rc, time::SystemTime};
 use lock_api::RawMutex as _;
 use parking_lot::RawMutex;
-
 use sys::signal_context;
 
 #[cfg(feature = "crypto-native")]
@@ -11,7 +11,7 @@ use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
-    keys::{IdentityKeyPair, PreKeyList},
+    keys::{IdentityKeyPair, PreKeyList, SessionSignedPreKey},
     pre_key_store::{self as pks, PreKeyStore},
     raw_ptr::Raw,
     session_store::{self as sess, SessionStore},
@@ -23,15 +23,13 @@ use crate::{
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
-    pub fn new<C: Crypto + 'static>(
-        crypto: C,
-    ) -> Result<Context, InternalError> {
-        ContextInner::new(crypto).map(|c| Context(Rc::new(c)))
+    pub fn new<C: Crypto + 'static>(crypto: C) -> Result<Context, Error> {
+        ContextInner::new(crypto)
+            .map(|c| Context(Rc::new(c)))
+            .map_err(Error::from)
     }
 
-    pub fn generate_identity_key_pair(
-        &self,
-    ) -> Result<IdentityKeyPair, InternalError> {
+    pub fn generate_identity_key_pair(&self) -> Result<IdentityKeyPair, Error> {
         unsafe {
             let mut key_pair = ptr::null_mut();
             sys::signal_protocol_key_helper_generate_identity_key_pair(
@@ -48,7 +46,7 @@ impl Context {
     pub fn generate_registration_id(
         &self,
         extended_range: i32,
-    ) -> Result<u32, InternalError> {
+    ) -> Result<u32, Error> {
         let mut id = 0;
         unsafe {
             sys::signal_protocol_key_helper_generate_registration_id(
@@ -66,7 +64,7 @@ impl Context {
         &self,
         start: u32,
         count: u32,
-    ) -> Result<PreKeyList, InternalError> {
+    ) -> Result<PreKeyList, Error> {
         unsafe {
             let mut pre_keys_head = ptr::null_mut();
             sys::signal_protocol_key_helper_generate_pre_keys(
@@ -81,13 +79,42 @@ impl Context {
         }
     }
 
+    pub fn generate_signed_pre_key(
+        &self,
+        identity_key_pair: &IdentityKeyPair,
+        id: u32,
+        timestamp: SystemTime,
+    ) -> Result<SessionSignedPreKey, Error> {
+        unsafe {
+            let mut raw = ptr::null_mut();
+            let unix_time = timestamp.duration_since(SystemTime::UNIX_EPOCH)?;
+
+            sys::signal_protocol_key_helper_generate_signed_pre_key(
+                &mut raw,
+                identity_key_pair.raw.as_const_ptr(),
+                id,
+                unix_time.as_secs(),
+                self.raw(),
+            )
+            .into_result()?;
+
+            if raw.is_null() {
+                Err(failure::err_msg("Unable to generate a signed pre key"))
+            } else {
+                Ok(SessionSignedPreKey {
+                    raw: Raw::from_ptr(raw),
+                })
+            }
+        }
+    }
+
     pub fn new_store_context<P, K, S, I>(
         &self,
         pre_key_store: P,
         signed_pre_key_store: K,
         session_store: S,
         identity_key_store: I,
-    ) -> Result<StoreContext, InternalError>
+    ) -> Result<StoreContext, Error>
     where
         P: PreKeyStore + 'static,
         K: SignedPreKeyStore + 'static,

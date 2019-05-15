@@ -34,26 +34,26 @@ fn main() -> Result<(), Error> {
     let pre_key_count = 20;
 
     let identity_key_pair = ctx.generate_identity_key_pair()?;
-    unimplemented!();
-    // let signed_pre_key = identity_key_pair.sign(5, SystemTime::now())?;
-    // println!(
-    //     "Signed pre key ID: {} at {:?}",
-    //     signed_pre_key.id(),
-    //     signed_pre_key.timestamp()
-    // );
+    let signed_pre_key =
+        ctx.generate_signed_pre_key(&identity_key_pair, 5, SystemTime::now())?;
+    println!(
+        "Signed pre key ID: {} at {:?}",
+        signed_pre_key.id(),
+        signed_pre_key.timestamp()
+    );
 
-    // let registration_id = ctx.generate_registration_id(extended_range)?;
-    // println!("Registration ID: {}", registration_id);
+    let registration_id = ctx.generate_registration_id(extended_range)?;
+    println!("Registration ID: {}", registration_id);
 
-    // let pre_keys = ctx.generate_pre_keys(start, pre_key_count)?;
+    let pre_keys = ctx.generate_pre_keys(start, pre_key_count)?;
 
-    // let pre_key_ids: Vec<_> = pre_keys
-    //     .iter()
-    //     .map(|session_key| session_key.id())
-    //     .collect();
+    let pre_key_ids: Vec<_> = pre_keys
+        .iter()
+        .map(|session_key| session_key.id())
+        .collect();
 
-    // println!("Pre Key session IDs:");
-    // println!("{:?}", pre_key_ids);
+    println!("Pre Key session IDs:");
+    println!("{:?}", pre_key_ids);
 
-    // Ok(())
+    Ok(())
 }

@@ -9,7 +9,7 @@ use std::{
 };
 
 pub struct SessionSignedPreKey {
-    raw: Raw<sys::session_signed_pre_key>,
+    pub(crate) raw: Raw<sys::session_signed_pre_key>,
 }
 
 impl SessionSignedPreKey {
