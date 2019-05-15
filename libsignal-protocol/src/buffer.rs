@@ -1,10 +1,8 @@
-use crate::{context::ContextInner, Wrapped};
 use std::{
     cmp::{Ord, Ordering},
     io::{self, Write},
     mem,
     ops::{Index, IndexMut},
-    rc::Rc,
 };
 
 /// A byte buffer (e.g. `Vec<u8>`).
@@ -172,18 +170,6 @@ impl Drop for Buffer {
             sys::signal_buffer_free(self.raw);
         }
     }
-}
-
-impl Wrapped for Buffer {
-    type Raw = sys::signal_buffer;
-
-    unsafe fn from_raw(raw: *mut Self::Raw, _ctx: &Rc<ContextInner>) -> Self {
-        Buffer { raw }
-    }
-
-    fn raw(&self) -> *const Self::Raw { self.raw }
-
-    fn raw_mut(&self) -> *mut Self::Raw { self.raw }
 }
 
 #[cfg(test)]

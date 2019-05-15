@@ -34,7 +34,8 @@ fn main() -> Result<(), Error> {
     let pre_key_count = 20;
 
     let identity_key_pair = ctx.generate_identity_key_pair()?;
-    let signed_pre_key = identity_key_pair.sign(5, SystemTime::now())?;
+    let signed_pre_key =
+        ctx.generate_signed_pre_key(&identity_key_pair, 5, SystemTime::now())?;
     println!(
         "Signed pre key ID: {} at {:?}",
         signed_pre_key.id(),

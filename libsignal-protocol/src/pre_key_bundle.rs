@@ -1,23 +1,22 @@
-use crate::{keys::PublicKey, Context, ContextInner, Wrapped};
+use crate::{keys::PublicKey, raw_ptr::Raw};
 use failure::Error;
-use std::{convert::TryInto, ptr, rc::Rc};
+use std::{convert::TryInto, ptr};
 
-pub struct PreKeyBundleBuilder<'a> {
-    ctx: Rc<ContextInner>,
+pub struct PreKeyBundleBuilder {
     registration_id: Option<u32>,
     device_id: Option<u32>,
     pre_key_id: Option<u32>,
-    pre_key_public: Option<&'a PublicKey>,
+    pre_key_public: Option<PublicKey>,
     signed_pre_key_id: Option<u32>,
-    signed_pre_key_public: Option<&'a PublicKey>,
-    signature: Option<&'a [u8]>,
-    identity_key: Option<&'a PublicKey>,
+    signed_pre_key_public: Option<PublicKey>,
+    signature: Option<Vec<u8>>,
+    identity_key: Option<PublicKey>,
 }
 
-impl<'a> PreKeyBundleBuilder<'a> {
-    pub fn pre_key(mut self, id: u32, public_key: &'a PublicKey) -> Self {
+impl PreKeyBundleBuilder {
+    pub fn pre_key(mut self, id: u32, public_key: &PublicKey) -> Self {
         self.pre_key_id = Some(id);
-        self.pre_key_public = Some(public_key);
+        self.pre_key_public = Some(public_key.clone());
 
         self
     }
@@ -25,16 +24,16 @@ impl<'a> PreKeyBundleBuilder<'a> {
     pub fn signed_pre_key(
         mut self,
         id: u32,
-        signed_public_key: &'a PublicKey,
+        signed_public_key: &PublicKey,
     ) -> Self {
         self.signed_pre_key_id = Some(id);
-        self.signed_pre_key_public = Some(signed_public_key);
+        self.signed_pre_key_public = Some(signed_public_key.clone());
 
         self
     }
 
-    pub fn signature(mut self, sig: &'a [u8]) -> Self {
-        self.signature = Some(sig);
+    pub fn signature(mut self, sig: &[u8]) -> Self {
+        self.signature = Some(sig.to_vec());
         self
     }
 
@@ -48,14 +47,13 @@ impl<'a> PreKeyBundleBuilder<'a> {
         self
     }
 
-    pub fn identity_key(mut self, identity_key: &'a PublicKey) -> Self {
-        self.identity_key = Some(identity_key);
+    pub fn identity_key(mut self, identity_key: &PublicKey) -> Self {
+        self.identity_key = Some(identity_key.clone());
         self
     }
 
     pub fn build(self) -> Result<PreKeyBundle, Error> {
         if let PreKeyBundleBuilder {
-            ctx,
             registration_id: Some(registration_id),
             device_id: Some(device_id),
             pre_key_id: Some(pre_key_id),
@@ -74,14 +72,16 @@ impl<'a> PreKeyBundleBuilder<'a> {
                     registration_id,
                     device_id.try_into().unwrap(),
                     pre_key_id,
-                    pre_key_public.raw_mut(),
+                    pre_key_public.raw.as_ptr(),
                     signed_pre_key_id,
-                    signed_pre_key_public.raw_mut(),
+                    signed_pre_key_public.raw.as_ptr(),
                     signature.as_ptr(),
                     signature.len(),
-                    identity_key.raw_mut(),
+                    identity_key.raw.as_ptr(),
                 );
-                Ok(PreKeyBundle::from_raw(raw, &ctx))
+                Ok(PreKeyBundle {
+                    raw: Raw::from_ptr(raw),
+                })
             }
         } else {
             Err(failure::err_msg("Not all builder methods were executed"))
@@ -89,16 +89,14 @@ impl<'a> PreKeyBundleBuilder<'a> {
     }
 }
 
+#[derive(Clone)]
 pub struct PreKeyBundle {
-    raw: *mut sys::session_pre_key_bundle,
-    #[allow(dead_code)]
-    ctx: Rc<ContextInner>,
+    pub(crate) raw: Raw<sys::session_pre_key_bundle>,
 }
 
 impl PreKeyBundle {
-    pub fn builder<'a>(ctx: &Context) -> PreKeyBundleBuilder<'a> {
+    pub fn builder() -> PreKeyBundleBuilder {
         PreKeyBundleBuilder {
-            ctx: Rc::clone(&ctx.0),
             registration_id: None,
             device_id: None,
             pre_key_id: None,
@@ -110,5 +108,3 @@ impl PreKeyBundle {
         }
     }
 }
-
-impl_wrapped!(sys::session_pre_key_bundle as PreKeyBundle);

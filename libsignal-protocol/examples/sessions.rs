@@ -45,8 +45,8 @@
 
 use failure::Error;
 use libsignal_protocol::{
-    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyStore,
-    SessionBuilder, SessionStore, SignedPreKeyStore,
+    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyBundle,
+    PreKeyStore, SessionBuilder, SessionStore, SignedPreKeyStore,
 };
 use std::io::{self, Write};
 
@@ -71,7 +71,7 @@ fn main() -> Result<(), Error> {
     let session_builder = SessionBuilder::new(&ctx, store_ctx, addr);
 
     // Build a session with a pre key retrieved from the server.
-    let pre_key_bundle = ctx.new_pre_key_bundle_builder().build()?;
+    let pre_key_bundle = PreKeyBundle::builder().build()?;
 
     session_builder.process_pre_key_bundle(&pre_key_bundle);
 
