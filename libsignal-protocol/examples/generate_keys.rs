@@ -24,11 +24,11 @@
 //! cit: https://github.com/signalapp/libsignal-protocol-c#client-install-time
 
 use failure::Error;
-use libsignal_protocol::{Context, DefaultCrypto};
+use libsignal_protocol::Context;
 use std::time::SystemTime;
 
 fn main() -> Result<(), Error> {
-    let ctx = Context::new(DefaultCrypto::default())?;
+    let ctx = Context::default();
     let extended_range = 0;
     let start = 123;
     let pre_key_count = 20;
