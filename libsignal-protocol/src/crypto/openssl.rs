@@ -1,4 +1,7 @@
-use crate::crypto::{Crypto, SignalCipherType::*};
+use crate::{
+    crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
+    errors::{FromInternalErrorCode, InternalError, IntoInternalErrorCode},
+};
 use openssl::{
     hash::{Hasher, MessageDigest},
     nid::Nid,
@@ -17,32 +20,36 @@ impl OpenSSLCrypto {
         data: &[u8],
     ) -> Result<Vec<u8>, InternalError> {
         let signal_cipher_type = match (cipher, key.len()) {
-            (AesCtrNoPadding, 16) => Cipher::aes_128_ctr(),
-            (AesCtrNoPadding, 24) => {
+            (SignalCipherType::AesCtrNoPadding, 16) => Cipher::aes_128_ctr(),
+            (SignalCipherType::AesCtrNoPadding, 24) => {
                 let nid = Nid::AES_192_CTR;
                 Cipher::from_nid(nid)
                     .expect("OpenSSL should have AES_192_CTR !!")
             },
-            (AesCtrNoPadding, 32) => Cipher::aes_256_ctr(),
-            (AesCbcPkcs5, 16) => Cipher::aes_128_cbc(),
-            (AesCbcPkcs5, 24) => {
+            (SignalCipherType::AesCtrNoPadding, 32) => Cipher::aes_256_ctr(),
+            (SignalCipherType::AesCbcPkcs5, 16) => Cipher::aes_128_cbc(),
+            (SignalCipherType::AesCbcPkcs5, 24) => {
                 let nid = Nid::AES_192_CBC;
                 Cipher::from_nid(nid)
                     .expect("OpenSSL should have AES_192_CBC !!")
             },
-            (AesCbcPkcs5, 32) => Cipher::aes_256_cbc(),
+            (SignalCipherType::AesCbcPkcs5, 32) => Cipher::aes_256_cbc(),
             _ => unreachable!(),
         };
+
         let block_size = signal_cipher_type.block_size();
         let mut result = Vec::with_capacity(data.len() + block_size);
         let mut crypter = Crypter::new(signal_cipher_type, mode, key, Some(iv))
             .map_err(|_e| InternalError::Unknown)?;
+
         crypter
             .update(data, &mut result)
             .map_err(|_e| InternalError::Unknown)?;
+
         crypter
             .finalize(&mut result)
             .map_err(|_e| InternalError::Unknown)?;
+
         Ok(result)
     }
 }
@@ -57,20 +64,28 @@ impl Crypto for OpenSSLCrypto {
         &self,
         key: &[u8],
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
-        unimplemented!()
+        let nid = Nid::HMACWITHSHA256;
+        let ty = MessageDigest::from_nid(nid)
+            .ok_or_else(|| InternalError::Unknown)?;
+        let hasher = Hasher::new(ty).map_err(|_e| InternalError::Unknown)?;
+
+        Ok(Box::new(hasher))
     }
 
     fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError> {
-        unimplemented!()
+        let ty = MessageDigest::sha512();
+        let hasher = Hasher::new(ty).map_err(|_e| InternalError::Unknown)?;
+
+        Ok(Box::new(hasher))
     }
 
-    // fn hmac_sha256_init(&self, _key: &[u8]) -> Result<(), InternalError> {
-    //     let nid = Nid::HMACWITHSHA256;
-    //     let ty = MessageDigest::from_nid(nid)
-    //         .ok_or_else(|| InternalError::Unknown)?;
+    // fn sha512_digest_init(&self) -> Result<(), InternalError> {
+    //     let ty = MessageDigest::sha512();
     //     let ctx = Hasher::new(ty).map_err(|_e| InternalError::Unknown)?;
-    //     let mut guard =
-    //         self.hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
+    //     let mut guard = self
+    //         .sha512_ctx
+    //         .lock()
+    //         .map_err(|_e| InternalError::Unknown)?;
     //     *guard = Some(ctx);
     //     Ok(())
     // }
@@ -96,16 +111,6 @@ impl Crypto for OpenSSLCrypto {
     //     }
     // }
 
-    // fn sha512_digest_init(&self) -> Result<(), InternalError> {
-    //     let ty = MessageDigest::sha512();
-    //     let ctx = Hasher::new(ty).map_err(|_e| InternalError::Unknown)?;
-    //     let mut guard = self
-    //         .sha512_ctx
-    //         .lock()
-    //         .map_err(|_e| InternalError::Unknown)?;
-    //     *guard = Some(ctx);
-    //     Ok(())
-    // }
 
     // fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError>
     // {     let mut guard = self
@@ -154,10 +159,29 @@ impl Crypto for OpenSSLCrypto {
 }
 
 impl Default for OpenSSLCrypto {
-    fn default() -> Self {
-        Self {
-            hmac_ctx: Mutex::new(None),
-            sha512_ctx: Mutex::new(None),
-        }
+    fn default() -> OpenSSLCrypto { OpenSSLCrypto }
+}
+
+impl Sha256Hmac for Hasher {
+    fn update(&mut self, data: &[u8]) -> Result<(), InternalError> {
+        self.update(data).map_err(|_| InternalError::Unknown)
+    }
+
+    fn finalize(&mut self) -> Result<Vec<u8>, InternalError> {
+        self.finish()
+            .map(|bytes| bytes.as_ref().to_vec())
+            .map_err(|_| InternalError::Unknown)
+    }
+}
+
+impl Sha512Digest for Hasher {
+    fn update(&mut self, data: &[u8]) -> Result<(), InternalError> {
+        self.update(data).map_err(|_| InternalError::Unknown)
+    }
+
+    fn finalize(&mut self) -> Result<Vec<u8>, InternalError> {
+        self.finish()
+            .map(|bytes| bytes.as_ref().to_vec())
+            .map_err(|_| InternalError::Unknown)
     }
 }
