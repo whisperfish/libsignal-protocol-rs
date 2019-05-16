@@ -10,12 +10,14 @@ use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     identity_key_store::{self as iks, IdentityKeyStore},
-    keys::{IdentityKeyPair, PreKeyList, SessionSignedPreKey},
+    keys::{
+        IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
+    },
     pre_key_store::{self as pks, PreKeyStore},
     raw_ptr::Raw,
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
-    StoreContext,
+    Buffer, StoreContext,
 };
 
 /// Global state and callbacks used by the library.
@@ -39,6 +41,38 @@ impl Context {
             Ok(IdentityKeyPair {
                 raw: Raw::from_ptr(key_pair),
             })
+        }
+    }
+
+    pub fn generate_key_pair(&self) -> Result<KeyPair, Error> {
+        unsafe {
+            let mut key_pair = ptr::null_mut();
+            sys::curve_generate_key_pair(self.raw(), &mut key_pair)
+                .into_result()?;
+
+            Ok(KeyPair {
+                raw: Raw::from_ptr(key_pair),
+            })
+        }
+    }
+
+    pub fn calculate_signature(
+        &self,
+        private: &PrivateKey,
+        message: &[u8],
+    ) -> Result<Buffer, Error> {
+        unsafe {
+            let mut buffer = ptr::null_mut();
+            sys::curve_calculate_signature(
+                self.raw(),
+                &mut buffer,
+                private.raw.as_const_ptr(),
+                message.as_ptr(),
+                message.len(),
+            )
+            .into_result()?;
+
+            Ok(Buffer::from_raw(buffer))
         }
     }
 
@@ -259,4 +293,16 @@ unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
 /// appropriate synchronisation mechanisms (i.e. `RefCell` or atomics).
 struct State {
     mux: RawMutex,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn library_initialization_example_from_readme() {
+        let ctx = Context::new(DefaultCrypto::default()).unwrap();
+
+        drop(ctx);
+    }
 }

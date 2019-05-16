@@ -31,25 +31,6 @@ fn test_curve25519_generate_public() {
     assert_eq!(got, expected_public_key);
 }
 
-#[test]
-fn decode_from_binary() {
-    let ctx = Context::default();
-    let public = &[
-        0x05, 0x1b, 0xb7, 0x59, 0x66, 0xf2, 0xe9, 0x3a, 0x36, 0x91, 0xdf, 0xff,
-        0x94, 0x2b, 0xb2, 0xa4, 0x66, 0xa1, 0xc0, 0x8b, 0x8d, 0x78, 0xca, 0x3f,
-        0x4d, 0x6d, 0xf8, 0xb8, 0xbf, 0xa2, 0xe4, 0xee, 0x28,
-    ];
-
-    let _got = PublicKey::decode_point(&ctx, public).unwrap();
-}
-
-#[test]
-fn library_initialization_example_from_readme() {
-    let ctx = Context::new(DefaultCrypto::default()).unwrap();
-
-    drop(ctx);
-}
-
 /// See https://github.com/signalapp/libsignal-protocol-c/blob/7bd0e5fee0ebde15c45fffcd631b74d188fd5551/tests/test_key_helper.c#L90
 #[test]
 fn test_generate_pre_keys() {
@@ -150,4 +131,24 @@ fn test_generate_signed_pre_key() {
     let serialized = signed.serialize().unwrap();
 
     assert_eq!(serialized.as_slice(), SIGNED_PRE_KEY);
+}
+
+#[test]
+fn test_curve25519_large_signatures() {
+    let ctx = Context::default();
+    let pair = ctx.generate_key_pair().unwrap();
+
+    let mut msg = vec![0; 1048576];
+    let private = pair.private().unwrap();
+
+    let signature = ctx.calculate_signature(&private, &msg).unwrap();
+
+    let public = pair.public().unwrap();
+    let got = public.verify_signature(&msg, signature.as_slice());
+    assert!(got.is_ok());
+
+    msg[0] ^= 0x01;
+
+    let got = public.verify_signature(&msg, signature.as_slice());
+    assert!(got.is_err());
 }

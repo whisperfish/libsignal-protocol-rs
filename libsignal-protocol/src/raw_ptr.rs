@@ -1,5 +1,3 @@
-use std::mem;
-
 /// A wrapper around `libsignal-protocol`'s native reference counted pointers.
 #[derive(Debug)]
 pub struct Raw<T: SignalType>(*mut T);
