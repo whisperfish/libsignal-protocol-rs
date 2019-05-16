@@ -1,4 +1,7 @@
-use libsignal_protocol::{Crypto, InternalError, SignalCipherType};
+use libsignal_protocol::{
+    crypto::{Crypto, Sha256Hmac, Sha512Digest},
+    InternalError, SignalCipherType,
+};
 
 pub(crate) struct MockCrypto<C> {
     inner: C,
@@ -32,33 +35,16 @@ impl<C: Crypto> Crypto for MockCrypto<C> {
         }
     }
 
-    fn hmac_sha256_init(&self, key: &[u8]) -> Result<(), InternalError> {
-        self.inner.hmac_sha256_init(key)
+    fn hmac_sha256(
+        &self,
+        key: &[u8],
+    ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
+        self.inner.hmac_sha256(key)
     }
 
-    fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError> {
-        self.inner.hmac_sha256_update(data)
+    fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError> {
+        self.inner.sha512_digest()
     }
-
-    fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError> {
-        self.inner.hmac_sha256_final()
-    }
-
-    fn hmac_sha256_cleanup(&self) { self.inner.hmac_sha256_cleanup() }
-
-    fn sha512_digest_init(&self) -> Result<(), InternalError> {
-        self.inner.sha512_digest_init()
-    }
-
-    fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError> {
-        self.inner.sha512_digest_update(data)
-    }
-
-    fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError> {
-        self.inner.sha512_digest_final()
-    }
-
-    fn sha512_digest_cleanup(&self) { self.inner.sha512_digest_cleanup() }
 
     fn encrypt(
         &self,
