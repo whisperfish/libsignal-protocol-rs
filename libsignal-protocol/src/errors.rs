@@ -1,4 +1,7 @@
-use std::fmt::{self, Display, Formatter};
+use std::{
+    convert::TryFrom,
+    fmt::{self, Display, Formatter},
+};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, failure_derive::Fail)]
 pub enum InternalError {
@@ -103,6 +106,12 @@ pub(crate) trait FromInternalErrorCode: Sized {
 
 pub(crate) trait IntoInternalErrorCode: Sized {
     fn into_code(self) -> i32;
+}
+
+impl FromInternalErrorCode for isize {
+    fn into_result(self) -> Result<(), InternalError> {
+        i32::try_from(self).expect("Overflow").into_result()
+    }
 }
 
 impl FromInternalErrorCode for i32 {

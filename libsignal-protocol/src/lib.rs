@@ -62,6 +62,7 @@ pub use crate::{
     context::Context,
     crypto::{CipherMode, Crypto, SignalCipherType, SignalCipherTypeError},
     errors::InternalError,
+    hkdf::HMACBasedKeyDerivationFunction,
     identity_key_store::IdentityKeyStore,
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
     pre_key_store::PreKeyStore,
@@ -76,6 +77,7 @@ mod buffer;
 mod context;
 mod crypto;
 mod errors;
+mod hkdf;
 mod identity_key_store;
 pub mod keys;
 mod pre_key_bundle;

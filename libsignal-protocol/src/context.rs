@@ -2,13 +2,21 @@ use failure::Error;
 
 use lock_api::RawMutex as _;
 use parking_lot::RawMutex;
-use std::{ffi::c_void, pin::Pin, ptr, rc::Rc, time::SystemTime};
+use std::{
+    ffi::c_void,
+    fmt::{self, Debug, Formatter},
+    pin::Pin,
+    ptr,
+    rc::Rc,
+    time::SystemTime,
+};
 
 #[cfg(feature = "crypto-native")]
 use crate::crypto::DefaultCrypto;
 use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
+    hkdf::HMACBasedKeyDerivationFunction,
     identity_key_store::{self as iks, IdentityKeyStore},
     keys::{
         IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
@@ -194,6 +202,13 @@ impl Context {
         }
     }
 
+    pub fn create_hkdf(
+        &self,
+        version: i32,
+    ) -> Result<HMACBasedKeyDerivationFunction, Error> {
+        HMACBasedKeyDerivationFunction::new(version, self)
+    }
+
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
@@ -270,6 +285,12 @@ impl Drop for ContextInner {
         unsafe {
             sys::signal_context_destroy(self.raw());
         }
+    }
+}
+
+impl Debug for ContextInner {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("ContextInner").finish()
     }
 }
 
