@@ -1,8 +1,8 @@
 use crate::{
-    Buffer,
     errors::FromInternalErrorCode,
     keys::{PrivateKey, PublicKey},
     raw_ptr::Raw,
+    Buffer,
 };
 use failure::Error;
 use std::{io::Write, ptr};

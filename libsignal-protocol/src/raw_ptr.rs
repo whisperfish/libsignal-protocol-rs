@@ -21,14 +21,6 @@ impl<T: SignalType> Raw<T> {
     pub fn as_ptr(&self) -> *mut T { self.0 }
 
     pub fn as_const_ptr(&self) -> *const T { self.0 }
-
-    pub fn into_inner(self) -> *mut T {
-        let ptr = self.0;
-        mem::forget(self);
-        ptr
-    }
-
-    pub fn ptr_eq(&self, other: &Raw<T>) -> bool { self.0 == other.0 }
 }
 
 impl<T: SignalType> Clone for Raw<T> {
