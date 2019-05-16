@@ -50,13 +50,11 @@ impl HMACBasedKeyDerivationFunction {
             )
             .into_result()?;
 
-            // FIXME: Could this be unsound because secret came from malloc
-            // but the allocator used to free this memory is unspecified...
-            let secret = Box::from_raw(std::slice::from_raw_parts_mut(
-                secret,
-                secret_length,
-            ));
-            Ok(Vec::from(secret))
+            // Note: I'm not 100% sure this is sound. `secret` was allocated
+            // using malloc, but the allocator used to free our Vec is
+            // unspecified...
+            let secret = std::slice::from_raw_parts_mut(secret, secret_length);
+            Ok(Vec::from(Box::from_raw(secret)))
         }
     }
 }
