@@ -54,7 +54,6 @@ impl OpenSSLCrypto {
     }
 }
 
-
 impl Crypto for OpenSSLCrypto {
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError> {
         openssl::rand::rand_bytes(buffer).map_err(|_e| InternalError::Unknown)
@@ -110,7 +109,6 @@ impl Crypto for OpenSSLCrypto {
     //         Err(InternalError::Unknown)
     //     }
     // }
-
 
     // fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError>
     // {     let mut guard = self

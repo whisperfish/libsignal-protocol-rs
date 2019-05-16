@@ -71,12 +71,10 @@ pub trait Crypto {
     fn hmac_sha256(
         &self,
         key: &[u8],
-    ) -> Result<Box<dyn Sha256Hmac + 'static>, InternalError>;
+    ) -> Result<Box<dyn Sha256Hmac>, InternalError>;
 
     /// Start to generate a SHA-512 digest.
-    fn sha512_digest(
-        &self,
-    ) -> Result<Box<dyn Sha512Digest + 'static>, InternalError>;
+    fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError>;
 
     /// Encrypt the provided data using AES.
     fn encrypt(
@@ -260,7 +258,6 @@ unsafe extern "C" fn sha512_digest_final_func(
     // just to make sure that the c ffi gave us a valid buffer to write to.
     assert!(!output.is_null());
     assert!(!digest_context.is_null());
-
 
     let hasher = &*(digest_context as *const DigestContext);
 
