@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["IdentityKeyPair",""],["KeyPair",""],["PreKeyList",""],["PrivateKey",""],["PublicKey",""],["SessionPreKeyRef",""],["SignedPreKey",""]]});
+initSidebarItems({"struct":[["IdentityKeyPair",""],["KeyPair",""],["PreKey",""],["PreKeyList",""],["PrivateKey",""],["PublicKey",""],["SessionSignedPreKey",""]]});

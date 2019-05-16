@@ -59,12 +59,12 @@
     <span class="ident">context</span>::{<span class="ident">Context</span>, <span class="ident">ContextInner</span>},
     <span class="ident">pre_key_bundle</span>::<span class="ident">PreKeyBundle</span>,
     <span class="ident">store_context</span>::{<span class="ident">StoreContext</span>, <span class="ident">StoreContextInner</span>},
-    <span class="ident">Wrapped</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">ptr</span>, <span class="ident">rc</span>::<span class="ident">Rc</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionBuilder</span> {
     <span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">session_builder</span>,
+    <span class="comment">// both these fields must outlive `session_builder`</span>
     <span class="ident">_store_ctx</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">StoreContextInner</span><span class="op">&gt;</span>,
     <span class="ident">_ctx</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">ContextInner</span><span class="op">&gt;</span>,
 }
@@ -96,7 +96,7 @@
         <span class="kw">unsafe</span> {
             <span class="ident">sys</span>::<span class="ident">session_builder_process_pre_key_bundle</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>,
-                <span class="ident">pre_key_bundle</span>.<span class="ident">raw_mut</span>(),
+                <span class="ident">pre_key_bundle</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>(),
             );
         }
     }
