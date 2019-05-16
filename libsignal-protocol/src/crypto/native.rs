@@ -1,5 +1,5 @@
 use crate::{
-    crypto::{Crypto, SignalCipherType},
+    crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
     errors::InternalError,
 };
 
@@ -15,27 +15,14 @@ impl Crypto for DefaultCrypto {
         Ok(())
     }
 
-    fn hmac_sha256_init(&self, _key: &[u8]) -> Result<(), InternalError> {
+    fn hmac_sha256(
+        &self,
+        key: &[u8],
+    ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
         unimplemented!()
     }
 
-    fn hmac_sha256_update(&self, _data: &[u8]) -> Result<(), InternalError> {
-        unimplemented!()
-    }
-
-    fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError> {
-        unimplemented!()
-    }
-
-    fn sha512_digest_init(&self) -> Result<(), InternalError> {
-        unimplemented!()
-    }
-
-    fn sha512_digest_update(&self, _data: &[u8]) -> Result<(), InternalError> {
-        unimplemented!()
-    }
-
-    fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError> {
+    fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError> {
         unimplemented!()
     }
 

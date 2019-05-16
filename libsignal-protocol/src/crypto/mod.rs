@@ -9,12 +9,12 @@ mod openssl;
 pub use self::openssl::OpenSSLCrypto;
 
 use std::{
+    cell::RefCell,
     convert::TryFrom,
     os::raw::{c_int, c_void},
     pin::Pin,
     slice,
 };
-
 use sys::{signal_buffer, signal_crypto_provider};
 
 use crate::{
@@ -50,11 +50,13 @@ impl TryFrom<i32> for SignalCipherType {
     }
 }
 
+/// Something which can calculate a SHA-256 HMAC.
 pub trait Sha256Hmac {
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
 }
 
+/// Something which can generate a SHA-512 hash.
 pub trait Sha512Digest {
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
@@ -69,10 +71,12 @@ pub trait Crypto {
     fn hmac_sha256(
         &self,
         key: &[u8],
-    ) -> Result<Box<dyn Sha256Hmac>, InternalError>;
+    ) -> Result<Box<dyn Sha256Hmac + 'static>, InternalError>;
 
     /// Start to generate a SHA-512 digest.
-    fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError>;
+    fn sha512_digest(
+        &self,
+    ) -> Result<Box<dyn Sha512Digest + 'static>, InternalError>;
 
     /// Encrypt the provided data using AES.
     fn encrypt(
@@ -128,6 +132,10 @@ impl CryptoProvider {
 
 struct State(Box<dyn Crypto>);
 
+struct HmacContext(RefCell<Box<dyn Sha256Hmac>>);
+
+struct DigestContext(RefCell<Box<dyn Sha512Digest>>);
+
 unsafe extern "C" fn random_func(
     data: *mut u8,
     len: usize,
@@ -142,28 +150,30 @@ unsafe extern "C" fn random_func(
 }
 
 unsafe extern "C" fn hmac_sha256_cleanup_func(
-    _hmac_context: *mut c_void,
-    user_data: *mut c_void,
+    hmac_context: *mut c_void,
+    _user_data: *mut c_void,
 ) {
-    assert!(!user_data.is_null());
+    assert!(!hmac_context.is_null());
 
-    let user_data = &*(user_data as *const State);
-    user_data.0.hmac_sha256_cleanup();
+    let hmac_context: Box<HmacContext> =
+        Box::from_raw(hmac_context as *mut HmacContext);
+    drop(hmac_context);
 }
 
 unsafe extern "C" fn hmac_sha256_final_func(
-    _hmac_context: *mut c_void,
+    hmac_context: *mut c_void,
     output: *mut *mut signal_buffer,
-    user_data: *mut c_void,
+    _user_data: *mut c_void,
 ) -> i32 {
     // just to make sure that the c ffi gave us a valid buffer to write to.
     assert!(!output.is_null());
-    assert!(!user_data.is_null());
+    assert!(!hmac_context.is_null());
 
-    let user_data = &*(user_data as *const State);
-    match user_data.0.hmac_sha256_final() {
-        Ok(buf) => {
-            let buffer = Buffer::from(buf);
+    let hmac_context = &*(hmac_context as *const HmacContext);
+
+    match hmac_context.0.borrow_mut().finalize() {
+        Ok(hmac) => {
+            let buffer = Buffer::from(hmac);
             *output = buffer.into_raw();
             sys::SG_SUCCESS as c_int
         },
@@ -172,7 +182,7 @@ unsafe extern "C" fn hmac_sha256_final_func(
 }
 
 unsafe extern "C" fn hmac_sha256_init_func(
-    _hmac_context: *mut *mut c_void,
+    hmac_context: *mut *mut c_void,
     key: *const u8,
     key_len: usize,
     user_data: *mut c_void,
@@ -180,60 +190,81 @@ unsafe extern "C" fn hmac_sha256_init_func(
     assert!(!key.is_null());
     assert!(!user_data.is_null());
 
-    let user_data = &*(user_data as *const State);
-    let buffer = slice::from_raw_parts(key, key_len);
-    user_data.0.hmac_sha256_init(buffer).into_code()
+    let state = &*(user_data as *const State);
+    let key = slice::from_raw_parts(key, key_len);
+
+    let hasher = match state.0.hmac_sha256(key) {
+        Ok(h) => h,
+        Err(e) => return e.code(),
+    };
+
+    *hmac_context = Box::into_raw(Box::new(HmacContext(RefCell::new(hasher))))
+        as *mut c_void;
+    sys::SG_SUCCESS as c_int
 }
 
 unsafe extern "C" fn hmac_sha256_update_func(
-    _hmac_context: *mut c_void,
+    hmac_context: *mut c_void,
     data: *const u8,
     data_len: usize,
-    user_data: *mut c_void,
+    _user_data: *mut c_void,
 ) -> i32 {
     assert!(!data.is_null());
-    assert!(!user_data.is_null());
+    assert!(!hmac_context.is_null());
 
-    let user_data = &*(user_data as *const State);
-    let buffer = slice::from_raw_parts(data, data_len);
-    user_data.0.hmac_sha256_update(buffer).into_code()
+    let hmac_context = &*(hmac_context as *const HmacContext);
+
+    let data = slice::from_raw_parts(data, data_len);
+    hmac_context.0.borrow_mut().update(data).into_code()
 }
 
 unsafe extern "C" fn sha512_digest_init_func(
-    _digest_context: *mut *mut c_void,
+    digest_context: *mut *mut c_void,
     user_data: *mut c_void,
 ) -> c_int {
     assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
-    user_data.0.sha512_digest_init().into_code()
+    let hasher = match user_data.0.sha512_digest() {
+        Ok(h) => h,
+        Err(e) => return e.code(),
+    };
+
+    let dc = Box::new(DigestContext(RefCell::new(hasher)));
+    *digest_context = Box::into_raw(Box::new(dc)) as *mut c_void;
+
+    sys::SG_SUCCESS as c_int
 }
 
 unsafe extern "C" fn sha512_digest_update_func(
-    _digest_context: *mut c_void,
+    digest_context: *mut c_void,
     data: *const u8,
     data_len: usize,
-    user_data: *mut c_void,
+    _user_data: *mut c_void,
 ) -> c_int {
     assert!(!data.is_null());
-    assert!(!user_data.is_null());
+    assert!(!digest_context.is_null());
 
-    let user_data = &*(user_data as *const State);
+    let hasher = &*(digest_context as *const DigestContext);
+    let mut hasher = hasher.0.borrow_mut();
+
     let buffer = slice::from_raw_parts(data, data_len);
-    user_data.0.sha512_digest_update(buffer).into_code()
+    hasher.update(buffer).into_code()
 }
 
 unsafe extern "C" fn sha512_digest_final_func(
-    _digest_context: *mut c_void,
+    digest_context: *mut c_void,
     output: *mut *mut signal_buffer,
-    user_data: *mut c_void,
+    _user_data: *mut c_void,
 ) -> c_int {
     // just to make sure that the c ffi gave us a valid buffer to write to.
     assert!(!output.is_null());
-    assert!(!user_data.is_null());
+    assert!(!digest_context.is_null());
 
-    let user_data = &*(user_data as *const State);
-    match user_data.0.sha512_digest_final() {
+
+    let hasher = &*(digest_context as *const DigestContext);
+
+    match hasher.0.borrow_mut().finalize() {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
             *output = buffer.into_raw();
@@ -244,13 +275,14 @@ unsafe extern "C" fn sha512_digest_final_func(
 }
 
 unsafe extern "C" fn sha512_digest_cleanup_func(
-    _digest_context: *mut c_void,
-    user_data: *mut c_void,
+    digest_context: *mut c_void,
+    _user_data: *mut c_void,
 ) {
-    assert!(!user_data.is_null());
+    assert!(!digest_context.is_null());
 
-    let user_data = &*(user_data as *const State);
-    user_data.0.sha512_digest_cleanup();
+    let digest_context: Box<DigestContext> =
+        Box::from_raw(digest_context as *mut DigestContext);
+    drop(digest_context);
 }
 
 unsafe extern "C" fn encrypt_func(
