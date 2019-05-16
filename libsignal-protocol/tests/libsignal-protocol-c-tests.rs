@@ -2,9 +2,9 @@ mod helpers;
 
 use crate::helpers::{fake_random_generator, MockCrypto};
 use libsignal_protocol::{
+    crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
     Context,
-    crypto::DefaultCrypto,
 };
 use std::time::{Duration, SystemTime};
 
