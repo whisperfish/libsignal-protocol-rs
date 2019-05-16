@@ -50,19 +50,31 @@ impl TryFrom<i32> for SignalCipherType {
     }
 }
 
+pub trait Sha256Hmac {
+    fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
+    fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
+}
+
+pub trait Sha512Digest {
+    fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
+    fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
+}
+
 /// Cryptography routines used in the signal protocol.
 pub trait Crypto {
+    /// Fill the provided buffer with some random bytes.
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError>;
-    fn hmac_sha256_init(&self, key: &[u8]) -> Result<(), InternalError>;
-    fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError>;
-    fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError>;
-    fn hmac_sha256_cleanup(&self) {}
 
-    fn sha512_digest_init(&self) -> Result<(), InternalError>;
-    fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError>;
-    fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError>;
-    fn sha512_digest_cleanup(&self) {}
+    /// Start to calculate a SHA-256 HMAC using the provided key.
+    fn hmac_sha256(
+        &self,
+        key: &[u8],
+    ) -> Result<Box<dyn Sha256Hmac>, InternalError>;
 
+    /// Start to generate a SHA-512 digest.
+    fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError>;
+
+    /// Encrypt the provided data using AES.
     fn encrypt(
         &self,
         cipher: SignalCipherType,
@@ -70,6 +82,8 @@ pub trait Crypto {
         iv: &[u8],
         data: &[u8],
     ) -> Result<Vec<u8>, InternalError>;
+
+    /// Decrypt the provided data using AES.
     fn decrypt(
         &self,
         cipher: SignalCipherType,
