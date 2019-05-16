@@ -1,4 +1,3 @@
-
 use crate::{keys::PreKey, raw_ptr::Raw};
 use std::marker::PhantomData;
 
@@ -33,7 +32,6 @@ pub struct PreKeyListIter<'a> {
     _lifetime: PhantomData<&'a ()>,
     head: *mut sys::signal_protocol_key_helper_pre_key_list_node,
 }
-
 
 impl<'a> Iterator for PreKeyListIter<'a> {
     type Item = PreKey;

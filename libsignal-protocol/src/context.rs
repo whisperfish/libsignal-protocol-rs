@@ -1,22 +1,31 @@
-
 use failure::Error;
 
 use lock_api::RawMutex as _;
 use parking_lot::RawMutex;
-use std::{ffi::c_void, pin::Pin, ptr, rc::Rc, time::SystemTime};
+use std::{
+    ffi::c_void,
+    fmt::{self, Debug, Formatter},
+    pin::Pin,
+    ptr,
+    rc::Rc,
+    time::SystemTime,
+};
 
 #[cfg(feature = "crypto-native")]
 use crate::crypto::DefaultCrypto;
 use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
+    hkdf::HMACBasedKeyDerivationFunction,
     identity_key_store::{self as iks, IdentityKeyStore},
-    keys::{IdentityKeyPair, PreKeyList, SessionSignedPreKey},
+    keys::{
+        IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
+    },
     pre_key_store::{self as pks, PreKeyStore},
     raw_ptr::Raw,
     session_store::{self as sess, SessionStore},
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
-    StoreContext,
+    Buffer, StoreContext,
 };
 
 /// Global state and callbacks used by the library.
@@ -40,6 +49,38 @@ impl Context {
             Ok(IdentityKeyPair {
                 raw: Raw::from_ptr(key_pair),
             })
+        }
+    }
+
+    pub fn generate_key_pair(&self) -> Result<KeyPair, Error> {
+        unsafe {
+            let mut key_pair = ptr::null_mut();
+            sys::curve_generate_key_pair(self.raw(), &mut key_pair)
+                .into_result()?;
+
+            Ok(KeyPair {
+                raw: Raw::from_ptr(key_pair),
+            })
+        }
+    }
+
+    pub fn calculate_signature(
+        &self,
+        private: &PrivateKey,
+        message: &[u8],
+    ) -> Result<Buffer, Error> {
+        unsafe {
+            let mut buffer = ptr::null_mut();
+            sys::curve_calculate_signature(
+                self.raw(),
+                &mut buffer,
+                private.raw.as_const_ptr(),
+                message.as_ptr(),
+                message.len(),
+            )
+            .into_result()?;
+
+            Ok(Buffer::from_raw(buffer))
         }
     }
 
@@ -161,6 +202,13 @@ impl Context {
         }
     }
 
+    pub fn create_hkdf(
+        &self,
+        version: i32,
+    ) -> Result<HMACBasedKeyDerivationFunction, Error> {
+        HMACBasedKeyDerivationFunction::new(version, self)
+    }
+
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
@@ -240,6 +288,12 @@ impl Drop for ContextInner {
     }
 }
 
+impl Debug for ContextInner {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("ContextInner").finish()
+    }
+}
+
 unsafe extern "C" fn lock_function(user_data: *mut c_void) {
     let state = &*(user_data as *const State);
     state.mux.lock();
@@ -262,7 +316,7 @@ struct State {
     mux: RawMutex,
 }
 
-#[cfg(all(test, feature = "crypto-native"))]
+#[cfg(test)]
 mod tests {
     use super::*;
 

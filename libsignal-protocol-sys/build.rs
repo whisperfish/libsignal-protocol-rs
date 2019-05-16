@@ -31,6 +31,7 @@ fn main_library_bindings() {
         .whitelist_function("fingerprint_.*")
         .whitelist_function("group_cipher_.*")
         .whitelist_function("group_session_.*")
+        .whitelist_function("hkdf_.*")
         .whitelist_function("pre_key_.*")
         .whitelist_function("ratchet_.*")
         .whitelist_function("ratcheting_.*")

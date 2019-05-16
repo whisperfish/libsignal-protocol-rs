@@ -1,4 +1,8 @@
-use crate::{errors::FromInternalErrorCode, raw_ptr::Raw, Buffer, Context};
+use crate::{
+    errors::{FromInternalErrorCode, InternalError},
+    raw_ptr::Raw,
+    Buffer, Context,
+};
 use failure::Error;
 use std::{
     cmp::{Ord, Ordering},
@@ -6,16 +10,13 @@ use std::{
     ptr,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PublicKey {
     pub(crate) raw: Raw<sys::ec_public_key>,
 }
 
 impl PublicKey {
-    pub fn decode_point(
-        ctx: &Context,
-        key: &[u8],
-    ) -> Result<PublicKey, Error> {
+    pub fn decode_point(ctx: &Context, key: &[u8]) -> Result<PublicKey, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::curve_decode_point(
@@ -42,6 +43,32 @@ impl PublicKey {
             writer.write_all(buffer.as_slice())?;
 
             Ok(())
+        }
+    }
+
+    pub fn verify_signature(
+        &self,
+        message: &[u8],
+        signature: &[u8],
+    ) -> Result<(), Error> {
+        unsafe {
+            let result = sys::curve_verify_signature(
+                self.raw.as_const_ptr(),
+                message.as_ptr(),
+                message.len(),
+                signature.as_ptr(),
+                signature.len(),
+            );
+
+            if result == 1 {
+                Ok(())
+            } else if result == 0 {
+                Err(failure::err_msg("Invalid signature"))
+            } else if let Some(err) = InternalError::from_error_code(result) {
+                Err(err.into())
+            } else {
+                Err(failure::format_err!("Unknown error code: {}", result))
+            }
         }
     }
 }
@@ -80,7 +107,7 @@ impl PartialOrd for PublicKey {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]

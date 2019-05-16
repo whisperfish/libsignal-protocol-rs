@@ -1,8 +1,8 @@
 use crate::{
-    Buffer,
     errors::FromInternalErrorCode,
     keys::{PrivateKey, PublicKey},
     raw_ptr::Raw,
+    Buffer,
 };
 use failure::Error;
 use std::{io::Write, ptr};
@@ -31,7 +31,14 @@ impl IdentityKeyPair {
         }
     }
 
-    pub fn serialize<W: Write>(&self, mut writer: W) -> Result<(), Error> {
+    pub fn serialize_to<W: Write>(&self, mut writer: W) -> Result<(), Error> {
+        let buffer = self.serialize()?;
+        writer.write_all(buffer.as_slice())?;
+
+        Ok(())
+    }
+
+    pub fn serialize(&self) -> Result<Buffer, Error> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::ratchet_identity_key_pair_serialize(
@@ -39,11 +46,7 @@ impl IdentityKeyPair {
                 self.raw.as_const_ptr(),
             )
             .into_result()?;
-            let buffer = Buffer::from_raw(buffer);
-
-            writer.write_all(buffer.as_slice())?;
-
-            Ok(())
+            Ok(Buffer::from_raw(buffer))
         }
     }
 

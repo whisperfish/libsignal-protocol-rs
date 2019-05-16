@@ -60,8 +60,9 @@ pub use crate::{
     address::Address,
     buffer::Buffer,
     context::Context,
-    crypto::Crypto,
+    crypto::{CipherMode, Crypto, SignalCipherType, SignalCipherTypeError},
     errors::InternalError,
+    hkdf::HMACBasedKeyDerivationFunction,
     identity_key_store::IdentityKeyStore,
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
     pre_key_store::PreKeyStore,
@@ -76,12 +77,13 @@ mod buffer;
 mod context;
 mod crypto;
 mod errors;
+mod hkdf;
 mod identity_key_store;
 pub mod keys;
 mod pre_key_bundle;
 mod pre_key_store;
 mod raw_ptr;
+mod session_builder;
 mod session_store;
 mod signed_pre_key_store;
 mod store_context;
-mod session_builder;

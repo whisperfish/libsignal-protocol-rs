@@ -1,5 +1,3 @@
-use std::mem;
-
 /// A wrapper around `libsignal-protocol`'s native reference counted pointers.
 #[derive(Debug)]
 pub struct Raw<T: SignalType>(*mut T);
@@ -21,14 +19,6 @@ impl<T: SignalType> Raw<T> {
     pub fn as_ptr(&self) -> *mut T { self.0 }
 
     pub fn as_const_ptr(&self) -> *const T { self.0 }
-
-    pub fn into_inner(self) -> *mut T {
-        let ptr = self.0;
-        mem::forget(self);
-        ptr
-    }
-
-    pub fn ptr_eq(&self, other: &Raw<T>) -> bool { self.0 == other.0 }
 }
 
 impl<T: SignalType> Clone for Raw<T> {
@@ -67,5 +57,5 @@ macro_rules! impl_signal_type_base {
 impl_signal_type_base! {
     sys::ratchet_identity_key_pair, sys::session_signed_pre_key,
     sys::ec_public_key, sys::ec_private_key, sys::session_pre_key,
-    sys::ec_key_pair, sys::session_pre_key_bundle,
+    sys::ec_key_pair, sys::session_pre_key_bundle, sys::hkdf_context,
 }
