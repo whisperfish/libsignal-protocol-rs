@@ -8,20 +8,10 @@ pub struct PreKeyBundle {
 }
 
 impl PreKeyBundle {
-    pub fn builder() -> PreKeyBundleBuilder {
-        PreKeyBundleBuilder {
-            registration_id: None,
-            device_id: None,
-            pre_key_id: None,
-            pre_key_public: None,
-            signed_pre_key_id: None,
-            signed_pre_key_public: None,
-            signature: None,
-            identity_key: None,
-        }
-    }
+    pub fn builder() -> PreKeyBundleBuilder { PreKeyBundleBuilder::default() }
 }
 
+#[derive(Default)]
 pub struct PreKeyBundleBuilder {
     registration_id: Option<u32>,
     device_id: Option<i32>,
@@ -98,7 +88,9 @@ impl PreKeyBundleBuilder {
         {
             Ok((*id, public.raw.as_ptr()))
         } else {
-            Err(failure::err_msg("PreKey ID and public key are required"))
+            Err(failure::err_msg(
+                "PreKey ID and PreKey public key are required",
+            ))
         }
     }
 
