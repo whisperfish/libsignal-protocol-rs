@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use libsignal_protocol::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest},
     Address, Buffer, IdentityKeyStore, InternalError, PreKeyStore,

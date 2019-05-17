@@ -53,6 +53,14 @@ use std::{
     io::{self, Write},
 };
 
+#[path = "../tests/helpers/mod.rs"]
+mod helpers;
+
+use self::helpers::{
+    BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
+    BasicSignedPreKeyStore,
+};
+
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
 
@@ -73,77 +81,10 @@ fn main() -> Result<(), Error> {
     // Instantiate a session_builder for a recipient address.
     let session_builder = SessionBuilder::new(&ctx, store_ctx, addr);
 
-    // Build a session with a pre key retrieved from the server.
     let pre_key_bundle = PreKeyBundle::builder().build()?;
 
-    session_builder.process_pre_key_bundle(&pre_key_bundle);
+    // Build a session with a pre key retrieved from the server.
+    let got = session_builder.process_pre_key_bundle(&pre_key_bundle)?;
 
     Ok(())
-}
-
-#[derive(Debug, Default)]
-struct BasicPreKeyStore {}
-
-impl PreKeyStore for BasicPreKeyStore {
-    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
-        unimplemented!()
-    }
-
-    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
-        unimplemented!()
-    }
-
-    fn contains(&self, _id: u32) -> bool { unimplemented!() }
-
-    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
-}
-
-#[derive(Debug, Default)]
-struct BasicSignedPreKeyStore {}
-
-impl SignedPreKeyStore for BasicSignedPreKeyStore {
-    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
-        unimplemented!()
-    }
-
-    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
-        unimplemented!()
-    }
-
-    fn contains(&self, _id: u32) -> bool { unimplemented!() }
-
-    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
-}
-
-#[derive(Debug, Default)]
-struct BasicSessionStore {}
-
-impl SessionStore for BasicSessionStore {
-    fn load_session(
-        &self,
-        _address: &Address,
-    ) -> Result<(Buffer, Buffer), InternalError> {
-        unimplemented!()
-    }
-
-    fn get_sub_devuce_sessions(&self) { unimplemented!() }
-}
-
-#[derive(Debug, Default)]
-pub struct BasicIdentityKeyStore {
-    registration_id: Cell<u32>,
-}
-
-impl IdentityKeyStore for BasicIdentityKeyStore {
-    fn local_registration_id(&self) -> Result<u32, InternalError> {
-        Ok(self.registration_id.get())
-    }
-
-    fn is_trusted_identity(
-        &self,
-        address: Address<'_>,
-        identity_key: &[u8],
-    ) -> Result<bool, InternalError> {
-        unimplemented!()
-    }
 }

@@ -2,8 +2,8 @@ use crate::{
     address::Address,
     context::{Context, ContextInner},
     errors::{FromInternalErrorCode, InternalError},
+    pre_key_bundle::PreKeyBundle,
     store_context::{StoreContext, StoreContextInner},
-    pre_key_bundle::PreKeyBundle
 };
 use std::{ptr, rc::Rc};
 

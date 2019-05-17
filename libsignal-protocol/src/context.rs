@@ -25,8 +25,8 @@ use crate::{
     raw_ptr::Raw,
     session_builder::SessionBuilder,
     session_store::{self as sess, SessionStore},
-    Address, Buffer, StoreContext,
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
+    Address, Buffer, StoreContext,
 };
 
 /// Global state and callbacks used by the library.
