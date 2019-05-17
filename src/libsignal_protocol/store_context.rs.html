@@ -33,8 +33,23 @@
 <span id="33">33</span>
 <span id="34">34</span>
 <span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">context</span>::<span class="ident">ContextInner</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context</span>::<span class="ident">ContextInner</span>, <span class="ident">errors</span>::<span class="ident">FromInternalErrorCode</span>};
+<span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">rc</span>::<span class="ident">Rc</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StoreContext</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">StoreContextInner</span><span class="op">&gt;</span>);
@@ -48,6 +63,19 @@
             <span class="ident">raw</span>,
             <span class="ident">ctx</span>: <span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="ident">ctx</span>),
         }))
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registration_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="ident">sys</span>::<span class="ident">signal_protocol_identity_get_local_registration_id</span>(
+                <span class="self">self</span>.<span class="ident">raw</span>(),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">id</span>,
+            )
+            .<span class="ident">into_result</span>()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
+        }
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_store_context</span> {

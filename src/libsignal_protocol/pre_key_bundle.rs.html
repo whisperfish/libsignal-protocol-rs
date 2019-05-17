@@ -108,14 +108,54 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">keys</span>::<span class="ident">PublicKey</span>, <span class="ident">raw_ptr</span>::<span class="ident">Raw</span>};
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert</span>::<span class="ident">TryInto</span>, <span class="ident">ptr</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PreKeyBundle</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">session_pre_key_bundle</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">PreKeyBundle</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">PreKeyBundleBuilder</span> { <span class="ident">PreKeyBundleBuilder</span>::<span class="ident">default</span>() }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PreKeyBundleBuilder</span> {
     <span class="ident">registration_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">device_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="ident">device_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
     <span class="ident">pre_key_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">pre_key_public</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span>,
     <span class="ident">signed_pre_key_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
@@ -153,7 +193,7 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">device_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
         <span class="self">self</span>
     }
@@ -163,59 +203,79 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PreKeyBundle</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PreKeyBundleBuilder</span> {
-            <span class="ident">registration_id</span>: <span class="prelude-val">Some</span>(<span class="ident">registration_id</span>),
-            <span class="ident">device_id</span>: <span class="prelude-val">Some</span>(<span class="ident">device_id</span>),
-            <span class="ident">pre_key_id</span>: <span class="prelude-val">Some</span>(<span class="ident">pre_key_id</span>),
-            <span class="ident">pre_key_public</span>: <span class="prelude-val">Some</span>(<span class="ident">pre_key_public</span>),
-            <span class="ident">signed_pre_key_id</span>: <span class="prelude-val">Some</span>(<span class="ident">signed_pre_key_id</span>),
-            <span class="ident">signed_pre_key_public</span>: <span class="prelude-val">Some</span>(<span class="ident">signed_pre_key_public</span>),
-            <span class="ident">signature</span>: <span class="prelude-val">Some</span>(<span class="ident">signature</span>),
-            <span class="ident">identity_key</span>: <span class="prelude-val">Some</span>(<span class="ident">identity_key</span>),
-        } <span class="op">=</span> <span class="self">self</span>
-        {
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
+    <span class="kw">fn</span> <span class="ident">get_registration_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">registration_id</span>
+            .<span class="ident">ok_or_else</span>(<span class="op">||</span> <span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;a registration ID is required&quot;</span>))
+    }
 
-                <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_create</span>(
-                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">raw</span>,
-                    <span class="ident">registration_id</span>,
-                    <span class="ident">device_id</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>(),
-                    <span class="ident">pre_key_id</span>,
-                    <span class="ident">pre_key_public</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>(),
-                    <span class="ident">signed_pre_key_id</span>,
-                    <span class="ident">signed_pre_key_public</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>(),
-                    <span class="ident">signature</span>.<span class="ident">as_ptr</span>(),
-                    <span class="ident">signature</span>.<span class="ident">len</span>(),
-                    <span class="ident">identity_key</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>(),
-                );
-                <span class="prelude-val">Ok</span>(<span class="ident">PreKeyBundle</span> {
-                    <span class="ident">raw</span>: <span class="ident">Raw</span>::<span class="ident">from_ptr</span>(<span class="ident">raw</span>),
-                })
-            }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;Not all builder methods were executed&quot;</span>))
+    <span class="kw">fn</span> <span class="ident">get_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">device_id</span>
+            .<span class="ident">ok_or_else</span>(<span class="op">||</span> <span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;a device ID is required&quot;</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">get_identity_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">identity_key</span> {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">key</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">key</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>()),
+            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;Identity key is required&quot;</span>)),
         }
     }
-}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PreKeyBundle</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">session_pre_key_bundle</span><span class="op">&gt;</span>,
-}
+    <span class="kw">fn</span> <span class="ident">get_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PreKeyBundleBuilder</span> {
+            <span class="ident">pre_key_id</span>: <span class="prelude-val">Some</span>(<span class="ident">id</span>),
+            <span class="ident">pre_key_public</span>: <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">public</span>),
+            ..
+        } <span class="op">=</span> <span class="self">self</span>
+        {
+            <span class="prelude-val">Ok</span>((<span class="kw-2">*</span><span class="ident">id</span>, <span class="ident">public</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>()))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="ident">err_msg</span>(
+                <span class="string">&quot;PreKey ID and PreKey public key are required&quot;</span>,
+            ))
+        }
+    }
 
-<span class="kw">impl</span> <span class="ident">PreKeyBundle</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">PreKeyBundleBuilder</span> {
-        <span class="ident">PreKeyBundleBuilder</span> {
-            <span class="ident">registration_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">device_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">pre_key_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">pre_key_public</span>: <span class="prelude-val">None</span>,
-            <span class="ident">signed_pre_key_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">signed_pre_key_public</span>: <span class="prelude-val">None</span>,
-            <span class="ident">signature</span>: <span class="prelude-val">None</span>,
-            <span class="ident">identity_key</span>: <span class="prelude-val">None</span>,
+    <span class="kw">fn</span> <span class="ident">get_signed_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">u32</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>) {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PreKeyBundleBuilder</span> {
+            <span class="ident">signed_pre_key_id</span>: <span class="prelude-val">Some</span>(<span class="ident">id</span>),
+            <span class="ident">signed_pre_key_public</span>: <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">public</span>),
+            ..
+        } <span class="op">=</span> <span class="self">self</span>
+        {
+            (<span class="kw-2">*</span><span class="ident">id</span>, <span class="ident">public</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>())
+        } <span class="kw">else</span> {
+            (<span class="number">0</span>, <span class="ident">ptr</span>::<span class="ident">null_mut</span>())
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PreKeyBundle</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">registration_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_registration_id</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_device_id</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">pre_key_id</span>, <span class="ident">pre_key_public</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_pre_key</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> (<span class="ident">signed_pre_key_id</span>, <span class="ident">signed_pre_key_public</span>) <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">get_signed_pre_key</span>();
+        <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span>
+            <span class="self">self</span>.<span class="ident">signature</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Vec</span>::<span class="ident">as_slice</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]);
+        <span class="kw">let</span> <span class="ident">identity_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_identity_key</span>()<span class="question-mark">?</span>;
+
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
+
+            <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_create</span>(
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">raw</span>,
+                <span class="ident">registration_id</span>,
+                <span class="ident">device_id</span>,
+                <span class="ident">pre_key_id</span>,
+                <span class="ident">pre_key_public</span>,
+                <span class="ident">signed_pre_key_id</span>,
+                <span class="ident">signed_pre_key_public</span>,
+                <span class="ident">signature</span>.<span class="ident">as_ptr</span>(),
+                <span class="ident">signature</span>.<span class="ident">len</span>(),
+                <span class="ident">identity_key</span>,
+            );
+            <span class="prelude-val">Ok</span>(<span class="ident">PreKeyBundle</span> {
+                <span class="ident">raw</span>: <span class="ident">Raw</span>::<span class="ident">from_ptr</span>(<span class="ident">raw</span>),
+            })
         }
     }
 }
