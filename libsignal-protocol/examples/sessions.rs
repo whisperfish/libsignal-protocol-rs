@@ -75,7 +75,10 @@ fn main() -> Result<(), Error> {
     // Instantiate a session_builder for a recipient address.
     let session_builder = SessionBuilder::new(&ctx, &store_ctx, addr.clone());
 
-    let pre_key_bundle = PreKeyBundle::builder().build()?;
+    let pre_key_bundle = PreKeyBundle::builder()
+        .registration_id(42)
+        .device_id(addr.device_id())
+        .build()?;
 
     // Build a session with a pre key retrieved from the server.
     session_builder.process_pre_key_bundle(&pre_key_bundle)?;

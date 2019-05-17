@@ -1,6 +1,6 @@
 use crate::{keys::PublicKey, raw_ptr::Raw};
-use failure::{Error, ResultExt};
-use std::{convert::TryFrom, ptr};
+use failure::Error;
+use std::ptr;
 
 #[derive(Clone)]
 pub struct PreKeyBundle {
@@ -24,7 +24,7 @@ impl PreKeyBundle {
 
 pub struct PreKeyBundleBuilder {
     registration_id: Option<u32>,
-    device_id: Option<u32>,
+    device_id: Option<i32>,
     pre_key_id: Option<u32>,
     pre_key_public: Option<PublicKey>,
     signed_pre_key_id: Option<u32>,
@@ -62,7 +62,7 @@ impl PreKeyBundleBuilder {
         self
     }
 
-    pub fn device_id(mut self, id: u32) -> Self {
+    pub fn device_id(mut self, id: i32) -> Self {
         self.device_id = Some(id);
         self
     }
@@ -78,13 +78,8 @@ impl PreKeyBundleBuilder {
     }
 
     fn get_device_id(&self) -> Result<i32, Error> {
-        let id = self
-            .device_id
-            .ok_or_else(|| failure::err_msg("a device ID is required"))?;
-
-        i32::try_from(id)
-            .context("invalid device ID")
-            .map_err(Error::from)
+        self.device_id
+            .ok_or_else(|| failure::err_msg("a device ID is required"))
     }
 
     fn get_identity_key(&self) -> Result<*mut sys::ec_public_key, Error> {
