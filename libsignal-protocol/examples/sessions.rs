@@ -43,90 +43,82 @@
 //!
 //! [bas]: https://github.com/signalapp/libsignal-protocol-c#building-a-session
 
-use failure::Error;
-use libsignal_protocol::{
-    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyBundle,
-    PreKeyStore, SessionBuilder, SessionStore, SignedPreKeyStore,
+#[path = "../tests/helpers/mod.rs"]
+mod helpers;
+
+use self::helpers::{
+    BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
+    BasicSignedPreKeyStore,
 };
-use std::io::{self, Write};
+use failure::{Error, ResultExt};
+use libsignal_protocol::{
+    Address, Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
+};
+use std::time::SystemTime;
 
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
 
-    let pre_key_store = BasicPreKeyStore::default();
-    let signed_pre_key_store = BasicSignedPreKeyStore::default();
-    let session_store = BasicSessionStore::default();
-    let identity_key_store = BasicIdentityKeyStore::default();
+    // first we'll need a copy of bob's public key and some of his pre-keys
+    let bob_address = Address::new("+14159998888", 1);
+    let bob_identity_keys = ctx
+        .generate_identity_key_pair()
+        .context("Unable to generate bob's keys")?;
+    let bob_public_identity_key = bob_identity_keys.public()?;
+    let bob_pre_keys: Vec<_> = ctx
+        .generate_pre_keys(0, 10)
+        .context("Unable to generate bob's pre-keys")?
+        .iter()
+        .collect();
+    let pre_key = &bob_pre_keys[0];
+    let bob_signed_pre_key = ctx
+        .generate_signed_pre_key(&bob_identity_keys, 12, SystemTime::now())
+        .context("Unable to generate a signed pre-key for bob")?;
 
-    let store_ctx = ctx.new_store_context(
-        pre_key_store,
-        signed_pre_key_store,
-        session_store,
-        identity_key_store,
+    // set up some key stores for alice
+    let alice_store_ctx = ctx.store_context(
+        BasicPreKeyStore::default(),
+        BasicSignedPreKeyStore::default(),
+        BasicSessionStore::default(),
+        BasicIdentityKeyStore::default(),
     )?;
 
-    let addr = Address::new("+14159998888", 1);
-
     // Instantiate a session_builder for a recipient address.
-    let session_builder = SessionBuilder::new(&ctx, store_ctx, addr);
+    let alice_session_builder =
+        SessionBuilder::new(&ctx, &alice_store_ctx, bob_address.clone());
 
-    // Build a session with a pre key retrieved from the server.
-    let pre_key_bundle = PreKeyBundle::builder().build()?;
+    let pre_key_bundle = PreKeyBundle::builder()
+        .registration_id(42)
+        .device_id(bob_address.device_id())
+        .identity_key(&bob_public_identity_key)
+        .pre_key(pre_key.id(), &pre_key.key_pair().public()?)
+        .signed_pre_key(
+            bob_signed_pre_key.id(),
+            &bob_signed_pre_key.key_pair().public()?,
+        )
+        .signature(bob_signed_pre_key.signature())
+        .build()
+        .context("Unable to generate the pre-key bundle")?;
 
-    session_builder.process_pre_key_bundle(&pre_key_bundle);
+    // Create a session using a pre key retrieved from the server.
+    alice_session_builder
+        .process_pre_key_bundle(&pre_key_bundle)
+        .context("Unable to create a session with bob")?;
+
+    // Now we've established a session alice can start encrypting messages to
+    // send to bob
+    let cipher =
+        SessionCipher::new(&ctx, &alice_store_ctx, bob_address.clone())?;
+    let message = "Hello, World!";
+    let encrypted_message = cipher
+        .encrypt(message.as_bytes())
+        .context("Encryption failed")?;
+
+    let serialized = encrypted_message
+        .serialize()
+        .context("Unable to serialize the message for transmission")?;
+
+    println!("Encrypted Message: {:?}", serialized.as_slice());
 
     Ok(())
 }
-
-#[derive(Debug, Default)]
-struct BasicPreKeyStore {}
-
-impl PreKeyStore for BasicPreKeyStore {
-    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
-        unimplemented!()
-    }
-
-    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
-        unimplemented!()
-    }
-
-    fn contains(&self, _id: u32) -> bool { unimplemented!() }
-
-    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
-}
-
-#[derive(Debug, Default)]
-struct BasicSignedPreKeyStore {}
-
-impl SignedPreKeyStore for BasicSignedPreKeyStore {
-    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
-        unimplemented!()
-    }
-
-    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
-        unimplemented!()
-    }
-
-    fn contains(&self, _id: u32) -> bool { unimplemented!() }
-
-    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
-}
-
-#[derive(Debug, Default)]
-struct BasicSessionStore {}
-
-impl SessionStore for BasicSessionStore {
-    fn load_session(
-        &self,
-        _address: &Address,
-    ) -> Result<(Buffer, Buffer), InternalError> {
-        unimplemented!()
-    }
-
-    fn get_sub_devuce_sessions(&self) { unimplemented!() }
-}
-
-#[derive(Debug, Default)]
-struct BasicIdentityKeyStore {}
-
-impl IdentityKeyStore for BasicIdentityKeyStore {}

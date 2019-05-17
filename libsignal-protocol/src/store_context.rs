@@ -1,4 +1,5 @@
-use crate::context::ContextInner;
+use crate::{context::ContextInner, errors::FromInternalErrorCode};
+use failure::Error;
 use std::rc::Rc;
 
 pub struct StoreContext(pub(crate) Rc<StoreContextInner>);
@@ -12,6 +13,19 @@ impl StoreContext {
             raw,
             ctx: Rc::clone(ctx),
         }))
+    }
+
+    pub fn registration_id(&self) -> Result<u32, Error> {
+        unsafe {
+            let mut id = 0;
+            sys::signal_protocol_identity_get_local_registration_id(
+                self.raw(),
+                &mut id,
+            )
+            .into_result()?;
+
+            Ok(id)
+        }
     }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_protocol_store_context {

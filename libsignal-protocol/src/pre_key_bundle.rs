@@ -1,10 +1,20 @@
 use crate::{keys::PublicKey, raw_ptr::Raw};
 use failure::Error;
-use std::{convert::TryInto, ptr};
+use std::ptr;
 
+#[derive(Clone)]
+pub struct PreKeyBundle {
+    pub(crate) raw: Raw<sys::session_pre_key_bundle>,
+}
+
+impl PreKeyBundle {
+    pub fn builder() -> PreKeyBundleBuilder { PreKeyBundleBuilder::default() }
+}
+
+#[derive(Default)]
 pub struct PreKeyBundleBuilder {
     registration_id: Option<u32>,
-    device_id: Option<u32>,
+    device_id: Option<i32>,
     pre_key_id: Option<u32>,
     pre_key_public: Option<PublicKey>,
     signed_pre_key_id: Option<u32>,
@@ -42,7 +52,7 @@ impl PreKeyBundleBuilder {
         self
     }
 
-    pub fn device_id(mut self, id: u32) -> Self {
+    pub fn device_id(mut self, id: i32) -> Self {
         self.device_id = Some(id);
         self
     }
@@ -52,59 +62,79 @@ impl PreKeyBundleBuilder {
         self
     }
 
-    pub fn build(self) -> Result<PreKeyBundle, Error> {
-        if let PreKeyBundleBuilder {
-            registration_id: Some(registration_id),
-            device_id: Some(device_id),
-            pre_key_id: Some(pre_key_id),
-            pre_key_public: Some(pre_key_public),
-            signed_pre_key_id: Some(signed_pre_key_id),
-            signed_pre_key_public: Some(signed_pre_key_public),
-            signature: Some(signature),
-            identity_key: Some(identity_key),
-        } = self
-        {
-            unsafe {
-                let mut raw = ptr::null_mut();
+    fn get_registration_id(&self) -> Result<u32, Error> {
+        self.registration_id
+            .ok_or_else(|| failure::err_msg("a registration ID is required"))
+    }
 
-                sys::session_pre_key_bundle_create(
-                    &mut raw,
-                    registration_id,
-                    device_id.try_into().unwrap(),
-                    pre_key_id,
-                    pre_key_public.raw.as_ptr(),
-                    signed_pre_key_id,
-                    signed_pre_key_public.raw.as_ptr(),
-                    signature.as_ptr(),
-                    signature.len(),
-                    identity_key.raw.as_ptr(),
-                );
-                Ok(PreKeyBundle {
-                    raw: Raw::from_ptr(raw),
-                })
-            }
-        } else {
-            Err(failure::err_msg("Not all builder methods were executed"))
+    fn get_device_id(&self) -> Result<i32, Error> {
+        self.device_id
+            .ok_or_else(|| failure::err_msg("a device ID is required"))
+    }
+
+    fn get_identity_key(&self) -> Result<*mut sys::ec_public_key, Error> {
+        match self.identity_key {
+            Some(ref key) => Ok(key.raw.as_ptr()),
+            None => Err(failure::err_msg("Identity key is required")),
         }
     }
-}
 
-#[derive(Clone)]
-pub struct PreKeyBundle {
-    pub(crate) raw: Raw<sys::session_pre_key_bundle>,
-}
+    fn get_pre_key(&self) -> Result<(u32, *mut sys::ec_public_key), Error> {
+        if let PreKeyBundleBuilder {
+            pre_key_id: Some(id),
+            pre_key_public: Some(ref public),
+            ..
+        } = self
+        {
+            Ok((*id, public.raw.as_ptr()))
+        } else {
+            Err(failure::err_msg(
+                "PreKey ID and PreKey public key are required",
+            ))
+        }
+    }
 
-impl PreKeyBundle {
-    pub fn builder() -> PreKeyBundleBuilder {
-        PreKeyBundleBuilder {
-            registration_id: None,
-            device_id: None,
-            pre_key_id: None,
-            pre_key_public: None,
-            signed_pre_key_id: None,
-            signed_pre_key_public: None,
-            signature: None,
-            identity_key: None,
+    fn get_signed_pre_key(&self) -> (u32, *mut sys::ec_public_key) {
+        if let PreKeyBundleBuilder {
+            signed_pre_key_id: Some(id),
+            signed_pre_key_public: Some(ref public),
+            ..
+        } = self
+        {
+            (*id, public.raw.as_ptr())
+        } else {
+            (0, ptr::null_mut())
+        }
+    }
+
+    pub fn build(self) -> Result<PreKeyBundle, Error> {
+        let registration_id = self.get_registration_id()?;
+        let device_id = self.get_device_id()?;
+        let (pre_key_id, pre_key_public) = self.get_pre_key()?;
+        let (signed_pre_key_id, signed_pre_key_public) =
+            self.get_signed_pre_key();
+        let signature =
+            self.signature.as_ref().map(Vec::as_slice).unwrap_or(&[]);
+        let identity_key = self.get_identity_key()?;
+
+        unsafe {
+            let mut raw = ptr::null_mut();
+
+            sys::session_pre_key_bundle_create(
+                &mut raw,
+                registration_id,
+                device_id,
+                pre_key_id,
+                pre_key_public,
+                signed_pre_key_id,
+                signed_pre_key_public,
+                signature.as_ptr(),
+                signature.len(),
+                identity_key,
+            );
+            Ok(PreKeyBundle {
+                raw: Raw::from_ptr(raw),
+            })
         }
     }
 }

@@ -1,10 +1,13 @@
 mod helpers;
 
-use crate::helpers::{fake_random_generator, MockCrypto};
+use crate::helpers::{
+    fake_random_generator, BasicIdentityKeyStore, BasicPreKeyStore,
+    BasicSessionStore, BasicSignedPreKeyStore, MockCrypto,
+};
 use libsignal_protocol::{
     crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
-    Context,
+    Address, Context, InternalError, PreKeyBundle, Serializable,
 };
 use std::time::{Duration, SystemTime};
 
@@ -253,4 +256,50 @@ fn test_hkdf_vector_v2() {
     assert_eq!(secret.len(), length);
 
     assert_eq!(secret, OKM);
+}
+
+#[test]
+fn test_basic_pre_key_v2() {
+    let bob_address = Address::new("+14152222222", 1);
+    let ctx = mock_ctx();
+
+    // Create Alice's data store and session builder
+    let alice_store = ctx
+        .store_context(
+            BasicPreKeyStore::default(),
+            BasicSignedPreKeyStore::default(),
+            BasicSessionStore::default(),
+            BasicIdentityKeyStore::default(),
+        )
+        .unwrap();
+    let alice_session_builder = ctx.session_builder(&alice_store, bob_address);
+
+    // Create Bob's data store and pre key bundle
+    let bob_store = ctx
+        .store_context(
+            BasicPreKeyStore::default(),
+            BasicSignedPreKeyStore::default(),
+            BasicSessionStore::default(),
+            BasicIdentityKeyStore::default(),
+        )
+        .unwrap();
+
+    let registration_id = bob_store.registration_id().unwrap();
+    let bob_identity_key_pair = ctx.generate_identity_key_pair().unwrap();
+    let bob_pre_key_pair = ctx.generate_key_pair().unwrap();
+
+    let bob_public_identity_key_pair = bob_identity_key_pair.public().unwrap();
+    let bob_public_pre_key = bob_pre_key_pair.public().unwrap();
+    let bob_pre_key_bundle = PreKeyBundle::builder()
+        .registration_id(registration_id)
+        .device_id(1)
+        .pre_key(31337, &bob_public_pre_key)
+        .identity_key(&bob_public_identity_key_pair)
+        .build()
+        .unwrap();
+
+    // Have Alice process Bob's pre key bundle, which should fail due to a
+    // missing unsigned pre key.
+    let got = alice_session_builder.process_pre_key_bundle(&bob_pre_key_bundle);
+    assert_eq!(got, Err(InternalError::InvalidKey));
 }

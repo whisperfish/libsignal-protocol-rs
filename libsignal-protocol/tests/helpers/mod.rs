@@ -1,6 +1,14 @@
+#![allow(dead_code)]
+
 use libsignal_protocol::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest},
-    InternalError, SignalCipherType,
+    Address, Buffer, IdentityKeyStore, InternalError, PreKeyStore,
+    SessionStore, SignalCipherType, SignedPreKeyStore,
+};
+use std::{
+    cell::{Cell, RefCell},
+    collections::HashMap,
+    io::{self, Write},
 };
 
 pub(crate) struct MockCrypto<C> {
@@ -69,7 +77,6 @@ impl<C: Crypto> Crypto for MockCrypto<C> {
 
 pub fn fake_random_generator() -> impl Fn(&mut [u8]) -> Result<(), InternalError>
 {
-    use std::cell::Cell;
     let test_next_random = Cell::new(0);
 
     move |data| {
@@ -79,5 +86,109 @@ pub fn fake_random_generator() -> impl Fn(&mut [u8]) -> Result<(), InternalError
         }
 
         Ok(())
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct BasicPreKeyStore {}
+
+impl PreKeyStore for BasicPreKeyStore {
+    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
+        unimplemented!()
+    }
+
+    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
+        unimplemented!()
+    }
+
+    fn contains(&self, _id: u32) -> bool { unimplemented!() }
+
+    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
+}
+
+#[derive(Debug, Default)]
+pub struct BasicSignedPreKeyStore {}
+
+impl SignedPreKeyStore for BasicSignedPreKeyStore {
+    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
+        unimplemented!()
+    }
+
+    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
+        unimplemented!()
+    }
+
+    fn contains(&self, _id: u32) -> bool { unimplemented!() }
+
+    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
+}
+
+#[derive(Default)]
+pub struct BasicSessionStore {
+    sessions: RefCell<HashMap<OwnedAddress, (Buffer, Buffer)>>,
+}
+
+impl SessionStore for BasicSessionStore {
+    fn load_session(
+        &self,
+        address: Address,
+    ) -> Result<(Buffer, Buffer), InternalError> {
+        let address = OwnedAddress::from(address);
+
+        self.sessions
+            .borrow()
+            .get(&address)
+            .cloned()
+            .ok_or(InternalError::Unknown)
+    }
+
+    fn get_sub_device_sessions(&self) { unimplemented!() }
+}
+
+#[derive(Debug, Default)]
+pub struct BasicIdentityKeyStore {
+    registration_id: Cell<u32>,
+    trusted_identities: RefCell<Vec<(OwnedAddress, Vec<u8>)>>,
+}
+
+#[derive(Debug, Hash, PartialEq, Eq)]
+struct OwnedAddress {
+    name: Vec<u8>,
+    id: i32,
+}
+
+impl<'a> PartialEq<Address<'a>> for OwnedAddress {
+    fn eq(&self, other: &Address<'a>) -> bool {
+        self.id == other.device_id() && self.name.as_slice() == other.bytes()
+    }
+}
+
+impl<'a> From<Address<'a>> for OwnedAddress {
+    fn from(other: Address<'a>) -> OwnedAddress {
+        OwnedAddress {
+            name: other.bytes().to_vec(),
+            id: other.device_id(),
+        }
+    }
+}
+
+impl IdentityKeyStore for BasicIdentityKeyStore {
+    fn local_registration_id(&self) -> Result<u32, InternalError> {
+        Ok(self.registration_id.get())
+    }
+
+    fn is_trusted_identity(
+        &self,
+        address: Address<'_>,
+        identity_key: &[u8],
+    ) -> Result<bool, InternalError> {
+        let identities = self.trusted_identities.borrow();
+
+        match identities.iter().position(|(addr, _)| *addr == address) {
+            // if we already know this address, check the keys match
+            Some(ix) => Ok(identities[ix].1.as_slice() == identity_key),
+            // otherwise, blindly trust this unknown identity
+            None => Ok(true),
+        }
     }
 }

@@ -17,7 +17,7 @@ impl Crypto for DefaultCrypto {
 
     fn hmac_sha256(
         &self,
-        key: &[u8],
+        _key: &[u8],
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
         unimplemented!()
     }

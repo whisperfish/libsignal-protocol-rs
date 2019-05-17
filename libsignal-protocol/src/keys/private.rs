@@ -78,3 +78,5 @@ impl PartialOrd for PrivateKey {
         Some(self.cmp(other))
     }
 }
+
+impl_serializable!(PrivateKey, ec_private_key_serialize, asd);

@@ -58,4 +58,5 @@ impl_signal_type_base! {
     sys::ratchet_identity_key_pair, sys::session_signed_pre_key,
     sys::ec_public_key, sys::ec_private_key, sys::session_pre_key,
     sys::ec_key_pair, sys::session_pre_key_bundle, sys::hkdf_context,
+    sys::ciphertext_message,
 }
