@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["CipherMode",""],["SignalCipherType",""]],"struct":[["DefaultCrypto",""],["SignalCipherTypeError",""]],"trait":[["Crypto","Cryptography routines used in the signal protocol."],["Sha256Hmac","Something which can calculate a SHA-256 HMAC."],["Sha512Digest","Something which can generate a SHA-512 hash."]]});
