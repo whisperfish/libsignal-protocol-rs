@@ -54,6 +54,7 @@ use failure::{Error, ResultExt};
 use libsignal_protocol::{
     Address, Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
 };
+use std::time::SystemTime;
 
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
@@ -70,6 +71,9 @@ fn main() -> Result<(), Error> {
         .iter()
         .collect();
     let pre_key = &bob_pre_keys[0];
+    let bob_signed_pre_key = ctx
+        .generate_signed_pre_key(&bob_identity_keys, 12, SystemTime::now())
+        .context("Unable to generate a signed pre-key for bob")?;
 
     // set up some key stores for alice
     let alice_store_ctx = ctx.store_context(
@@ -88,6 +92,11 @@ fn main() -> Result<(), Error> {
         .device_id(bob_address.device_id())
         .identity_key(&bob_public_identity_key)
         .pre_key(pre_key.id(), &pre_key.key_pair().public()?)
+        .signed_pre_key(
+            bob_signed_pre_key.id(),
+            &bob_signed_pre_key.key_pair().public()?,
+        )
+        .signature(bob_signed_pre_key.signature())
         .build()
         .context("Unable to generate the pre-key bundle")?;
 

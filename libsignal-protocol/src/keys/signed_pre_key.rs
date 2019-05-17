@@ -1,9 +1,6 @@
-use crate::{
-    errors::FromInternalErrorCode, keys::KeyPair, raw_ptr::Raw, Buffer,
-};
+use crate::{errors::FromInternalErrorCode, keys::KeyPair, raw_ptr::Raw};
 use failure::Error;
 use std::{
-    io::Write,
     ptr,
     time::{Duration, SystemTime},
 };
@@ -39,25 +36,6 @@ impl SessionSignedPreKey {
         }
     }
 
-    pub fn serialize_to<W: Write>(&self, mut writer: W) -> Result<(), Error> {
-        let buffer = self.serialize()?;
-        writer.write_all(buffer.as_slice())?;
-
-        Ok(())
-    }
-
-    pub fn serialize(&self) -> Result<Buffer, Error> {
-        unsafe {
-            let mut buffer = ptr::null_mut();
-            sys::session_signed_pre_key_serialize(
-                &mut buffer,
-                self.raw.as_const_ptr(),
-            )
-            .into_result()?;
-            Ok(Buffer::from_raw(buffer))
-        }
-    }
-
     pub fn id(&self) -> u32 {
         unsafe { sys::session_signed_pre_key_get_id(self.raw.as_const_ptr()) }
     }
@@ -71,7 +49,7 @@ impl SessionSignedPreKey {
         }
     }
 
-    pub fn get_key_pair(&self) -> KeyPair {
+    pub fn key_pair(&self) -> KeyPair {
         unsafe {
             let raw = sys::session_signed_pre_key_get_key_pair(
                 self.raw.as_const_ptr(),
@@ -83,7 +61,7 @@ impl SessionSignedPreKey {
         }
     }
 
-    pub fn get_signature(&self) -> &[u8] {
+    pub fn signature(&self) -> &[u8] {
         unsafe {
             let len = sys::session_signed_pre_key_get_signature_len(
                 self.raw.as_const_ptr(),
@@ -96,3 +74,5 @@ impl SessionSignedPreKey {
         }
     }
 }
+
+impl_serializable!(SessionSignedPreKey, session_signed_pre_key_serialize, foo);
