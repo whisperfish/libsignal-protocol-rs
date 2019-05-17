@@ -23,9 +23,10 @@ use crate::{
     },
     pre_key_store::{self as pks, PreKeyStore},
     raw_ptr::Raw,
+    session_builder::SessionBuilder,
     session_store::{self as sess, SessionStore},
+    Address, Buffer, StoreContext,
     signed_pre_key_store::{self as spks, SignedPreKeyStore},
-    Buffer, StoreContext,
 };
 
 /// Global state and callbacks used by the library.
@@ -149,7 +150,7 @@ impl Context {
         }
     }
 
-    pub fn new_store_context<P, K, S, I>(
+    pub fn store_context<P, K, S, I>(
         &self,
         pre_key_store: P,
         signed_pre_key_store: K,
@@ -207,6 +208,14 @@ impl Context {
         version: i32,
     ) -> Result<HMACBasedKeyDerivationFunction, Error> {
         HMACBasedKeyDerivationFunction::new(version, self)
+    }
+
+    pub fn session_builder(
+        &self,
+        store_context: StoreContext,
+        address: Address<'_>,
+    ) -> SessionBuilder {
+        SessionBuilder::new(self, store_context, address)
     }
 
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }

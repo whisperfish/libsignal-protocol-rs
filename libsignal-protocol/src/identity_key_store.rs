@@ -1,6 +1,10 @@
+
+use crate::errors::InternalError;
 use std::os::raw::{c_int, c_void};
 
-pub trait IdentityKeyStore {}
+pub trait IdentityKeyStore {
+    fn local_registration_id(&self) -> Result<u32, InternalError>;
+}
 
 pub(crate) fn new_vtable<I: IdentityKeyStore + 'static>(
     identity_key_store: I,
@@ -28,10 +32,18 @@ unsafe extern "C" fn get_identity_key_pair(
 }
 
 unsafe extern "C" fn get_local_registration_id(
-    _user_data: *mut c_void,
-    _registration_id: *mut u32,
+    user_data: *mut c_void,
+    registration_id: *mut u32,
 ) -> c_int {
-    unimplemented!()
+    let user_data = &*(user_data as *const State);
+
+    match user_data.0.local_registration_id() {
+        Ok(id) => {
+            *registration_id = id;
+            sys::SG_SUCCESS as c_int
+        },
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn save_identity(

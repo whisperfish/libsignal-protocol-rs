@@ -48,7 +48,10 @@ use libsignal_protocol::{
     Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyBundle,
     PreKeyStore, SessionBuilder, SessionStore, SignedPreKeyStore,
 };
-use std::io::{self, Write};
+use std::{
+    cell::Cell,
+    io::{self, Write},
+};
 
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
@@ -58,7 +61,7 @@ fn main() -> Result<(), Error> {
     let session_store = BasicSessionStore::default();
     let identity_key_store = BasicIdentityKeyStore::default();
 
-    let store_ctx = ctx.new_store_context(
+    let store_ctx = ctx.store_context(
         pre_key_store,
         signed_pre_key_store,
         session_store,
@@ -127,6 +130,12 @@ impl SessionStore for BasicSessionStore {
 }
 
 #[derive(Debug, Default)]
-struct BasicIdentityKeyStore {}
+pub struct BasicIdentityKeyStore {
+    registration_id: Cell<u32>,
+}
 
-impl IdentityKeyStore for BasicIdentityKeyStore {}
+impl IdentityKeyStore for BasicIdentityKeyStore {
+    fn local_registration_id(&self) -> Result<u32, InternalError> {
+        Ok(self.registration_id.get())
+    }
+}

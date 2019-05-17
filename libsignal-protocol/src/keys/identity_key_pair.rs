@@ -50,7 +50,7 @@ impl IdentityKeyPair {
         }
     }
 
-    pub fn public_key(&self) -> Result<PublicKey, Error> {
+    pub fn public(&self) -> Result<PublicKey, Error> {
         unsafe {
             let raw = sys::ratchet_identity_key_pair_get_public(
                 self.raw.as_const_ptr(),

@@ -1,6 +1,11 @@
 use libsignal_protocol::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest},
-    InternalError, SignalCipherType,
+    Address, Buffer, IdentityKeyStore, InternalError, PreKeyStore,
+    SessionStore, SignalCipherType, SignedPreKeyStore,
+};
+use std::{
+    cell::Cell,
+    io::{self, Write},
 };
 
 pub(crate) struct MockCrypto<C> {
@@ -69,7 +74,6 @@ impl<C: Crypto> Crypto for MockCrypto<C> {
 
 pub fn fake_random_generator() -> impl Fn(&mut [u8]) -> Result<(), InternalError>
 {
-    use std::cell::Cell;
     let test_next_random = Cell::new(0);
 
     move |data| {
@@ -79,5 +83,64 @@ pub fn fake_random_generator() -> impl Fn(&mut [u8]) -> Result<(), InternalError
         }
 
         Ok(())
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct BasicPreKeyStore {}
+
+impl PreKeyStore for BasicPreKeyStore {
+    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
+        unimplemented!()
+    }
+
+    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
+        unimplemented!()
+    }
+
+    fn contains(&self, _id: u32) -> bool { unimplemented!() }
+
+    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
+}
+
+#[derive(Debug, Default)]
+pub struct BasicSignedPreKeyStore {}
+
+impl SignedPreKeyStore for BasicSignedPreKeyStore {
+    fn load(&self, _id: u32, _writer: &mut dyn Write) -> io::Result<()> {
+        unimplemented!()
+    }
+
+    fn store(&self, _id: u32, _body: &[u8]) -> Result<(), InternalError> {
+        unimplemented!()
+    }
+
+    fn contains(&self, _id: u32) -> bool { unimplemented!() }
+
+    fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
+}
+
+#[derive(Debug, Default)]
+pub struct BasicSessionStore {}
+
+impl SessionStore for BasicSessionStore {
+    fn load_session(
+        &self,
+        _address: &Address,
+    ) -> Result<(Buffer, Buffer), InternalError> {
+        unimplemented!()
+    }
+
+    fn get_sub_devuce_sessions(&self) { unimplemented!() }
+}
+
+#[derive(Debug, Default)]
+pub struct BasicIdentityKeyStore {
+    registration_id: Cell<u32>,
+}
+
+impl IdentityKeyStore for BasicIdentityKeyStore {
+    fn local_registration_id(&self) -> Result<u32, InternalError> {
+        Ok(self.registration_id.get())
     }
 }

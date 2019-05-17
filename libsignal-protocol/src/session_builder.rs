@@ -1,8 +1,9 @@
 use crate::{
     address::Address,
     context::{Context, ContextInner},
-    pre_key_bundle::PreKeyBundle,
+    errors::{FromInternalErrorCode, InternalError},
     store_context::{StoreContext, StoreContextInner},
+    pre_key_bundle::PreKeyBundle
 };
 use std::{ptr, rc::Rc};
 
@@ -17,7 +18,7 @@ impl SessionBuilder {
     pub fn new(
         ctx: &Context,
         store_context: StoreContext,
-        address: Address,
+        address: Address<'_>,
     ) -> SessionBuilder {
         unsafe {
             let mut raw = ptr::null_mut();
@@ -36,12 +37,16 @@ impl SessionBuilder {
         }
     }
 
-    pub fn process_pre_key_bundle(&self, pre_key_bundle: &PreKeyBundle) {
+    pub fn process_pre_key_bundle(
+        &self,
+        pre_key_bundle: &PreKeyBundle,
+    ) -> Result<(), InternalError> {
         unsafe {
             sys::session_builder_process_pre_key_bundle(
                 self.raw,
                 pre_key_bundle.raw.as_ptr(),
-            );
+            )
+            .into_result()
         }
     }
 }
