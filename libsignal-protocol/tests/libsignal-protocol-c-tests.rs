@@ -7,7 +7,7 @@ use crate::helpers::{
 use libsignal_protocol::{
     crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
-    Address, Context, InternalError, PreKeyBundle,
+    Address, Context, InternalError, PreKeyBundle, Serializable,
 };
 use std::time::{Duration, SystemTime};
 

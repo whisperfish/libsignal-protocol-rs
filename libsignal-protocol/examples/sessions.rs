@@ -44,14 +44,7 @@
 //! [bas]: https://github.com/signalapp/libsignal-protocol-c#building-a-session
 
 use failure::Error;
-use libsignal_protocol::{
-    Address, Buffer, Context, IdentityKeyStore, InternalError, PreKeyBundle,
-    PreKeyStore, SessionBuilder, SessionStore, SignedPreKeyStore,
-};
-use std::{
-    cell::Cell,
-    io::{self, Write},
-};
+use libsignal_protocol::{Address, Context, PreKeyBundle, SessionBuilder};
 
 #[path = "../tests/helpers/mod.rs"]
 mod helpers;
@@ -84,7 +77,7 @@ fn main() -> Result<(), Error> {
     let pre_key_bundle = PreKeyBundle::builder().build()?;
 
     // Build a session with a pre key retrieved from the server.
-    let got = session_builder.process_pre_key_bundle(&pre_key_bundle)?;
+    session_builder.process_pre_key_bundle(&pre_key_bundle)?;
 
     Ok(())
 }

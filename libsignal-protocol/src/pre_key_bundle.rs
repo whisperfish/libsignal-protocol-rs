@@ -2,6 +2,26 @@ use crate::{keys::PublicKey, raw_ptr::Raw};
 use failure::{Error, ResultExt};
 use std::{convert::TryFrom, ptr};
 
+#[derive(Clone)]
+pub struct PreKeyBundle {
+    pub(crate) raw: Raw<sys::session_pre_key_bundle>,
+}
+
+impl PreKeyBundle {
+    pub fn builder() -> PreKeyBundleBuilder {
+        PreKeyBundleBuilder {
+            registration_id: None,
+            device_id: None,
+            pre_key_id: None,
+            pre_key_public: None,
+            signed_pre_key_id: None,
+            signed_pre_key_public: None,
+            signature: None,
+            identity_key: None,
+        }
+    }
+}
+
 pub struct PreKeyBundleBuilder {
     registration_id: Option<u32>,
     device_id: Option<u32>,
@@ -54,14 +74,12 @@ impl PreKeyBundleBuilder {
 
     fn get_registration_id(&self) -> Result<u32, Error> {
         self.registration_id
-            .clone()
             .ok_or_else(|| failure::err_msg("a registration ID is required"))
     }
 
     fn get_device_id(&self) -> Result<i32, Error> {
         let id = self
             .device_id
-            .clone()
             .ok_or_else(|| failure::err_msg("a device ID is required"))?;
 
         i32::try_from(id)
@@ -108,11 +126,8 @@ impl PreKeyBundleBuilder {
         let (pre_key_id, pre_key_public) = self.get_pre_key()?;
         let (signed_pre_key_id, signed_pre_key_public) =
             self.get_signed_pre_key();
-        let signature = self
-            .signature
-            .as_ref()
-            .map(|sig| sig.as_slice())
-            .unwrap_or(&[]);
+        let signature =
+            self.signature.as_ref().map(Vec::as_slice).unwrap_or(&[]);
         let identity_key = self.get_identity_key()?;
 
         unsafe {
@@ -133,26 +148,6 @@ impl PreKeyBundleBuilder {
             Ok(PreKeyBundle {
                 raw: Raw::from_ptr(raw),
             })
-        }
-    }
-}
-
-#[derive(Clone)]
-pub struct PreKeyBundle {
-    pub(crate) raw: Raw<sys::session_pre_key_bundle>,
-}
-
-impl PreKeyBundle {
-    pub fn builder() -> PreKeyBundleBuilder {
-        PreKeyBundleBuilder {
-            registration_id: None,
-            device_id: None,
-            pre_key_id: None,
-            pre_key_public: None,
-            signed_pre_key_id: None,
-            signed_pre_key_public: None,
-            signature: None,
-            identity_key: None,
         }
     }
 }

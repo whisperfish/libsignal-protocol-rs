@@ -1,12 +1,11 @@
 use crate::{
     errors::{FromInternalErrorCode, InternalError},
     raw_ptr::Raw,
-    Buffer, Context,
+    Context,
 };
 use failure::Error;
 use std::{
     cmp::{Ord, Ordering},
-    io::Write,
     ptr,
 };
 
@@ -30,19 +29,6 @@ impl PublicKey {
             Ok(PublicKey {
                 raw: Raw::from_ptr(raw),
             })
-        }
-    }
-
-    pub fn serialize<W: Write>(&self, mut writer: W) -> Result<(), Error> {
-        unsafe {
-            let mut buffer = ptr::null_mut();
-            sys::ec_public_key_serialize(&mut buffer, self.raw.as_const_ptr())
-                .into_result()?;
-            let buffer = Buffer::from_raw(buffer);
-
-            writer.write_all(buffer.as_slice())?;
-
-            Ok(())
         }
     }
 
@@ -105,6 +91,8 @@ impl PartialOrd for PublicKey {
         Some(self.cmp(other))
     }
 }
+
+impl_serializable!(PublicKey, ec_public_key_serialize, asd);
 
 #[cfg(test)]
 mod tests {

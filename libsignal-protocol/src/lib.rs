@@ -68,6 +68,9 @@ pub use crate::{
     store_context::StoreContext,
 };
 
+#[macro_use]
+mod macros;
+
 mod address;
 mod buffer;
 mod context;
@@ -83,3 +86,21 @@ mod session_builder;
 mod session_store;
 mod signed_pre_key_store;
 mod store_context;
+
+use failure::Error;
+use std::io::Write;
+
+pub trait Serializable {
+    fn serialize(&self) -> Result<Buffer, Error>;
+
+    fn deserialize(data: &[u8]) -> Result<Self, Error>
+    where
+        Self: Sized;
+
+    fn serialize_to<W: Write>(&self, mut writer: W) -> Result<(), Error> {
+        let buffer = self.serialize()?;
+        writer.write_all(buffer.as_slice())?;
+
+        Ok(())
+    }
+}

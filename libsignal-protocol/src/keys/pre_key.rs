@@ -1,8 +1,6 @@
-use crate::{
-    errors::FromInternalErrorCode, keys::KeyPair, raw_ptr::Raw, Buffer,
-};
+use crate::{errors::FromInternalErrorCode, keys::KeyPair, raw_ptr::Raw};
 use failure::Error;
-use std::{io::Write, ptr};
+use std::ptr;
 
 #[derive(Clone)]
 pub struct PreKey {
@@ -22,25 +20,6 @@ impl PreKey {
         }
     }
 
-    pub fn serialize_to<W: Write>(&self, mut writer: W) -> Result<(), Error> {
-        let buffer = self.serialize()?;
-        writer.write_all(buffer.as_slice())?;
-
-        Ok(())
-    }
-
-    pub fn serialize(&self) -> Result<Buffer, Error> {
-        unsafe {
-            let mut buffer = ptr::null_mut();
-            sys::session_pre_key_serialize(
-                &mut buffer,
-                self.raw.as_const_ptr(),
-            )
-            .into_result()?;
-            Ok(Buffer::from_raw(buffer))
-        }
-    }
-
     pub fn id(&self) -> u32 {
         unsafe { sys::session_pre_key_get_id(self.raw.as_const_ptr()) }
     }
@@ -56,3 +35,5 @@ impl PreKey {
         }
     }
 }
+
+impl_serializable!(PreKey, session_pre_key_serialize, foo);
