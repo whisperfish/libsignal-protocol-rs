@@ -9,6 +9,79 @@ pub struct PreKeyBundle {
 
 impl PreKeyBundle {
     pub fn builder() -> PreKeyBundleBuilder { PreKeyBundleBuilder::default() }
+
+    pub fn registration_id(&self) -> u32 {
+        unsafe {
+            sys::session_pre_key_bundle_get_registration_id(
+                self.raw.as_const_ptr(),
+            )
+        }
+    }
+
+    pub fn device_id(&self) -> i32 {
+        unsafe {
+            sys::session_pre_key_bundle_get_device_id(self.raw.as_const_ptr())
+        }
+    }
+
+    pub fn pre_key_id(&self) -> u32 {
+        unsafe {
+            sys::session_pre_key_bundle_get_pre_key_id(self.raw.as_const_ptr())
+        }
+    }
+
+    pub fn pre_key(&self) -> Result<PublicKey, Error> {
+        unsafe {
+            let raw = sys::session_pre_key_bundle_get_pre_key(
+                self.raw.as_const_ptr(),
+            );
+            if raw.is_null() {
+                Err(failure::err_msg("Unable to get the pre-key"))
+            } else {
+                Ok(PublicKey {
+                    raw: Raw::copied_from(raw),
+                })
+            }
+        }
+    }
+
+    pub fn signed_pre_key_id(&self) -> u32 {
+        unsafe {
+            sys::session_pre_key_bundle_get_signed_pre_key_id(
+                self.raw.as_const_ptr(),
+            )
+        }
+    }
+
+    pub fn signed_pre_key(&self) -> Result<PublicKey, Error> {
+        unsafe {
+            let raw = sys::session_pre_key_bundle_get_signed_pre_key(
+                self.raw.as_const_ptr(),
+            );
+            if raw.is_null() {
+                Err(failure::err_msg("Unable to get the signed pre-key"))
+            } else {
+                Ok(PublicKey {
+                    raw: Raw::copied_from(raw),
+                })
+            }
+        }
+    }
+
+    pub fn identity_key(&self) -> Result<PublicKey, Error> {
+        unsafe {
+            let raw = sys::session_pre_key_bundle_get_identity_key(
+                self.raw.as_const_ptr(),
+            );
+            if raw.is_null() {
+                Err(failure::err_msg("Unable to get the identity key"))
+            } else {
+                Ok(PublicKey {
+                    raw: Raw::copied_from(raw),
+                })
+            }
+        }
+    }
 }
 
 #[derive(Default)]

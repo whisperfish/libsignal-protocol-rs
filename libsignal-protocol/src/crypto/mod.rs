@@ -52,13 +52,25 @@ impl TryFrom<i32> for SignalCipherType {
 
 /// Something which can calculate a SHA-256 HMAC.
 pub trait Sha256Hmac {
+    /// Update the HMAC context with the provided data.
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
+    /// Return the HMAC result.
+    /// 
+    /// # Note
+    /// 
+    /// This method should prepare the context for reuse.
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
 }
 
 /// Something which can generate a SHA-512 hash.
 pub trait Sha512Digest {
+    /// Update the digest context with the provided data.
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
+    /// Return the digest result.
+    /// 
+    /// # Note
+    /// 
+    /// This method should prepare the context for reuse.
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
 }
 
