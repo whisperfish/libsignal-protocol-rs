@@ -55,9 +55,9 @@ pub trait Sha256Hmac {
     /// Update the HMAC context with the provided data.
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
     /// Return the HMAC result.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// This method should prepare the context for reuse.
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
 }
@@ -67,9 +67,9 @@ pub trait Sha512Digest {
     /// Update the digest context with the provided data.
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError>;
     /// Return the digest result.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// This method should prepare the context for reuse.
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError>;
 }
