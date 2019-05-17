@@ -2,8 +2,9 @@ mod helpers;
 
 use crate::helpers::{fake_random_generator, MockCrypto};
 use libsignal_protocol::{
+    crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
-    Context, DefaultCrypto,
+    Context,
 };
 use std::time::{Duration, SystemTime};
 
@@ -75,11 +76,7 @@ fn test_generate_pre_keys() {
         0x75, 0x76, 0x77, 0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f,
     ];
 
-    let ctx = Context::new(
-        MockCrypto::new(DefaultCrypto::default())
-            .random_func(fake_random_generator()),
-    )
-    .unwrap();
+    let ctx = mock_ctx();
 
     let pre_keys = ctx.generate_pre_keys(1, 4).unwrap();
     let mut iter = pre_keys.iter();

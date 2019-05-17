@@ -52,10 +52,6 @@
 
 extern crate libsignal_protocol_sys as sys;
 
-#[cfg(feature = "crypto-native")]
-pub use crate::crypto::DefaultCrypto;
-#[cfg(feature = "crypto-openssl")]
-pub use crate::crypto::OpenSSLCrypto;
 pub use crate::{
     address::Address,
     buffer::Buffer,
@@ -75,7 +71,7 @@ pub use crate::{
 mod address;
 mod buffer;
 mod context;
-mod crypto;
+pub mod crypto;
 mod errors;
 mod hkdf;
 mod identity_key_store;
