@@ -272,7 +272,7 @@ fn test_basic_pre_key_v2() {
             BasicIdentityKeyStore::default(),
         )
         .unwrap();
-    let alice_session_builder = ctx.session_builder(alice_store, bob_address);
+    let alice_session_builder = ctx.session_builder(&alice_store, bob_address);
 
     // Create Bob's data store and pre key bundle
     let bob_store = ctx

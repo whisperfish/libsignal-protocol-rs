@@ -43,15 +43,16 @@
 //!
 //! [bas]: https://github.com/signalapp/libsignal-protocol-c#building-a-session
 
-use failure::Error;
-use libsignal_protocol::{Address, Context, PreKeyBundle, SessionBuilder};
-
 #[path = "../tests/helpers/mod.rs"]
 mod helpers;
 
 use self::helpers::{
     BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
     BasicSignedPreKeyStore,
+};
+use failure::Error;
+use libsignal_protocol::{
+    Address, Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
 };
 
 fn main() -> Result<(), Error> {
@@ -72,12 +73,20 @@ fn main() -> Result<(), Error> {
     let addr = Address::new("+14159998888", 1);
 
     // Instantiate a session_builder for a recipient address.
-    let session_builder = SessionBuilder::new(&ctx, store_ctx, addr);
+    let session_builder = SessionBuilder::new(&ctx, &store_ctx, addr.clone());
 
     let pre_key_bundle = PreKeyBundle::builder().build()?;
 
     // Build a session with a pre key retrieved from the server.
     session_builder.process_pre_key_bundle(&pre_key_bundle)?;
+
+    let cipher = SessionCipher::new(&ctx, &store_ctx, addr.clone())?;
+    let message = "Hello, World!";
+    let encrypted_message = cipher.encrypt(message.as_bytes())?;
+
+    let serialized = encrypted_message.serialize()?;
+
+    println!("Encrypted Message: {:?}", serialized.as_slice());
 
     Ok(())
 }

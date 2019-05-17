@@ -63,6 +63,7 @@ pub use crate::{
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
     pre_key_store::PreKeyStore,
     session_builder::SessionBuilder,
+    session_cipher::SessionCipher,
     session_store::SessionStore,
     signed_pre_key_store::SignedPreKeyStore,
     store_context::StoreContext,
@@ -79,10 +80,12 @@ mod errors;
 mod hkdf;
 mod identity_key_store;
 pub mod keys;
+mod messages;
 mod pre_key_bundle;
 mod pre_key_store;
 mod raw_ptr;
 mod session_builder;
+mod session_cipher;
 mod session_store;
 mod signed_pre_key_store;
 mod store_context;

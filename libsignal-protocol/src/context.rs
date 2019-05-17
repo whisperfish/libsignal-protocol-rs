@@ -212,7 +212,7 @@ impl Context {
 
     pub fn session_builder(
         &self,
-        store_context: StoreContext,
+        store_context: &StoreContext,
         address: Address<'_>,
     ) -> SessionBuilder {
         SessionBuilder::new(self, store_context, address)
