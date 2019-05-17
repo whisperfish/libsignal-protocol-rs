@@ -138,4 +138,12 @@ impl IdentityKeyStore for BasicIdentityKeyStore {
     fn local_registration_id(&self) -> Result<u32, InternalError> {
         Ok(self.registration_id.get())
     }
+
+    fn is_trusted_identity(
+        &self,
+        address: Address<'_>,
+        identity_key: &[u8],
+    ) -> Result<bool, InternalError> {
+        unimplemented!()
+    }
 }

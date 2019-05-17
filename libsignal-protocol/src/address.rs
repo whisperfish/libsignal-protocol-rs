@@ -14,6 +14,10 @@ impl<'a> Address<'a> {
             device_id,
         };
 
+        Address::from_raw(raw)
+    }
+
+    pub fn from_raw(raw: sys::signal_protocol_address) -> Address<'a> {
         Address {
             raw,
             _string_lifetime: PhantomData,

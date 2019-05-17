@@ -260,9 +260,7 @@ fn test_hkdf_vector_v2() {
 
 #[test]
 fn test_basic_pre_key_v2() {
-    let alice_address = Address::new("+14151111111", 1);
     let bob_address = Address::new("+14152222222", 1);
-
     let ctx = mock_ctx();
 
     // Create Alice's data store and session builder
@@ -300,13 +298,8 @@ fn test_basic_pre_key_v2() {
         .build()
         .unwrap();
 
+    // Have Alice process Bob's pre key bundle, which should fail due to a
+    // missing unsigned pre key.
     let got = alice_session_builder.process_pre_key_bundle(&bob_pre_key_bundle);
     assert_eq!(got, Err(InternalError::InvalidKey));
-
-    // /*
-    //  * Have Alice process Bob's pre key bundle, which should fail due to a
-    //  * missing unsigned pre key.
-    //  */
-    // result = session_builder_process_pre_key_bundle(alice_session_builder,
-    // bob_pre_key); ck_assert_int_eq(result, SG_ERR_INVALID_KEY);
 }

@@ -4,7 +4,7 @@ use libsignal_protocol::{
     SessionStore, SignalCipherType, SignedPreKeyStore,
 };
 use std::{
-    cell::Cell,
+    cell::{Cell, RefCell},
     io::{self, Write},
 };
 
@@ -137,10 +137,47 @@ impl SessionStore for BasicSessionStore {
 #[derive(Debug, Default)]
 pub struct BasicIdentityKeyStore {
     registration_id: Cell<u32>,
+    trusted_identities: RefCell<Vec<(OwnedAddress, Vec<u8>)>>,
+}
+
+#[derive(Debug, PartialEq)]
+struct OwnedAddress {
+    name: Vec<u8>,
+    id: i32,
+}
+
+impl<'a> PartialEq<Address<'a>> for OwnedAddress {
+    fn eq(&self, other: &Address<'a>) -> bool {
+        self.id == other.device_id() && self.name.as_slice() == other.bytes()
+    }
+}
+
+impl<'a> From<Address<'a>> for OwnedAddress {
+    fn from(other: Address<'a>) -> OwnedAddress {
+        OwnedAddress {
+            name: other.bytes().to_vec(),
+            id: other.device_id(),
+        }
+    }
 }
 
 impl IdentityKeyStore for BasicIdentityKeyStore {
     fn local_registration_id(&self) -> Result<u32, InternalError> {
         Ok(self.registration_id.get())
+    }
+
+    fn is_trusted_identity(
+        &self,
+        address: Address<'_>,
+        identity_key: &[u8],
+    ) -> Result<bool, InternalError> {
+        let identities = self.trusted_identities.borrow();
+
+        match identities.iter().position(|(addr, _)| *addr == address) {
+            // if we already know this address, check the keys match
+            Some(ix) => Ok(identities[ix].1.as_slice() == identity_key),
+            // otherwise, blindly trust this unknown identity
+            None => Ok(true),
+        }
     }
 }

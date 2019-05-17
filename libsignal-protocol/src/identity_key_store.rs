@@ -1,9 +1,21 @@
-
-use crate::errors::InternalError;
+use crate::{errors::InternalError, Address};
 use std::os::raw::{c_int, c_void};
 
 pub trait IdentityKeyStore {
     fn local_registration_id(&self) -> Result<u32, InternalError>;
+
+    /// Verify a remote client's identity key.
+    /// Determine whether a remote client's identity is trusted.  Convention is
+    /// that the TextSecure protocol is 'trust on first use.'  This means that
+    /// an identity key is considered 'trusted' if there is no entry for the
+    /// recipient in the local store, or if it matches the saved key for a
+    /// recipient in the local store.  Only if it mismatches an entry in the
+    /// local store is it considered 'untrusted.'
+    fn is_trusted_identity(
+        &self,
+        address: Address<'_>,
+        identity_key: &[u8],
+    ) -> Result<bool, InternalError>;
 }
 
 pub(crate) fn new_vtable<I: IdentityKeyStore + 'static>(
@@ -56,12 +68,28 @@ unsafe extern "C" fn save_identity(
 }
 
 unsafe extern "C" fn is_trusted_identity(
-    _address: *const sys::signal_protocol_address,
-    _key_data: *mut u8,
-    _key_len: usize,
-    _user_data: *mut c_void,
+    address: *const sys::signal_protocol_address,
+    key_data: *mut u8,
+    key_len: usize,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!address.is_null());
+    assert!(!key_data.is_null());
+    assert!(!user_data.is_null());
+
+    let user_data = &*(user_data as *const State);
+    let address = Address::from_raw(sys::signal_protocol_address {
+        name: (*address).name,
+        name_len: (*address).name_len,
+        device_id: (*address).device_id,
+    });
+    let key = std::slice::from_raw_parts(key_data, key_len);
+
+    match user_data.0.is_trusted_identity(address, key) {
+        Ok(true) => 1,
+        Ok(false) => 0,
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn destroy_func(user_data: *mut c_void) {
