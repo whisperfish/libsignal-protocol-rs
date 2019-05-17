@@ -1,7 +1,14 @@
-use crate::{errors::InternalError, Address};
+use crate::{errors::InternalError, Address, Buffer};
 use std::os::raw::{c_int, c_void};
 
 pub trait IdentityKeyStore {
+    // Get the local client's identity key pair.
+    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError>;
+
+    /// Get the local client's registration ID.
+    ///
+    /// Clients should maintain a registration ID, a random number
+    /// between 1 and 16380 that's generated once at install time.
     fn local_registration_id(&self) -> Result<u32, InternalError>;
 
     /// Verify a remote client's identity key.

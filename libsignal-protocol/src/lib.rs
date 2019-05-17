@@ -64,7 +64,7 @@ pub use crate::{
     pre_key_store::PreKeyStore,
     session_builder::SessionBuilder,
     session_cipher::SessionCipher,
-    session_store::SessionStore,
+    session_store::{SerializedSession, SessionStore},
     signed_pre_key_store::SignedPreKeyStore,
     store_context::StoreContext,
 };

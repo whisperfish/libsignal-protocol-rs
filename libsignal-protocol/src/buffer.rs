@@ -1,5 +1,6 @@
 use std::{
     cmp::{Ord, Ordering},
+    fmt::{self, Debug, Formatter},
     io::{self, Write},
     mem,
     ops::{Index, IndexMut},
@@ -102,6 +103,10 @@ impl Eq for Buffer {}
 
 impl Default for Buffer {
     fn default() -> Self { Self::new() }
+}
+
+impl Debug for Buffer {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result { self.as_slice().fmt(f) }
 }
 
 impl From<Vec<u8>> for Buffer {

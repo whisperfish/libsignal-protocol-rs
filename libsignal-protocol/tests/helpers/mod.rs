@@ -3,7 +3,7 @@
 use libsignal_protocol::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest},
     Address, Buffer, IdentityKeyStore, InternalError, PreKeyStore,
-    SessionStore, SignalCipherType, SignedPreKeyStore,
+    SerializedSession, SessionStore, SignalCipherType, SignedPreKeyStore,
 };
 use std::{
     cell::{Cell, RefCell},
@@ -125,24 +125,25 @@ impl SignedPreKeyStore for BasicSignedPreKeyStore {
 
 #[derive(Default)]
 pub struct BasicSessionStore {
-    sessions: RefCell<HashMap<OwnedAddress, (Buffer, Buffer)>>,
+    sessions: RefCell<HashMap<OwnedAddress, SerializedSession>>,
 }
 
 impl SessionStore for BasicSessionStore {
     fn load_session(
         &self,
-        address: Address,
-    ) -> Result<(Buffer, Buffer), InternalError> {
+        address: Address<'_>,
+    ) -> Result<Option<SerializedSession>, InternalError> {
         let address = OwnedAddress::from(address);
 
-        self.sessions
-            .borrow()
-            .get(&address)
-            .cloned()
-            .ok_or(InternalError::Unknown)
+        Ok(self.sessions.borrow().get(&address).cloned())
     }
 
-    fn get_sub_device_sessions(&self) { unimplemented!() }
+    fn get_sub_device_sessions(
+        &self,
+        name: &[u8],
+    ) -> Result<Vec<i32>, InternalError> {
+        unimplemented!()
+    }
 }
 
 #[derive(Debug, Default)]
@@ -175,6 +176,10 @@ impl<'a> From<Address<'a>> for OwnedAddress {
 impl IdentityKeyStore for BasicIdentityKeyStore {
     fn local_registration_id(&self) -> Result<u32, InternalError> {
         Ok(self.registration_id.get())
+    }
+
+    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError> {
+        unimplemented!()
     }
 
     fn is_trusted_identity(

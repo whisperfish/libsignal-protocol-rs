@@ -1,12 +1,25 @@
 use crate::{errors::InternalError, Address, Buffer};
 use std::os::raw::{c_char, c_int, c_void};
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct SerializedSession {
+    pub session: Buffer,
+    pub extra_data: Option<Buffer>,
+}
+
 pub trait SessionStore {
+    /// Get a copy of the serialized session record corresponding to the
+    /// provided recipient [`Address`].
     fn load_session(
         &self,
-        address: Address,
-    ) -> Result<(Buffer, Buffer), InternalError>;
-    fn get_sub_device_sessions(&self);
+        address: Address<'_>,
+    ) -> Result<Option<SerializedSession>, InternalError>;
+
+    /// Get the IDs of all known devices with active sessions for a recipient.
+    fn get_sub_device_sessions(
+        &self,
+        name: &[u8],
+    ) -> Result<Vec<i32>, InternalError>;
 }
 
 pub(crate) fn new_vtable<S: SessionStore + 'static>(
@@ -43,11 +56,18 @@ unsafe extern "C" fn load_session_func(
     let address = Address::from_ptr(address);
 
     match state.0.load_session(address) {
-        Ok((r, ur)) => {
-            *record = r.into_raw();
-            *user_record = ur.into_raw();
-            sys::SG_SUCCESS as c_int
+        Ok(Some(SerializedSession {
+            session,
+            extra_data,
+        })) => {
+            *record = session.into_raw();
+            if let Some(extra_data) = extra_data {
+                *user_record = extra_data.into_raw();
+            }
+
+            1
         },
+        Ok(None) => 0,
         Err(e) => e.code(),
     }
 }
