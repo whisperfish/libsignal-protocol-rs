@@ -1,6 +1,7 @@
 # libsignal-protocol-rs
 
 [![Build Status](https://travis-ci.com/Michael-F-Bryan/libsignal-protocol-rs.svg?branch=master)](https://travis-ci.com/Michael-F-Bryan/libsignal-protocol-rs)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs?ref=badge_shield)
 
 ([API Docs])
 
@@ -16,6 +17,9 @@ This project is licensed under either of
    http://opensource.org/licenses/MIT)
 
 at your option.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs?ref=badge_large)
 
 ### Contribution
 
