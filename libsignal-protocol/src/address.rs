@@ -24,6 +24,16 @@ impl<'a> Address<'a> {
         }
     }
 
+    pub unsafe fn from_ptr(
+        raw: *const sys::signal_protocol_address,
+    ) -> Address<'a> {
+        Address::from_raw(sys::signal_protocol_address {
+            name: (*raw).name,
+            name_len: (*raw).name_len,
+            device_id: (*raw).device_id,
+        })
+    }
+
     pub(crate) fn raw(&self) -> *const sys::signal_protocol_address {
         &self.raw
     }

@@ -7,6 +7,7 @@ use libsignal_protocol::{
 };
 use std::{
     cell::{Cell, RefCell},
+    collections::HashMap,
     io::{self, Write},
 };
 
@@ -122,18 +123,26 @@ impl SignedPreKeyStore for BasicSignedPreKeyStore {
     fn remove(&self, _id: u32) -> Result<(), InternalError> { unimplemented!() }
 }
 
-#[derive(Debug, Default)]
-pub struct BasicSessionStore {}
+#[derive(Default)]
+pub struct BasicSessionStore {
+    sessions: RefCell<HashMap<OwnedAddress, (Buffer, Buffer)>>,
+}
 
 impl SessionStore for BasicSessionStore {
     fn load_session(
         &self,
-        _address: &Address,
+        address: Address,
     ) -> Result<(Buffer, Buffer), InternalError> {
-        unimplemented!()
+        let address = OwnedAddress::from(address);
+
+        self.sessions
+            .borrow()
+            .get(&address)
+            .cloned()
+            .ok_or(InternalError::Unknown)
     }
 
-    fn get_sub_devuce_sessions(&self) { unimplemented!() }
+    fn get_sub_device_sessions(&self) { unimplemented!() }
 }
 
 #[derive(Debug, Default)]
@@ -142,7 +151,7 @@ pub struct BasicIdentityKeyStore {
     trusted_identities: RefCell<Vec<(OwnedAddress, Vec<u8>)>>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Hash, PartialEq, Eq)]
 struct OwnedAddress {
     name: Vec<u8>,
     id: i32,

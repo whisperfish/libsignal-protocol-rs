@@ -4,9 +4,9 @@ use std::os::raw::{c_char, c_int, c_void};
 pub trait SessionStore {
     fn load_session(
         &self,
-        address: &Address,
+        address: Address,
     ) -> Result<(Buffer, Buffer), InternalError>;
-    fn get_sub_devuce_sessions(&self);
+    fn get_sub_device_sessions(&self);
 }
 
 pub(crate) fn new_vtable<S: SessionStore + 'static>(
@@ -29,12 +29,27 @@ pub(crate) fn new_vtable<S: SessionStore + 'static>(
 struct State(Box<dyn SessionStore>);
 
 unsafe extern "C" fn load_session_func(
-    _record: *mut *mut sys::signal_buffer,
-    _user_record: *mut *mut sys::signal_buffer,
-    _address: *const sys::signal_protocol_address,
-    _user_data: *mut c_void,
+    record: *mut *mut sys::signal_buffer,
+    user_record: *mut *mut sys::signal_buffer,
+    address: *const sys::signal_protocol_address,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!record.is_null());
+    assert!(!user_record.is_null());
+    assert!(!address.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &*(user_data as *const State);
+    let address = Address::from_ptr(address);
+
+    match state.0.load_session(address) {
+        Ok((r, ur)) => {
+            *record = r.into_raw();
+            *user_record = ur.into_raw();
+            sys::SG_SUCCESS as c_int
+        },
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn get_sub_device_sessions_func(
