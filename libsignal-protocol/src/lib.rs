@@ -55,9 +55,8 @@ extern crate libsignal_protocol_sys as sys;
 pub use crate::{
     address::Address,
     buffer::Buffer,
-    context::Context,
-    crypto::{CipherMode, Crypto, SignalCipherType, SignalCipherTypeError},
-    errors::InternalError,
+    context::*,
+    errors::{FromInternalErrorCode, InternalError, IntoInternalErrorCode},
     hkdf::HMACBasedKeyDerivationFunction,
     identity_key_store::IdentityKeyStore,
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},

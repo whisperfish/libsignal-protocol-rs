@@ -43,6 +43,8 @@
 //!
 //! [bas]: https://github.com/signalapp/libsignal-protocol-c#building-a-session
 
+extern crate libsignal_protocol as sig;
+
 #[path = "../tests/helpers/mod.rs"]
 mod helpers;
 
@@ -51,7 +53,7 @@ use self::helpers::{
     BasicSignedPreKeyStore,
 };
 use failure::{Error, ResultExt};
-use libsignal_protocol::{
+use sig::{
     Address, Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
 };
 use std::time::SystemTime;
@@ -61,22 +63,25 @@ fn main() -> Result<(), Error> {
 
     // first we'll need a copy of bob's public key and some of his pre-keys
     let bob_address = Address::new("+14159998888", 1);
-    let bob_identity_keys = ctx
-        .generate_identity_key_pair()
+    let bob_identity_keys = sig::generate_identity_key_pair(&ctx)
         .context("Unable to generate bob's keys")?;
     let bob_public_identity_key = bob_identity_keys.public()?;
-    let bob_pre_keys: Vec<_> = ctx
-        .generate_pre_keys(0, 10)
+    let bob_pre_keys: Vec<_> = sig::generate_pre_keys(&ctx, 0, 10)
         .context("Unable to generate bob's pre-keys")?
         .iter()
         .collect();
     let pre_key = &bob_pre_keys[0];
-    let bob_signed_pre_key = ctx
-        .generate_signed_pre_key(&bob_identity_keys, 12, SystemTime::now())
-        .context("Unable to generate a signed pre-key for bob")?;
+    let bob_signed_pre_key = sig::generate_signed_pre_key(
+        &ctx,
+        &bob_identity_keys,
+        12,
+        SystemTime::now(),
+    )
+    .context("Unable to generate a signed pre-key for bob")?;
 
     // set up some key stores for alice
-    let alice_store_ctx = ctx.store_context(
+    let alice_store_ctx = sig::store_context(
+        &ctx,
         BasicPreKeyStore::default(),
         BasicSignedPreKeyStore::default(),
         BasicSessionStore::default(),

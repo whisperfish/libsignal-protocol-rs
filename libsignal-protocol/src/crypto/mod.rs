@@ -1,3 +1,5 @@
+//! Underlying cryptographic routines.
+
 #[cfg(feature = "crypto-native")]
 mod native;
 #[cfg(feature = "crypto-native")]
@@ -22,6 +24,7 @@ use crate::{
     errors::{InternalError, IntoInternalErrorCode},
 };
 
+/// The error returned from a failed conversion to [`SignalCipherType`].
 #[derive(Debug, Clone)]
 pub struct SignalCipherTypeError(i32);
 

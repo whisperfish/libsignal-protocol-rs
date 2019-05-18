@@ -100,11 +100,11 @@ impl InternalError {
     }
 }
 
-pub(crate) trait FromInternalErrorCode: Sized {
+pub trait FromInternalErrorCode: Sized {
     fn into_result(self) -> Result<(), InternalError>;
 }
 
-pub(crate) trait IntoInternalErrorCode: Sized {
+pub trait IntoInternalErrorCode: Sized {
     fn into_code(self) -> i32;
 }
 
