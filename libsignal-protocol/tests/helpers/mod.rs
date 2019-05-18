@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
 use libsignal_protocol::{
-    crypto::{Crypto, Sha256Hmac, Sha512Digest},
+    crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
     Address, Buffer, IdentityKeyStore, InternalError, PreKeyStore,
-    SerializedSession, SessionStore, SignalCipherType, SignedPreKeyStore,
+    SerializedSession, SessionStore, SignedPreKeyStore,
 };
 use std::{
     cell::{Cell, RefCell},

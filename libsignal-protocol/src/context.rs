@@ -29,7 +29,187 @@ use crate::{
     Address, Buffer, StoreContext,
 };
 
+pub fn generate_identity_key_pair(
+    ctx: &Context,
+) -> Result<IdentityKeyPair, Error> {
+    unsafe {
+        let mut key_pair = ptr::null_mut();
+        sys::signal_protocol_key_helper_generate_identity_key_pair(
+            &mut key_pair,
+            ctx.raw(),
+        )
+        .into_result()?;
+        Ok(IdentityKeyPair {
+            raw: Raw::from_ptr(key_pair),
+        })
+    }
+}
+
+pub fn generate_key_pair(ctx: &Context) -> Result<KeyPair, Error> {
+    unsafe {
+        let mut key_pair = ptr::null_mut();
+        sys::curve_generate_key_pair(ctx.raw(), &mut key_pair).into_result()?;
+
+        Ok(KeyPair {
+            raw: Raw::from_ptr(key_pair),
+        })
+    }
+}
+
+pub fn calculate_signature(
+    ctx: &Context,
+    private: &PrivateKey,
+    message: &[u8],
+) -> Result<Buffer, Error> {
+    unsafe {
+        let mut buffer = ptr::null_mut();
+        sys::curve_calculate_signature(
+            ctx.raw(),
+            &mut buffer,
+            private.raw.as_const_ptr(),
+            message.as_ptr(),
+            message.len(),
+        )
+        .into_result()?;
+
+        Ok(Buffer::from_raw(buffer))
+    }
+}
+
+pub fn generate_registration_id(
+    ctx: &Context,
+    extended_range: i32,
+) -> Result<u32, Error> {
+    let mut id = 0;
+    unsafe {
+        sys::signal_protocol_key_helper_generate_registration_id(
+            &mut id,
+            extended_range,
+            ctx.raw(),
+        )
+        .into_result()?;
+    }
+
+    Ok(id)
+}
+
+pub fn generate_pre_keys(
+    ctx: &Context,
+    start: u32,
+    count: u32,
+) -> Result<PreKeyList, Error> {
+    unsafe {
+        let mut pre_keys_head = ptr::null_mut();
+        sys::signal_protocol_key_helper_generate_pre_keys(
+            &mut pre_keys_head,
+            start,
+            count,
+            ctx.raw(),
+        )
+        .into_result()?;
+
+        Ok(PreKeyList::from_raw(pre_keys_head))
+    }
+}
+
+pub fn generate_signed_pre_key(
+    ctx: &Context,
+    identity_key_pair: &IdentityKeyPair,
+    id: u32,
+    timestamp: SystemTime,
+) -> Result<SessionSignedPreKey, Error> {
+    unsafe {
+        let mut raw = ptr::null_mut();
+        let unix_time = timestamp.duration_since(SystemTime::UNIX_EPOCH)?;
+
+        sys::signal_protocol_key_helper_generate_signed_pre_key(
+            &mut raw,
+            identity_key_pair.raw.as_const_ptr(),
+            id,
+            unix_time.as_secs(),
+            ctx.raw(),
+        )
+        .into_result()?;
+
+        if raw.is_null() {
+            Err(failure::err_msg("Unable to generate a signed pre key"))
+        } else {
+            Ok(SessionSignedPreKey {
+                raw: Raw::from_ptr(raw),
+            })
+        }
+    }
+}
+
+pub fn store_context<P, K, S, I>(
+    ctx: &Context,
+    pre_key_store: P,
+    signed_pre_key_store: K,
+    session_store: S,
+    identity_key_store: I,
+) -> Result<StoreContext, Error>
+where
+    P: PreKeyStore + 'static,
+    K: SignedPreKeyStore + 'static,
+    S: SessionStore + 'static,
+    I: IdentityKeyStore + 'static,
+{
+    unsafe {
+        let mut store_ctx = ptr::null_mut();
+        sys::signal_protocol_store_context_create(&mut store_ctx, ctx.raw())
+            .into_result()?;
+
+        let pre_key_store = pks::new_vtable(pre_key_store);
+        sys::signal_protocol_store_context_set_pre_key_store(
+            store_ctx,
+            &pre_key_store,
+        )
+        .into_result()?;
+
+        let signed_pre_key_store = spks::new_vtable(signed_pre_key_store);
+        sys::signal_protocol_store_context_set_signed_pre_key_store(
+            store_ctx,
+            &signed_pre_key_store,
+        )
+        .into_result()?;
+
+        let session_store = sess::new_vtable(session_store);
+        sys::signal_protocol_store_context_set_session_store(
+            store_ctx,
+            &session_store,
+        )
+        .into_result()?;
+
+        let identity_key_store = iks::new_vtable(identity_key_store);
+        sys::signal_protocol_store_context_set_identity_key_store(
+            store_ctx,
+            &identity_key_store,
+        )
+        .into_result()?;
+
+        Ok(StoreContext::new(store_ctx, &ctx.0))
+    }
+}
+
+pub fn create_hkdf(
+    ctx: &Context,
+    version: i32,
+) -> Result<HMACBasedKeyDerivationFunction, Error> {
+    HMACBasedKeyDerivationFunction::new(version, ctx)
+}
+
+pub fn session_builder(
+    ctx: &Context,
+    store_context: &StoreContext,
+    address: Address<'_>,
+) -> SessionBuilder {
+    SessionBuilder::new(ctx, store_context, address)
+}
+
 /// Global state and callbacks used by the library.
+///
+/// Most functions which require access to the global context (e.g. for crypto
+/// functions or locking) will accept a `&Context` as their first argument.
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
@@ -37,185 +217,6 @@ impl Context {
         ContextInner::new(crypto)
             .map(|c| Context(Rc::new(c)))
             .map_err(Error::from)
-    }
-
-    pub fn generate_identity_key_pair(&self) -> Result<IdentityKeyPair, Error> {
-        unsafe {
-            let mut key_pair = ptr::null_mut();
-            sys::signal_protocol_key_helper_generate_identity_key_pair(
-                &mut key_pair,
-                self.raw(),
-            )
-            .into_result()?;
-            Ok(IdentityKeyPair {
-                raw: Raw::from_ptr(key_pair),
-            })
-        }
-    }
-
-    pub fn generate_key_pair(&self) -> Result<KeyPair, Error> {
-        unsafe {
-            let mut key_pair = ptr::null_mut();
-            sys::curve_generate_key_pair(self.raw(), &mut key_pair)
-                .into_result()?;
-
-            Ok(KeyPair {
-                raw: Raw::from_ptr(key_pair),
-            })
-        }
-    }
-
-    pub fn calculate_signature(
-        &self,
-        private: &PrivateKey,
-        message: &[u8],
-    ) -> Result<Buffer, Error> {
-        unsafe {
-            let mut buffer = ptr::null_mut();
-            sys::curve_calculate_signature(
-                self.raw(),
-                &mut buffer,
-                private.raw.as_const_ptr(),
-                message.as_ptr(),
-                message.len(),
-            )
-            .into_result()?;
-
-            Ok(Buffer::from_raw(buffer))
-        }
-    }
-
-    pub fn generate_registration_id(
-        &self,
-        extended_range: i32,
-    ) -> Result<u32, Error> {
-        let mut id = 0;
-        unsafe {
-            sys::signal_protocol_key_helper_generate_registration_id(
-                &mut id,
-                extended_range,
-                self.raw(),
-            )
-            .into_result()?;
-        }
-
-        Ok(id)
-    }
-
-    pub fn generate_pre_keys(
-        &self,
-        start: u32,
-        count: u32,
-    ) -> Result<PreKeyList, Error> {
-        unsafe {
-            let mut pre_keys_head = ptr::null_mut();
-            sys::signal_protocol_key_helper_generate_pre_keys(
-                &mut pre_keys_head,
-                start,
-                count,
-                self.raw(),
-            )
-            .into_result()?;
-
-            Ok(PreKeyList::from_raw(pre_keys_head))
-        }
-    }
-
-    pub fn generate_signed_pre_key(
-        &self,
-        identity_key_pair: &IdentityKeyPair,
-        id: u32,
-        timestamp: SystemTime,
-    ) -> Result<SessionSignedPreKey, Error> {
-        unsafe {
-            let mut raw = ptr::null_mut();
-            let unix_time = timestamp.duration_since(SystemTime::UNIX_EPOCH)?;
-
-            sys::signal_protocol_key_helper_generate_signed_pre_key(
-                &mut raw,
-                identity_key_pair.raw.as_const_ptr(),
-                id,
-                unix_time.as_secs(),
-                self.raw(),
-            )
-            .into_result()?;
-
-            if raw.is_null() {
-                Err(failure::err_msg("Unable to generate a signed pre key"))
-            } else {
-                Ok(SessionSignedPreKey {
-                    raw: Raw::from_ptr(raw),
-                })
-            }
-        }
-    }
-
-    pub fn store_context<P, K, S, I>(
-        &self,
-        pre_key_store: P,
-        signed_pre_key_store: K,
-        session_store: S,
-        identity_key_store: I,
-    ) -> Result<StoreContext, Error>
-    where
-        P: PreKeyStore + 'static,
-        K: SignedPreKeyStore + 'static,
-        S: SessionStore + 'static,
-        I: IdentityKeyStore + 'static,
-    {
-        unsafe {
-            let mut store_ctx = ptr::null_mut();
-            sys::signal_protocol_store_context_create(
-                &mut store_ctx,
-                self.raw(),
-            )
-            .into_result()?;
-
-            let pre_key_store = pks::new_vtable(pre_key_store);
-            sys::signal_protocol_store_context_set_pre_key_store(
-                store_ctx,
-                &pre_key_store,
-            )
-            .into_result()?;
-
-            let signed_pre_key_store = spks::new_vtable(signed_pre_key_store);
-            sys::signal_protocol_store_context_set_signed_pre_key_store(
-                store_ctx,
-                &signed_pre_key_store,
-            )
-            .into_result()?;
-
-            let session_store = sess::new_vtable(session_store);
-            sys::signal_protocol_store_context_set_session_store(
-                store_ctx,
-                &session_store,
-            )
-            .into_result()?;
-
-            let identity_key_store = iks::new_vtable(identity_key_store);
-            sys::signal_protocol_store_context_set_identity_key_store(
-                store_ctx,
-                &identity_key_store,
-            )
-            .into_result()?;
-
-            Ok(StoreContext::new(store_ctx, &self.0))
-        }
-    }
-
-    pub fn create_hkdf(
-        &self,
-        version: i32,
-    ) -> Result<HMACBasedKeyDerivationFunction, Error> {
-        HMACBasedKeyDerivationFunction::new(version, self)
-    }
-
-    pub fn session_builder(
-        &self,
-        store_context: &StoreContext,
-        address: Address<'_>,
-    ) -> SessionBuilder {
-        SessionBuilder::new(self, store_context, address)
     }
 
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }

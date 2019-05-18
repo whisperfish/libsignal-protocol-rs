@@ -23,8 +23,10 @@
 //!
 //! cit: https://github.com/signalapp/libsignal-protocol-c#client-install-time
 
+extern crate libsignal_protocol as sig;
+
 use failure::Error;
-use libsignal_protocol::Context;
+use sig::Context;
 use std::time::SystemTime;
 
 fn main() -> Result<(), Error> {
@@ -33,19 +35,23 @@ fn main() -> Result<(), Error> {
     let start = 123;
     let pre_key_count = 20;
 
-    let identity_key_pair = ctx.generate_identity_key_pair()?;
-    let signed_pre_key =
-        ctx.generate_signed_pre_key(&identity_key_pair, 5, SystemTime::now())?;
+    let identity_key_pair = sig::generate_identity_key_pair(&ctx)?;
+    let signed_pre_key = sig::generate_signed_pre_key(
+        &ctx,
+        &identity_key_pair,
+        5,
+        SystemTime::now(),
+    )?;
     println!(
         "Signed pre key ID: {} at {:?}",
         signed_pre_key.id(),
         signed_pre_key.timestamp()
     );
 
-    let registration_id = ctx.generate_registration_id(extended_range)?;
+    let registration_id = sig::generate_registration_id(&ctx, extended_range)?;
     println!("Registration ID: {}", registration_id);
 
-    let pre_keys = ctx.generate_pre_keys(start, pre_key_count)?;
+    let pre_keys = sig::generate_pre_keys(&ctx, start, pre_key_count)?;
 
     let pre_key_ids: Vec<_> = pre_keys
         .iter()

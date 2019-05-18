@@ -1,10 +1,11 @@
+extern crate libsignal_protocol as sig;
 mod helpers;
 
 use crate::helpers::{
     fake_random_generator, BasicIdentityKeyStore, BasicPreKeyStore,
     BasicSessionStore, BasicSignedPreKeyStore, MockCrypto,
 };
-use libsignal_protocol::{
+use sig::{
     crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
     Address, Context, InternalError, PreKeyBundle, Serializable,
@@ -81,7 +82,7 @@ fn test_generate_pre_keys() {
 
     let ctx = mock_ctx();
 
-    let pre_keys = ctx.generate_pre_keys(1, 4).unwrap();
+    let pre_keys = sig::generate_pre_keys(&ctx, 1, 4).unwrap();
     let mut iter = pre_keys.iter();
 
     let pre_key_1 = iter.next().unwrap();
@@ -122,15 +123,15 @@ fn test_generate_signed_pre_key() {
     ];
     let ctx = mock_ctx();
 
-    let identity_key_pair = ctx.generate_identity_key_pair().unwrap();
+    let identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
 
-    let signed = ctx
-        .generate_signed_pre_key(
-            &identity_key_pair,
-            1234,
-            SystemTime::UNIX_EPOCH + Duration::from_secs(TIMESTAMP),
-        )
-        .unwrap();
+    let signed = sig::generate_signed_pre_key(
+        &ctx,
+        &identity_key_pair,
+        1234,
+        SystemTime::UNIX_EPOCH + Duration::from_secs(TIMESTAMP),
+    )
+    .unwrap();
 
     let serialized = signed.serialize().unwrap();
 
@@ -149,7 +150,7 @@ fn test_generate_identity_key_pair() {
     ];
     let ctx = mock_ctx();
 
-    let identity_key_pair = ctx.generate_identity_key_pair().unwrap();
+    let identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
 
     let serialized = identity_key_pair.serialize().unwrap();
     assert_eq!(serialized.as_slice(), IDENTITY_KEY_PAIR);
@@ -158,12 +159,12 @@ fn test_generate_identity_key_pair() {
 #[test]
 fn test_curve25519_large_signatures() {
     let ctx = Context::default();
-    let pair = ctx.generate_key_pair().unwrap();
+    let pair = sig::generate_key_pair(&ctx).unwrap();
 
     let mut msg = vec![0; 1048576];
     let private = pair.private().unwrap();
 
-    let signature = ctx.calculate_signature(&private, &msg).unwrap();
+    let signature = sig::calculate_signature(&ctx, &private, &msg).unwrap();
 
     let public = pair.public().unwrap();
     let got = public.verify_signature(&msg, signature.as_slice());
@@ -249,7 +250,7 @@ fn test_hkdf_vector_v2() {
     ];
 
     let ctx = mock_ctx();
-    let hkdf = ctx.create_hkdf(2).unwrap();
+    let hkdf = sig::create_hkdf(&ctx, 2).unwrap();
     let length = 64;
 
     let secret = hkdf.derive_secrets(length, IKM, SALT, INFO).unwrap();
@@ -264,29 +265,30 @@ fn test_basic_pre_key_v2() {
     let ctx = mock_ctx();
 
     // Create Alice's data store and session builder
-    let alice_store = ctx
-        .store_context(
-            BasicPreKeyStore::default(),
-            BasicSignedPreKeyStore::default(),
-            BasicSessionStore::default(),
-            BasicIdentityKeyStore::default(),
-        )
-        .unwrap();
-    let alice_session_builder = ctx.session_builder(&alice_store, bob_address);
+    let alice_store = sig::store_context(
+        &ctx,
+        BasicPreKeyStore::default(),
+        BasicSignedPreKeyStore::default(),
+        BasicSessionStore::default(),
+        BasicIdentityKeyStore::default(),
+    )
+    .unwrap();
+    let alice_session_builder =
+        sig::session_builder(&ctx, &alice_store, bob_address);
 
     // Create Bob's data store and pre key bundle
-    let bob_store = ctx
-        .store_context(
-            BasicPreKeyStore::default(),
-            BasicSignedPreKeyStore::default(),
-            BasicSessionStore::default(),
-            BasicIdentityKeyStore::default(),
-        )
-        .unwrap();
+    let bob_store = sig::store_context(
+        &ctx,
+        BasicPreKeyStore::default(),
+        BasicSignedPreKeyStore::default(),
+        BasicSessionStore::default(),
+        BasicIdentityKeyStore::default(),
+    )
+    .unwrap();
 
     let registration_id = bob_store.registration_id().unwrap();
-    let bob_identity_key_pair = ctx.generate_identity_key_pair().unwrap();
-    let bob_pre_key_pair = ctx.generate_key_pair().unwrap();
+    let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
+    let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
 
     let bob_public_identity_key_pair = bob_identity_key_pair.public().unwrap();
     let bob_public_pre_key = bob_pre_key_pair.public().unwrap();
