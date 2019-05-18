@@ -267,11 +267,11 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">FromInternalErrorCode</span>: <span class="ident">Sized</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromInternalErrorCode</span>: <span class="ident">Sized</span> {
     <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span>;
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">IntoInternalErrorCode</span>: <span class="ident">Sized</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoInternalErrorCode</span>: <span class="ident">Sized</span> {
     <span class="kw">fn</span> <span class="ident">into_code</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span>;
 }
 

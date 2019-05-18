@@ -106,7 +106,6 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-<span id="109">109</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A Rust interface to the [libsignal-protocol-c] library.</span>
 <span class="doccomment">//!</span>
@@ -165,9 +164,8 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">address</span>::<span class="ident">Address</span>,
     <span class="ident">buffer</span>::<span class="ident">Buffer</span>,
-    <span class="ident">context</span>::<span class="ident">Context</span>,
-    <span class="ident">crypto</span>::{<span class="ident">CipherMode</span>, <span class="ident">Crypto</span>, <span class="ident">SignalCipherType</span>, <span class="ident">SignalCipherTypeError</span>},
-    <span class="ident">errors</span>::<span class="ident">InternalError</span>,
+    <span class="ident">context</span>::<span class="kw-2">*</span>,
+    <span class="ident">errors</span>::{<span class="ident">FromInternalErrorCode</span>, <span class="ident">InternalError</span>, <span class="ident">IntoInternalErrorCode</span>},
     <span class="ident">hkdf</span>::<span class="ident">HMACBasedKeyDerivationFunction</span>,
     <span class="ident">identity_key_store</span>::<span class="ident">IdentityKeyStore</span>,
     <span class="ident">pre_key_bundle</span>::{<span class="ident">PreKeyBundle</span>, <span class="ident">PreKeyBundleBuilder</span>},
