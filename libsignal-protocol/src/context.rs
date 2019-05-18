@@ -207,6 +207,9 @@ pub fn session_builder(
 }
 
 /// Global state and callbacks used by the library.
+///
+/// Most functions which require access to the global context (e.g. for crypto
+/// functions or locking) will accept a `&Context` as their first argument.
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
