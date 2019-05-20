@@ -78,63 +78,6 @@ impl Crypto for OpenSSLCrypto {
         Ok(Box::new(hasher))
     }
 
-    // fn sha512_digest_init(&self) -> Result<(), InternalError> {
-    //     let ty = MessageDigest::sha512();
-    //     let ctx = Hasher::new(ty).map_err(|_e| InternalError::Unknown)?;
-    //     let mut guard = self
-    //         .sha512_ctx
-    //         .lock()
-    //         .map_err(|_e| InternalError::Unknown)?;
-    //     *guard = Some(ctx);
-    //     Ok(())
-    // }
-
-    // fn hmac_sha256_update(&self, data: &[u8]) -> Result<(), InternalError> {
-    //     let mut guard =
-    //         self.hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
-    //     if let Some(ref mut ctx) = *guard {
-    //         ctx.update(data).map_err(|_e| InternalError::Unknown)?;
-    //     }
-    //     Ok(())
-    // }
-
-    // fn hmac_sha256_final(&self) -> Result<Vec<u8>, InternalError> {
-    //     let mut guard =
-    //         self.hmac_ctx.lock().map_err(|_e| InternalError::Unknown)?;
-    //     if let Some(ref mut ctx) = *guard {
-    //         ctx.finish()
-    //             .map(|buf| buf.as_ref().to_owned())
-    //             .map_err(|_e| InternalError::Unknown)
-    //     } else {
-    //         Err(InternalError::Unknown)
-    //     }
-    // }
-
-    // fn sha512_digest_update(&self, data: &[u8]) -> Result<(), InternalError>
-    // {     let mut guard = self
-    //         .sha512_ctx
-    //         .lock()
-    //         .map_err(|_e| InternalError::Unknown)?;
-    //     if let Some(ref mut ctx) = *guard {
-    //         ctx.update(data).map_err(|_e| InternalError::Unknown)?;
-    //     }
-    //     Ok(())
-    // }
-
-    // fn sha512_digest_final(&self) -> Result<Vec<u8>, InternalError> {
-    //     let mut guard = self
-    //         .sha512_ctx
-    //         .lock()
-    //         .map_err(|_e| InternalError::Unknown)?;
-    //     if let Some(ref mut ctx) = *guard {
-    //         ctx.finish()
-    //             .map(|buf| buf.as_ref().to_owned())
-    //             .map_err(|_e| InternalError::Unknown)
-    //     } else {
-    //         Err(InternalError::Unknown)
-    //     }
-    // }
-
     fn encrypt(
         &self,
         cipher: SignalCipherType,
