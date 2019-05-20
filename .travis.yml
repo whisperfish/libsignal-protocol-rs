@@ -2,10 +2,17 @@ language: rust
 sudo: false
 cache: cargo
 
+addons:
+  apt:
+    update: true
+    packages:
+      - valgrind
+
 script: 
   - cargo build --all --verbose
   - cargo test --all --verbose
   - cargo doc --all --verbose
+  - python3 ./scripts/valgrind.py
 
 before_deploy:
   - cargo doc --all --verbose
