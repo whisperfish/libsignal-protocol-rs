@@ -56,7 +56,8 @@ def integration_tests():
 
 def run_valgrind(original_cmd):
     args = ["valgrind", "--leak-check=full", "--trace-children=yes",
-            "--show-leak-kinds=all", "--error-exitcode=1", *original_cmd]
+            "--show-leak-kinds=all", "--error-exitcode=1"]
+    args.extend(original_cmd)
 
     env = os.environ.copy()
     env["RUST_BACKTRACE"] = "full"
