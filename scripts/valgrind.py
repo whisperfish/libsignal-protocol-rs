@@ -9,7 +9,6 @@ import os
 from pathlib import Path
 
 ignored = ["sessions"]
-ignored = []
 
 PROJECT_ROOT = Path(__file__).parent.parent
 CARGO_TOML = PROJECT_ROOT.joinpath("libsignal-protocol", "Cargo.toml")
@@ -35,8 +34,8 @@ def get_manifest():
     args = ["cargo", "metadata", "--no-deps", "--format-version=1",
             "--manifest-path", str(CARGO_TOML)]
 
-    output = subprocess.run(args, check=True, stdout=subprocess.PIPE)
-    return json.loads(output.stdout.decode("utf-8"))
+    output = subprocess.check_output(args)
+    return json.loads(output.decode("utf-8"))
 
 
 def integration_tests():
@@ -45,8 +44,8 @@ def integration_tests():
     """
     args = ["cargo", "test", "--tests", "--no-run", "--message-format=json",
             "--manifest-path", str(CARGO_TOML)]
-    output = subprocess.run(args, check=True, stdout=subprocess.PIPE)
-    stdout = output.stdout.decode("utf-8")
+    output = subprocess.check_output(args)
+    stdout = output.decode("utf-8")
 
     for line in stdout.splitlines():
         line = json.loads(line)
@@ -61,7 +60,7 @@ def run_valgrind(original_cmd):
 
     env = os.environ.copy()
     env["RUST_BACKTRACE"] = "full"
-    subprocess.run(args, check=True, env=env)
+    subprocess.check_call(args, env=env)
 
 
 def main():
@@ -70,7 +69,7 @@ def main():
     binaries.extend(integration_tests())
 
     for binary in binaries:
-        run_valgrind([binary])
+        run_valgrind([str(binary)])
 
 
 if __name__ == "__main__":
