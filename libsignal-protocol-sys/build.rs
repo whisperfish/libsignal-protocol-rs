@@ -1,7 +1,3 @@
-extern crate bindgen;
-
-use std::{env, path::PathBuf};
-
 fn main() {
     let dst = cmake::build("libsignal-protocol-c");
 
