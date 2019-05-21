@@ -8,11 +8,16 @@ addons:
     packages:
       - valgrind
 
+before_script:
+  - export PATH=$HOME/.cargo/bin:$PATH
+  - cargo install --debug bindgen
+
 script: 
   - cargo build --all --verbose
   - cargo test --all --verbose
   - cargo doc --all --verbose
   - python3 ./scripts/valgrind.py
+  - git diff --exit-code -- libsignal-protocol-sys/bindings.rs || echo "Bindings are outdated" && exit 1
 
 before_deploy:
   - cargo doc --all --verbose
