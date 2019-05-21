@@ -4,8 +4,4 @@
 #![allow(non_snake_case)]
 #![allow(improper_ctypes)]
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
-
-pub mod protobuf {
-    include!(concat!(env!("OUT_DIR"), "/protobuf.rs"));
-}
+include!("bindings.rs");
