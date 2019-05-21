@@ -35,12 +35,6 @@ matrix:
       script:
         - cargo fmt --all -- --check
         - cargo clippy -- -D clippy::all
-    - rust: nightly
-      before_script:
-        - rustup component add miri
-        - cargo miri setup
-      script:
-        - cargo miri test -- -Zmiri-seed=42 -- -Zunstable-options --exclude-should-panic
 
 deploy:
   provider: pages
