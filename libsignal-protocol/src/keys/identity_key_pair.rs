@@ -1,11 +1,14 @@
+use std::ptr;
+
+use failure::Error;
+
 use crate::{
     errors::FromInternalErrorCode,
     keys::{PrivateKey, PublicKey},
     raw_ptr::Raw,
 };
-use failure::Error;
-use std::ptr;
 
+#[derive(Clone, Debug)]
 pub struct IdentityKeyPair {
     pub(crate) raw: Raw<sys::ratchet_identity_key_pair>,
 }
@@ -30,17 +33,36 @@ impl IdentityKeyPair {
         }
     }
 
-    pub fn public(&self) -> Result<PublicKey, Error> {
+    pub fn public(&self) -> PublicKey {
         unsafe {
             let raw = sys::ratchet_identity_key_pair_get_public(
                 self.raw.as_const_ptr(),
             );
             assert!(!raw.is_null());
-            Ok(PublicKey {
+            PublicKey {
                 raw: Raw::copied_from(raw),
-            })
+            }
+        }
+    }
+
+    pub fn private(&self) -> PrivateKey {
+        unsafe {
+            let raw = sys::ratchet_identity_key_pair_get_private(
+                self.raw.as_const_ptr(),
+            );
+            assert!(!raw.is_null());
+            PrivateKey {
+                raw: Raw::copied_from(raw),
+            }
         }
     }
 }
 
+impl Drop for IdentityKeyPair {
+    fn drop(&mut self) {
+        unsafe {
+            sys::ratchet_identity_key_pair_destroy(self.raw.as_ptr() as _)
+        }
+    }
+}
 impl_serializable!(IdentityKeyPair, ratchet_identity_key_pair_serialize, foo);

@@ -1,8 +1,9 @@
-use crate::{buffer::Buffer, errors::InternalError};
 use std::{
     io::{self, Write},
     os::raw::{c_int, c_void},
 };
+
+use crate::{buffer::Buffer, errors::InternalError};
 
 pub trait SignedPreKeyStore {
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;

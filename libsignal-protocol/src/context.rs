@@ -1,7 +1,3 @@
-use failure::Error;
-
-use lock_api::RawMutex as _;
-use parking_lot::RawMutex;
 use std::{
     ffi::c_void,
     fmt::{self, Debug, Formatter},
@@ -10,6 +6,10 @@ use std::{
     rc::Rc,
     time::SystemTime,
 };
+
+use failure::Error;
+use lock_api::RawMutex as _;
+use parking_lot::RawMutex;
 
 #[cfg(feature = "crypto-native")]
 use crate::crypto::DefaultCrypto;
@@ -152,7 +152,7 @@ where
     P: PreKeyStore + 'static,
     K: SignedPreKeyStore + 'static,
     S: SessionStore + 'static,
-    I: IdentityKeyStore + 'static,
+    I: IdentityKeyStore<'static> + 'static,
 {
     unsafe {
         let mut store_ctx = ptr::null_mut();

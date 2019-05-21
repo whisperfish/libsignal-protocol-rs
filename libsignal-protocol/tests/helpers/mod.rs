@@ -1,14 +1,16 @@
 #![allow(dead_code)]
 
-use libsignal_protocol::{
-    crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
-    Address, Buffer, IdentityKeyStore, InternalError, PreKeyStore,
-    SerializedSession, SessionStore, SignedPreKeyStore,
-};
 use std::{
     cell::{Cell, RefCell},
     collections::HashMap,
     io::{self, Write},
+};
+
+use libsignal_protocol::{
+    crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
+    keys::IdentityKeyPair,
+    Address, IdentityKeyStore, InternalError, PreKeyStore, SerializedSession,
+    SessionStore, SignedPreKeyStore,
 };
 
 pub(crate) struct MockCrypto<C> {
@@ -79,7 +81,7 @@ pub fn fake_random_generator() -> impl Fn(&mut [u8]) -> Result<(), InternalError
 {
     let test_next_random = Cell::new(0);
 
-    move |data| {
+    move |mut data| {
         for i in 0..data.len() {
             data[i] = test_next_random.get();
             test_next_random.set(test_next_random.get().wrapping_add(1));
@@ -173,12 +175,20 @@ impl<'a> From<Address<'a>> for OwnedAddress {
     }
 }
 
-impl IdentityKeyStore for BasicIdentityKeyStore {
+impl IdentityKeyStore<'_> for BasicIdentityKeyStore {
+    fn identity_key_pair(&self) -> Result<IdentityKeyPair, InternalError> {
+        unimplemented!()
+    }
+
     fn local_registration_id(&self) -> Result<u32, InternalError> {
         Ok(self.registration_id.get())
     }
 
-    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError> {
+    fn save_identity(
+        &self,
+        address: Address,
+        identity_key: &[u8],
+    ) -> Result<bool, InternalError> {
         unimplemented!()
     }
 

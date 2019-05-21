@@ -1,5 +1,11 @@
+use std::{
+    cmp::Ordering,
+    hash::{Hash, Hasher},
+    marker::PhantomData,
+    os::raw::c_char,
+};
+
 use libsignal_protocol_sys as sys;
-use std::{marker::PhantomData, os::raw::c_char};
 
 pub struct Address<'a> {
     raw: sys::signal_protocol_address,
@@ -52,6 +58,19 @@ impl<'a> Address<'a> {
     }
 
     pub fn device_id(&self) -> i32 { self.raw.device_id }
+
+    pub fn name(&self) -> &str {
+        unsafe {
+            let buf = std::slice::from_raw_parts(
+                self.raw.name as *const u8,
+                self.raw.name_len,
+            );
+            // i think it is safe here to use *_unchecked version of that
+            // function, since we pass `&str` to the `new` method
+            // so it must be a valid utf8 !
+            std::str::from_utf8_unchecked(buf)
+        }
+    }
 }
 
 impl<'a> Clone for Address<'a> {
@@ -63,3 +82,30 @@ impl<'a> Clone for Address<'a> {
         })
     }
 }
+
+impl<'a> Ord for Address<'a> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.device_id().cmp(&other.device_id())
+    }
+}
+
+impl<'a> PartialEq for Address<'a> {
+    fn eq(&self, other: &Self) -> bool {
+        self.name() == other.name() && self.device_id() == other.device_id()
+    }
+}
+
+impl<'a> PartialOrd for Address<'a> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl<'a> Hash for Address<'a> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write_i32(self.device_id());
+        state.write(self.bytes());
+    }
+}
+
+impl<'a> Eq for Address<'a> {}

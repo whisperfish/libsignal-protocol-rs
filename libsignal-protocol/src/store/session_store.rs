@@ -1,5 +1,6 @@
-use crate::{errors::InternalError, Address, Buffer};
 use std::os::raw::{c_char, c_int, c_void};
+
+use crate::{errors::InternalError, Address, Buffer};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct SerializedSession {

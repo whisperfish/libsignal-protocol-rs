@@ -1,9 +1,13 @@
-use crate::{errors::InternalError, Address, Buffer};
 use std::os::raw::{c_int, c_void};
 
-pub trait IdentityKeyStore {
-    // Get the local client's identity key pair.
-    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError>;
+use crate::{
+    errors::InternalError, keys::IdentityKeyPair, Address, Serializable,
+};
+
+// Provides an interface to identity information.
+pub trait IdentityKeyStore<'a> {
+    /// Get the local client's identity key pair.
+    fn identity_key_pair(&self) -> Result<IdentityKeyPair, InternalError>;
 
     /// Get the local client's registration ID.
     ///
@@ -11,6 +15,17 @@ pub trait IdentityKeyStore {
     /// between 1 and 16380 that's generated once at install time.
     fn local_registration_id(&self) -> Result<u32, InternalError>;
 
+    /// Save a remote client's identity key
+    ///
+    /// Store a remote client's identity key as trusted.
+    ///
+    /// it should return `true` if the identity key replaces a previous
+    /// identity, `false` if not
+    fn save_identity(
+        &self,
+        address: Address<'a>,
+        identity_key: &[u8],
+    ) -> Result<bool, InternalError>;
     /// Verify a remote client's identity key.
     /// Determine whether a remote client's identity is trusted.  Convention is
     /// that the TextSecure protocol is 'trust on first use.'  This means that
@@ -25,7 +40,7 @@ pub trait IdentityKeyStore {
     ) -> Result<bool, InternalError>;
 }
 
-pub(crate) fn new_vtable<I: IdentityKeyStore + 'static>(
+pub(crate) fn new_vtable<I: IdentityKeyStore<'static> + 'static>(
     identity_key_store: I,
 ) -> sys::signal_protocol_identity_key_store {
     let state: Box<State> = Box::new(State(Box::new(identity_key_store)));
@@ -40,20 +55,38 @@ pub(crate) fn new_vtable<I: IdentityKeyStore + 'static>(
     }
 }
 
-struct State(Box<dyn IdentityKeyStore>);
+struct State(Box<dyn IdentityKeyStore<'static>>);
 
 unsafe extern "C" fn get_identity_key_pair(
-    _public_data: *mut *mut sys::signal_buffer,
-    _private_data: *mut *mut sys::signal_buffer,
-    _user_data: *mut c_void,
+    public_data: *mut *mut sys::signal_buffer,
+    private_data: *mut *mut sys::signal_buffer,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!user_data.is_null());
+    assert!(!public_data.is_null());
+    assert!(!private_data.is_null());
+
+    let user_data = &*(user_data as *const State);
+
+    match user_data.0.identity_key_pair() {
+        // A funny way to pattern match :)
+        Ok(id) => match (id.public().serialize(), id.private().serialize()) {
+            (Ok(public_key), Ok(private_key)) => {
+                *public_data = public_key.into_raw();
+                *private_data = private_key.into_raw();
+                sys::SG_SUCCESS as c_int
+            },
+            _ => InternalError::Unknown.code(),
+        },
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn get_local_registration_id(
     user_data: *mut c_void,
     registration_id: *mut u32,
 ) -> c_int {
+    assert!(!user_data.is_null());
     let user_data = &*(user_data as *const State);
 
     match user_data.0.local_registration_id() {
@@ -66,12 +99,26 @@ unsafe extern "C" fn get_local_registration_id(
 }
 
 unsafe extern "C" fn save_identity(
-    _address: *const sys::signal_protocol_address,
-    _key_data: *mut u8,
-    _key_len: usize,
-    _user_data: *mut c_void,
+    address: *const sys::signal_protocol_address,
+    key_data: *mut u8,
+    key_len: usize,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!address.is_null());
+    assert!(!key_data.is_null());
+    assert!(!user_data.is_null());
+    let user_data = &*(user_data as *const State);
+    let address = Address::from_raw(sys::signal_protocol_address {
+        name: (*address).name,
+        name_len: (*address).name_len,
+        device_id: (*address).device_id,
+    });
+    let key = std::slice::from_raw_parts(key_data, key_len);
+    match user_data.0.save_identity(address, key) {
+        Ok(true) => 1,
+        Ok(false) => 0,
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn is_trusted_identity(
