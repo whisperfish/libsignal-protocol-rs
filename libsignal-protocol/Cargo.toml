@@ -14,8 +14,10 @@ rand = "0.6.5"
 parking_lot = "0.8.0"
 lock_api = "0.2.0"
 openssl = { version = "0.10", optional = true }
+sha2 = { version = "0.8.0", optional = true }
+hmac = { version = "0.7.0", optional = true }
 
 [features]
 default = ["crypto-native"]
-crypto-native = [] # TODO(shekohex): add this feature.
+crypto-native = ["sha2", "hmac"] # TODO(shekohex): find a way to add `aes`.
 crypto-openssl = ["openssl"]
