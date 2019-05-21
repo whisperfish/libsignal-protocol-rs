@@ -8,16 +8,12 @@ addons:
     packages:
       - valgrind
 
-before_script:
-  - export PATH=$HOME/.cargo/bin:$PATH
-  - cargo install --debug bindgen
-
 script: 
   - cargo build --all --verbose
   - cargo test --all --verbose
   - cargo doc --all --verbose
+    # Check that the (non-blacklisted) examples and tests don't have memory bugs
   - python3 ./scripts/valgrind.py
-  - git diff --exit-code -- libsignal-protocol-sys/bindings.rs || echo "Bindings are outdated" && exit 1
 
 before_deploy:
   - cargo doc --all --verbose
@@ -35,12 +31,6 @@ matrix:
       script:
         - cargo fmt --all -- --check
         - cargo clippy -- -D clippy::all
-    - rust: nightly
-      before_script:
-        - rustup component add miri
-        - cargo miri setup
-      script:
-        - cargo miri test -- -Zmiri-seed=42 -- -Zunstable-options --exclude-should-panic
 
 deploy:
   provider: pages
