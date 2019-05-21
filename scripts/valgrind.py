@@ -49,7 +49,7 @@ def integration_tests():
 
     for line in stdout.splitlines():
         line = json.loads(line)
-        if line["reason"] == "compiler-artifact" and "test" in line["target"]["kind"]:
+        if line["reason"] == "compiler-artifact" and "test" in line["target"]["kind"] and line.get("name") not in ignored:
             yield line["executable"]
 
 
