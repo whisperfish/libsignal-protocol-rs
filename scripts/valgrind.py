@@ -2,7 +2,6 @@
 
 import subprocess
 import json
-from pprint import pprint
 from functools import partial
 from os import path
 import os
@@ -49,7 +48,14 @@ def integration_tests():
 
     for line in stdout.splitlines():
         line = json.loads(line)
-        if line["reason"] == "compiler-artifact" and "test" in line["target"]["kind"] and line.get("name") not in ignored:
+        target = line.get("target")
+        if not target:
+            continue
+
+        is_test = "test" in target["kind"]
+        not_ignored = target["name"] not in ignored
+
+        if line["reason"] == "compiler-artifact" and is_test and not_ignored:
             yield line["executable"]
 
 
