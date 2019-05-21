@@ -2,8 +2,8 @@ use crate::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
     errors::InternalError,
 };
-use sha2::{Sha512,Sha256, Digest};
 use hmac::{Hmac, Mac};
+use sha2::{Digest, Sha256, Sha512};
 
 // Create alias for HMAC-SHA256
 type HmacSha256 = Hmac<Sha256>;
@@ -24,7 +24,8 @@ impl Crypto for DefaultCrypto {
         &self,
         key: &[u8],
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
-        let mac = HmacSha256::new_varkey(key).map_err(|_| InternalError::Unknown)?;
+        let mac =
+            HmacSha256::new_varkey(key).map_err(|_| InternalError::Unknown)?;
         Ok(Box::new(mac))
     }
 
@@ -79,7 +80,7 @@ impl Sha256Hmac for HmacSha256 {
     }
 
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError> {
-       let result = self.result_reset().code();
+        let result = self.result_reset().code();
         Ok(result.to_vec())
     }
 }
