@@ -8,7 +8,7 @@ from os import path
 import os
 from pathlib import Path
 
-ignored = ["sessions"]
+ignored = ["sessions", "libsignal-protocol-c-tests"]
 
 PROJECT_ROOT = Path(__file__).parent.parent
 CARGO_TOML = PROJECT_ROOT.joinpath("libsignal-protocol", "Cargo.toml")
