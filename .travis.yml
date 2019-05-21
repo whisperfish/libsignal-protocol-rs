@@ -12,6 +12,7 @@ script:
   - cargo build --all --verbose
   - cargo test --all --verbose
   - cargo doc --all --verbose
+    # Check that the (non-blacklisted) examples and tests don't have memory bugs
   - python3 ./scripts/valgrind.py
 
 before_deploy:
@@ -30,12 +31,6 @@ matrix:
       script:
         - cargo fmt --all -- --check
         - cargo clippy -- -D clippy::all
-    - rust: nightly
-        before_script:
-          - rustup component add miri
-          - cargo miri setup
-        script:
-          - cargo miri test -- -Zmiri-seed=42 -- -Zunstable-options --exclude-should-panic
 
 deploy:
   provider: pages
