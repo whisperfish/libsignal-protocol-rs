@@ -58,11 +58,4 @@ impl IdentityKeyPair {
     }
 }
 
-impl Drop for IdentityKeyPair {
-    fn drop(&mut self) {
-        unsafe {
-            sys::ratchet_identity_key_pair_destroy(self.raw.as_ptr() as _)
-        }
-    }
-}
 impl_serializable!(IdentityKeyPair, ratchet_identity_key_pair_serialize, foo);

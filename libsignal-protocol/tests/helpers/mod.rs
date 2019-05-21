@@ -81,7 +81,7 @@ pub fn fake_random_generator() -> impl Fn(&mut [u8]) -> Result<(), InternalError
 {
     let test_next_random = Cell::new(0);
 
-    move |mut data| {
+    move |data| {
         for i in 0..data.len() {
             data[i] = test_next_random.get();
             test_next_random.set(test_next_random.get().wrapping_add(1));

@@ -1,16 +1,19 @@
 extern crate libsignal_protocol as sig;
-mod helpers;
 
-use crate::helpers::{
-    fake_random_generator, BasicIdentityKeyStore, BasicPreKeyStore,
-    BasicSessionStore, BasicSignedPreKeyStore, MockCrypto,
-};
+use std::time::{Duration, SystemTime};
+
 use sig::{
     crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
     Address, Context, InternalError, PreKeyBundle, Serializable,
 };
-use std::time::{Duration, SystemTime};
+
+use crate::helpers::{
+    fake_random_generator, BasicIdentityKeyStore, BasicPreKeyStore,
+    BasicSessionStore, BasicSignedPreKeyStore, MockCrypto,
+};
+
+mod helpers;
 
 fn mock_ctx() -> Context {
     Context::new(
@@ -104,7 +107,7 @@ fn test_generate_pre_keys() {
 
 #[test]
 fn test_generate_signed_pre_key() {
-    const TIMESTAMP: u64 = 1411152577000;
+    const TIMESTAMP: u64 = 1_411_152_577_000;
 
     const SIGNED_PRE_KEY: &[u8] = &[
         0x08, 0xd2, 0x09, 0x12, 0x21, 0x05, 0x35, 0x80, 0x72, 0xd6, 0x36, 0x58,
@@ -161,7 +164,7 @@ fn test_curve25519_large_signatures() {
     let ctx = Context::default();
     let pair = sig::generate_key_pair(&ctx).unwrap();
 
-    let mut msg = vec![0; 1048576];
+    let mut msg = vec![0; 1_048_576];
     let private = pair.private().unwrap();
 
     let signature = sig::calculate_signature(&ctx, &private, &msg).unwrap();
@@ -290,7 +293,7 @@ fn test_basic_pre_key_v2() {
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
 
-    let bob_public_identity_key_pair = bob_identity_key_pair.public().unwrap();
+    let bob_public_identity_key_pair = bob_identity_key_pair.public();
     let bob_public_pre_key = bob_pre_key_pair.public().unwrap();
     let bob_pre_key_bundle = PreKeyBundle::builder()
         .registration_id(registration_id)

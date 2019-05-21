@@ -45,18 +45,21 @@
 
 extern crate libsignal_protocol as sig;
 
-#[path = "../tests/helpers/mod.rs"]
-mod helpers;
+use std::time::SystemTime;
+
+use failure::{Error, ResultExt};
+
+use sig::{
+    Address, Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
+};
 
 use self::helpers::{
     BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
     BasicSignedPreKeyStore,
 };
-use failure::{Error, ResultExt};
-use sig::{
-    Address, Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
-};
-use std::time::SystemTime;
+
+#[path = "../tests/helpers/mod.rs"]
+mod helpers;
 
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
@@ -65,7 +68,7 @@ fn main() -> Result<(), Error> {
     let bob_address = Address::new("+14159998888", 1);
     let bob_identity_keys = sig::generate_identity_key_pair(&ctx)
         .context("Unable to generate bob's keys")?;
-    let bob_public_identity_key = bob_identity_keys.public()?;
+    let bob_public_identity_key = bob_identity_keys.public();
     let bob_pre_keys: Vec<_> = sig::generate_pre_keys(&ctx, 0, 10)
         .context("Unable to generate bob's pre-keys")?
         .iter()
