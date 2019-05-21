@@ -16,8 +16,11 @@ script:
   - cargo build --all --verbose
   - cargo test --all --verbose
   - cargo doc --all --verbose
+    # Check that the (non-blacklisted) examples and tests don't have memory bugs
   - python3 ./scripts/valgrind.py
-  - git diff --exit-code -- libsignal-protocol-sys/bindings.rs || echo "Bindings are outdated" && exit 1
+    # Make sure our generated bindings are up to date
+  - ./scripts/generate_bindings.sh
+  - git diff --exit-code -- libsignal-protocol-sys/bindings.rs || (echo "Bindings are outdated" && exit 1)
 
 before_deploy:
   - cargo doc --all --verbose
