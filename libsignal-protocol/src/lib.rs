@@ -23,8 +23,8 @@
 //! Sessions are established in one of three ways:
 //!
 //! 1. [`PreKeyBundle`]. A client that wishes to send a message to a recipient
-//!    can establish a session by retrieving a PreKeyBundle for that recipient
-//!    from the server.
+//!    can establish a session by retrieving a [`PreKeyBundle`] for that
+//!    recipient from the server.
 //! 2. PreKeySignalMessages.  A client can receive a PreKeySignalMessage from a
 //!    recipient and use it to establish a session.
 //! 3. KeyExchangeMessages.  Two clients can exchange KeyExchange messages to

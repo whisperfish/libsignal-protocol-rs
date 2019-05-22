@@ -3,13 +3,18 @@ use failure::Error;
 use std::{
     ptr,
     time::{Duration, SystemTime},
+    fmt::{self, Debug, Formatter},
 };
 
+/// A signed pre-key.
+#[derive(Clone)]
 pub struct SessionSignedPreKey {
     pub(crate) raw: Raw<sys::session_signed_pre_key>,
 }
 
 impl SessionSignedPreKey {
+    /// Create a new [`SessionSignedPreKey`] out of an existing [`KeyPair`] and
+    /// its signature.
     pub fn new(
         id: u32,
         timestamp: SystemTime,
@@ -36,10 +41,12 @@ impl SessionSignedPreKey {
         }
     }
 
+    /// Get the signed pre-key's ID.
     pub fn id(&self) -> u32 {
         unsafe { sys::session_signed_pre_key_get_id(self.raw.as_const_ptr()) }
     }
 
+    /// When was this key signed?
     pub fn timestamp(&self) -> SystemTime {
         unsafe {
             let ts = sys::session_signed_pre_key_get_timestamp(
@@ -49,6 +56,7 @@ impl SessionSignedPreKey {
         }
     }
 
+    /// Get the key pair which has been signed.
     pub fn key_pair(&self) -> KeyPair {
         unsafe {
             let raw = sys::session_signed_pre_key_get_key_pair(
@@ -61,6 +69,7 @@ impl SessionSignedPreKey {
         }
     }
 
+    /// Get the signature.
     pub fn signature(&self) -> &[u8] {
         unsafe {
             let len = sys::session_signed_pre_key_get_signature_len(
@@ -76,3 +85,13 @@ impl SessionSignedPreKey {
 }
 
 impl_serializable!(SessionSignedPreKey, session_signed_pre_key_serialize, foo);
+
+impl Debug for SessionSignedPreKey {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("SessionSignedPreKey")
+            .field("key_pair", &self.key_pair())
+            .field("id", &self.id())
+            .field("timestamp", &self.timestamp())
+            .finish()
+    }
+}

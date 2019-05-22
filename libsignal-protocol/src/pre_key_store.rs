@@ -4,10 +4,16 @@ use std::{
     os::raw::{c_int, c_void},
 };
 
+/// Something which can store [`crate::keys::PreKey`]s without inspecting their
+/// contents.
 pub trait PreKeyStore {
+    /// Load a pre-key.
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
+    /// Store a pre-key.
     fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError>;
+    /// Is the pre-key with this ID present in the store?
     fn contains(&self, id: u32) -> bool;
+    /// Remove a pre-key from the store.
     fn remove(&self, id: u32) -> Result<(), InternalError>;
 }
 

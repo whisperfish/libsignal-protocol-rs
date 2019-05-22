@@ -4,14 +4,19 @@ use crate::{
     raw_ptr::Raw,
 };
 use failure::Error;
-use std::ptr;
+use std::{
+    fmt::{self, Debug, Formatter},
+    ptr,
+};
 
+/// A public-private key pair.
 #[derive(Clone)]
 pub struct KeyPair {
     pub(crate) raw: Raw<sys::ec_key_pair>,
 }
 
 impl KeyPair {
+    /// Create a new [`KeyPair`] from its public and private keys.
     pub fn new(
         public_key: &PublicKey,
         private_key: &PrivateKey,
@@ -31,31 +36,36 @@ impl KeyPair {
         }
     }
 
-    pub fn public(&self) -> Result<PublicKey, Error> {
+    /// Get the public key.
+    pub fn public(&self) -> PublicKey {
         unsafe {
             let raw = sys::ec_key_pair_get_public(self.raw.as_ptr());
+            assert!(!raw.is_null());
 
-            if raw.is_null() {
-                Err(failure::err_msg("Unable to get the public key"))
-            } else {
-                Ok(PublicKey {
-                    raw: Raw::copied_from(raw),
-                })
+            PublicKey {
+                raw: Raw::copied_from(raw),
             }
         }
     }
 
-    pub fn private(&self) -> Result<PrivateKey, Error> {
+    /// Get the private key.
+    pub fn private(&self) -> PrivateKey {
         unsafe {
             let raw = sys::ec_key_pair_get_private(self.raw.as_ptr());
+            assert!(!raw.is_null());
 
-            if raw.is_null() {
-                Err(failure::err_msg("Unable to get the private key"))
-            } else {
-                Ok(PrivateKey {
-                    raw: Raw::copied_from(raw),
-                })
+            PrivateKey {
+                raw: Raw::copied_from(raw),
             }
         }
+    }
+}
+
+impl Debug for KeyPair {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("KeyPair")
+            .field("public", &self.public())
+            .field("private", &"<elided>")
+            .finish()
     }
 }

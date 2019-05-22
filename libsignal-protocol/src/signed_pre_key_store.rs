@@ -4,10 +4,15 @@ use std::{
     os::raw::{c_int, c_void},
 };
 
+/// Something which can store signed pre-keys without inspecting their contents.
 pub trait SignedPreKeyStore {
+    /// Load a signed pre-key.
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
+    /// Store a signed pre-key.
     fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError>;
+    /// Is the signed pre-key with this ID present in the store?
     fn contains(&self, id: u32) -> bool;
+    /// Remove a signed pre-key from the store.
     fn remove(&self, id: u32) -> Result<(), InternalError>;
 }
 

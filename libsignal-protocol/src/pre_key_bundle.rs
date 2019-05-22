@@ -1,15 +1,21 @@
 use crate::{keys::PublicKey, raw_ptr::Raw};
 use failure::Error;
-use std::ptr;
+use std::{
+    fmt::{self, Debug, Formatter},
+    ptr,
+};
 
+/// The session state used when sending a message to another user.
 #[derive(Clone)]
 pub struct PreKeyBundle {
     pub(crate) raw: Raw<sys::session_pre_key_bundle>,
 }
 
 impl PreKeyBundle {
+    /// Get a builder struct for the [`PreKeyBundle`].
     pub fn builder() -> PreKeyBundleBuilder { PreKeyBundleBuilder::default() }
 
+    /// Get the registration ID.
     pub fn registration_id(&self) -> u32 {
         unsafe {
             sys::session_pre_key_bundle_get_registration_id(
@@ -18,18 +24,21 @@ impl PreKeyBundle {
         }
     }
 
+    /// Get the device ID.
     pub fn device_id(&self) -> i32 {
         unsafe {
             sys::session_pre_key_bundle_get_device_id(self.raw.as_const_ptr())
         }
     }
 
+    /// Get the pre-key ID.
     pub fn pre_key_id(&self) -> u32 {
         unsafe {
             sys::session_pre_key_bundle_get_pre_key_id(self.raw.as_const_ptr())
         }
     }
 
+    /// Get the pre-key itself.
     pub fn pre_key(&self) -> Result<PublicKey, Error> {
         unsafe {
             let raw = sys::session_pre_key_bundle_get_pre_key(
@@ -45,6 +54,7 @@ impl PreKeyBundle {
         }
     }
 
+    /// Get the signed pre-key id.
     pub fn signed_pre_key_id(&self) -> u32 {
         unsafe {
             sys::session_pre_key_bundle_get_signed_pre_key_id(
@@ -53,6 +63,7 @@ impl PreKeyBundle {
         }
     }
 
+    /// Get the signed pre-key.
     pub fn signed_pre_key(&self) -> Result<PublicKey, Error> {
         unsafe {
             let raw = sys::session_pre_key_bundle_get_signed_pre_key(
@@ -68,6 +79,7 @@ impl PreKeyBundle {
         }
     }
 
+    /// Get the identity key.
     pub fn identity_key(&self) -> Result<PublicKey, Error> {
         unsafe {
             let raw = sys::session_pre_key_bundle_get_identity_key(
@@ -84,7 +96,14 @@ impl PreKeyBundle {
     }
 }
 
-#[derive(Default)]
+impl Debug for PreKeyBundle {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("PreKeyBundle").finish()
+    }
+}
+
+/// A builder type for the [`PreKeyBundle`].
+#[derive(Debug, Default)]
 pub struct PreKeyBundleBuilder {
     registration_id: Option<u32>,
     device_id: Option<i32>,
@@ -97,6 +116,7 @@ pub struct PreKeyBundleBuilder {
 }
 
 impl PreKeyBundleBuilder {
+    /// Set the recipient's public pre-key.
     pub fn pre_key(mut self, id: u32, public_key: &PublicKey) -> Self {
         self.pre_key_id = Some(id);
         self.pre_key_public = Some(public_key.clone());
@@ -104,6 +124,7 @@ impl PreKeyBundleBuilder {
         self
     }
 
+    /// Set the signed pre-key.
     pub fn signed_pre_key(
         mut self,
         id: u32,
@@ -115,21 +136,25 @@ impl PreKeyBundleBuilder {
         self
     }
 
+    /// Set the signed pre-key's signature.
     pub fn signature(mut self, sig: &[u8]) -> Self {
         self.signature = Some(sig.to_vec());
         self
     }
 
+    /// Set the registration ID.
     pub fn registration_id(mut self, id: u32) -> Self {
         self.registration_id = Some(id);
         self
     }
 
+    /// Set the device ID.
     pub fn device_id(mut self, id: i32) -> Self {
         self.device_id = Some(id);
         self
     }
 
+    /// Set the user's identity key.
     pub fn identity_key(mut self, identity_key: &PublicKey) -> Self {
         self.identity_key = Some(identity_key.clone());
         self
@@ -180,6 +205,7 @@ impl PreKeyBundleBuilder {
         }
     }
 
+    /// Actually build the [`PreKeyBundle`].
     pub fn build(self) -> Result<PreKeyBundle, Error> {
         let registration_id = self.get_registration_id()?;
         let device_id = self.get_device_id()?;
