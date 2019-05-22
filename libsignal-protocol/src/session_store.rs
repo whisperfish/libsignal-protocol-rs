@@ -1,12 +1,16 @@
 use crate::{errors::InternalError, Address, Buffer};
 use std::os::raw::{c_char, c_int, c_void};
 
+/// A serialized session.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SerializedSession {
+    /// The session itself.
     pub session: Buffer,
+    /// Extra data attached by the user (e.g. a name or other information).
     pub extra_data: Option<Buffer>,
 }
 
+/// Something which can store the sessions established with recipients.
 pub trait SessionStore {
     /// Get a copy of the serialized session record corresponding to the
     /// provided recipient [`Address`].

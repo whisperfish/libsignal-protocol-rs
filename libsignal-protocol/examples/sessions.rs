@@ -96,10 +96,10 @@ fn main() -> Result<(), Error> {
         .registration_id(42)
         .device_id(bob_address.device_id())
         .identity_key(&bob_public_identity_key)
-        .pre_key(pre_key.id(), &pre_key.key_pair().public()?)
+        .pre_key(pre_key.id(), &pre_key.key_pair().public())
         .signed_pre_key(
             bob_signed_pre_key.id(),
-            &bob_signed_pre_key.key_pair().public()?,
+            &bob_signed_pre_key.key_pair().public(),
         )
         .signature(bob_signed_pre_key.signature())
         .build()

@@ -1,9 +1,9 @@
 use crate::{errors::FromInternalErrorCode, keys::KeyPair, raw_ptr::Raw};
 use failure::Error;
 use std::{
+    fmt::{self, Debug, Formatter},
     ptr,
     time::{Duration, SystemTime},
-    fmt::{self, Debug, Formatter},
 };
 
 /// A signed pre-key.

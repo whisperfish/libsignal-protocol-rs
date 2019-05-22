@@ -210,6 +210,7 @@ pub fn session_builder(
 ///
 /// Most functions which require access to the global context (e.g. for crypto
 /// functions or locking) will accept a `&Context` as their first argument.
+#[derive(Debug, Clone)]
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {

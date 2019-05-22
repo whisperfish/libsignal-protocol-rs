@@ -24,10 +24,10 @@ impl<'a> Address<'a> {
     }
 
     /// Create a new [`Address`] from the raw struct.
-    /// 
+    ///
     /// # Safety
-    /// 
-    /// The `name` pointed to by the [`sys::signal_protocol_address`] must 
+    ///
+    /// The `name` pointed to by the [`sys::signal_protocol_address`] must
     /// outlive this [`Address`].
     pub(crate) unsafe fn from_raw(
         raw: sys::signal_protocol_address,
@@ -39,9 +39,9 @@ impl<'a> Address<'a> {
     }
 
     /// Create an [`Address`] from a pointer to the raw struct.
-    /// 
+    ///
     /// # Safety
-    /// 
+    ///
     /// (See the notes on [`Address::from_raw`])
     pub(crate) unsafe fn from_ptr(
         raw: *const sys::signal_protocol_address,

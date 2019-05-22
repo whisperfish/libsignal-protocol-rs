@@ -162,11 +162,11 @@ fn test_curve25519_large_signatures() {
     let pair = sig::generate_key_pair(&ctx).unwrap();
 
     let mut msg = vec![0; 1048576];
-    let private = pair.private().unwrap();
+    let private = pair.private();
 
     let signature = sig::calculate_signature(&ctx, &private, &msg).unwrap();
 
-    let public = pair.public().unwrap();
+    let public = pair.public();
     let got = public.verify_signature(&msg, signature.as_slice());
     assert!(got.is_ok());
 
@@ -291,7 +291,7 @@ fn test_basic_pre_key_v2() {
     let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
 
     let bob_public_identity_key_pair = bob_identity_key_pair.public().unwrap();
-    let bob_public_pre_key = bob_pre_key_pair.public().unwrap();
+    let bob_public_pre_key = bob_pre_key_pair.public();
     let bob_pre_key_bundle = PreKeyBundle::builder()
         .registration_id(registration_id)
         .device_id(1)
