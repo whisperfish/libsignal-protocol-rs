@@ -4,6 +4,7 @@ use std::{
 };
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, failure_derive::Fail)]
+#[allow(missing_docs)]
 pub enum InternalError {
     NoMemory,
     InvalidArgument,
@@ -26,6 +27,7 @@ pub enum InternalError {
 }
 
 impl InternalError {
+    /// Try to figure out what type of error a code corresponds to.
     pub fn from_error_code(code: i32) -> Option<InternalError> {
         match code {
             sys::SG_ERR_NOMEM => Some(InternalError::NoMemory),
@@ -63,6 +65,7 @@ impl InternalError {
         }
     }
 
+    /// Get the code which corresponds to this error.
     pub fn code(self) -> i32 {
         match self {
             InternalError::NoMemory => sys::SG_ERR_NOMEM,
@@ -87,24 +90,17 @@ impl InternalError {
             InternalError::Other(c) => c,
         }
     }
-
-    pub fn into_result(self, code: i32) -> Result<(), InternalError> {
-        if code == 0 {
-            return Ok(());
-        }
-
-        match InternalError::from_error_code(code) {
-            None => Ok(()),
-            Some(e) => Err(e),
-        }
-    }
 }
 
+/// A helper trait for going from an [`InternalError`] to a `Result`.
 pub trait FromInternalErrorCode: Sized {
+    /// Make the conversion.
     fn into_result(self) -> Result<(), InternalError>;
 }
 
+/// A helper trait for going from a `Result` to an [`InternalError`].
 pub trait IntoInternalErrorCode: Sized {
+    /// Make the conversion.
     fn into_code(self) -> i32;
 }
 

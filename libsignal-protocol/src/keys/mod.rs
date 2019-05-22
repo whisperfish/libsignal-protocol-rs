@@ -1,3 +1,5 @@
+//! Elliptic curve cryptography keys.
+
 mod identity_key_pair;
 mod key_pair;
 mod pre_key;
