@@ -50,6 +50,12 @@
 //!
 //! [libsignal-protocol-c]: https://github.com/signalapp/libsignal-protocol-c
 
+#![deny(
+    missing_docs,
+    missing_debug_implementations,
+    missing_copy_implementations
+)]
+
 extern crate libsignal_protocol_sys as sys;
 
 pub use crate::{
@@ -92,13 +98,17 @@ mod store_context;
 use failure::Error;
 use std::io::Write;
 
+/// A helper trait for something which can be serialized to protobufs.
 pub trait Serializable {
+    /// Serialize the object to a buffer.
     fn serialize(&self) -> Result<Buffer, Error>;
 
+    /// Parse the provided data in the protobuf format.
     fn deserialize(data: &[u8]) -> Result<Self, Error>
     where
         Self: Sized;
 
+    /// Helper for serializing to anything which implements [`Write`].
     fn serialize_to<W: Write>(&self, mut writer: W) -> Result<(), Error> {
         let buffer = self.serialize()?;
         writer.write_all(buffer.as_slice())?;

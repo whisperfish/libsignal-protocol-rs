@@ -12,7 +12,7 @@ pub struct HMACBasedKeyDerivationFunction {
 }
 
 impl HMACBasedKeyDerivationFunction {
-    pub fn new(
+    pub(crate) fn new(
         version: i32,
         ctx: &Context,
     ) -> Result<HMACBasedKeyDerivationFunction, Error> {
@@ -28,6 +28,8 @@ impl HMACBasedKeyDerivationFunction {
         }
     }
 
+    /// Derive a new secret by cryptographically "stretching" the provided
+    /// information to the expected length.
     pub fn derive_secrets(
         &self,
         secret_length: usize,
