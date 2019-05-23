@@ -5,6 +5,10 @@ use std::{
     rc::Rc,
 };
 
+/// Something which contains state used by the signal protocol.
+///
+/// Under the hood this contains several "Stores" for various keys and session
+/// state (e.g. which identities are trusted, and their pre-keys).
 #[derive(Debug, Clone)]
 pub struct StoreContext(pub(crate) Rc<StoreContextInner>);
 

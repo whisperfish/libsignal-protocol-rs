@@ -11,6 +11,7 @@ use std::{
     rc::Rc,
 };
 
+/// Create a new session.
 pub struct SessionBuilder {
     raw: *mut sys::session_builder,
     // both these fields must outlive `session_builder`
@@ -19,6 +20,7 @@ pub struct SessionBuilder {
 }
 
 impl SessionBuilder {
+    /// Create a new session builder.
     pub fn new(
         ctx: &Context,
         store_context: &StoreContext,
@@ -41,6 +43,7 @@ impl SessionBuilder {
         }
     }
 
+    /// Build a session using a pre-key retrieved from the server.
     pub fn process_pre_key_bundle(
         &self,
         pre_key_bundle: &PreKeyBundle,

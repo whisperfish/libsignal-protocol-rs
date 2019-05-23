@@ -68,7 +68,6 @@ fn main() -> Result<(), Error> {
     let bob_public_identity_key = bob_identity_keys.public();
     let bob_pre_keys: Vec<_> = sig::generate_pre_keys(&ctx, 0, 10)
         .context("Unable to generate bob's pre-keys")?
-        .iter()
         .collect();
     let pre_key = &bob_pre_keys[0];
     let bob_signed_pre_key = sig::generate_signed_pre_key(

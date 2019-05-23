@@ -82,14 +82,13 @@ fn test_generate_pre_keys() {
 
     let ctx = mock_ctx();
 
-    let pre_keys = sig::generate_pre_keys(&ctx, 1, 4).unwrap();
-    let mut iter = pre_keys.iter();
+    let mut pre_keys = sig::generate_pre_keys(&ctx, 1, 4).unwrap();
 
-    let pre_key_1 = iter.next().unwrap();
-    let pre_key_2 = iter.next().unwrap();
-    let pre_key_3 = iter.next().unwrap();
-    let pre_key_4 = iter.next().unwrap();
-    assert!(iter.next().is_none());
+    let pre_key_1 = pre_keys.next().unwrap();
+    let pre_key_2 = pre_keys.next().unwrap();
+    let pre_key_3 = pre_keys.next().unwrap();
+    let pre_key_4 = pre_keys.next().unwrap();
+    assert!(pre_keys.next().is_none());
 
     let pre_key_1_serialized = pre_key_1.serialize().unwrap();
     let pre_key_2_serialized = pre_key_2.serialize().unwrap();

@@ -9,12 +9,14 @@ use std::{
     ptr,
 };
 
+/// The public part of an elliptic curve key pair.
 #[derive(Clone, Debug)]
 pub struct PublicKey {
     pub(crate) raw: Raw<sys::ec_public_key>,
 }
 
 impl PublicKey {
+    /// Deserialize a [`PublicKey`] from the raw key data.
     pub fn decode_point(ctx: &Context, key: &[u8]) -> Result<PublicKey, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
@@ -32,6 +34,7 @@ impl PublicKey {
         }
     }
 
+    /// Use this public key to check whether a message matches its signature.
     pub fn verify_signature(
         &self,
         message: &[u8],

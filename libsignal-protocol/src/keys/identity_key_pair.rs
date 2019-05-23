@@ -9,11 +9,13 @@ use std::{
     ptr,
 };
 
+/// A "ratcheting" key pair.
 pub struct IdentityKeyPair {
     pub(crate) raw: Raw<sys::ratchet_identity_key_pair>,
 }
 
 impl IdentityKeyPair {
+    /// Create a new [`IdentityKeyPair`] out of its public and private keys.
     pub fn new(
         public_key: &PublicKey,
         private_key: &PrivateKey,
@@ -33,6 +35,7 @@ impl IdentityKeyPair {
         }
     }
 
+    /// Get the public part of this key pair.
     pub fn public(&self) -> PublicKey {
         unsafe {
             let raw = sys::ratchet_identity_key_pair_get_public(
@@ -45,6 +48,7 @@ impl IdentityKeyPair {
         }
     }
 
+    /// Get the public part of this key pair.
     pub fn private(&self) -> PrivateKey {
         unsafe {
             let raw = sys::ratchet_identity_key_pair_get_private(

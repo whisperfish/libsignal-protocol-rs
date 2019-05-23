@@ -16,7 +16,7 @@
 //!
 //! ## Sessions
 //!
-//! The Signal Protocol is session-oriented. Clients establish a "session,"
+//! The Signal Protocol is session-oriented. Clients establish a "session"
 //! which is then used for all subsequent encrypt/decrypt operations. There is
 //! no need to ever tear down a session once one has been established.
 //!

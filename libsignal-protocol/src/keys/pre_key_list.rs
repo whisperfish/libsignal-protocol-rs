@@ -1,24 +1,19 @@
 use crate::{keys::PreKey, raw_ptr::Raw};
-use std::{
-    fmt::{self, Debug, Formatter},
-    marker::PhantomData,
-};
+use std::fmt::{self, Debug, Formatter};
 
+/// A list of pre-keys.
 pub struct PreKeyList {
     head: *mut sys::signal_protocol_key_helper_pre_key_list_node,
+    current: *mut sys::signal_protocol_key_helper_pre_key_list_node,
 }
 
 impl PreKeyList {
     pub(crate) fn from_raw(
         head: *mut sys::signal_protocol_key_helper_pre_key_list_node,
     ) -> PreKeyList {
-        PreKeyList { head }
-    }
-
-    pub fn iter<'this>(&'this self) -> impl Iterator<Item = PreKey> + 'this {
-        PreKeyListIter {
-            head: self.head,
-            _lifetime: PhantomData,
+        PreKeyList {
+            head,
+            current: head,
         }
     }
 }
@@ -37,26 +32,21 @@ impl Debug for PreKeyList {
     }
 }
 
-pub struct PreKeyListIter<'a> {
-    _lifetime: PhantomData<&'a ()>,
-    head: *mut sys::signal_protocol_key_helper_pre_key_list_node,
-}
-
-impl<'a> Iterator for PreKeyListIter<'a> {
+impl Iterator for PreKeyList {
     type Item = PreKey;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.head.is_null() {
+        if self.current.is_null() {
             return None;
         }
 
         unsafe {
             let elem =
-                sys::signal_protocol_key_helper_key_list_element(self.head);
+                sys::signal_protocol_key_helper_key_list_element(self.current);
             assert!(!elem.is_null());
 
-            self.head =
-                sys::signal_protocol_key_helper_key_list_next(self.head);
+            self.current =
+                sys::signal_protocol_key_helper_key_list_next(self.current);
 
             Some(PreKey {
                 raw: Raw::copied_from(elem),

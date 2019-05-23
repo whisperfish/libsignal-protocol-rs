@@ -29,6 +29,11 @@ use crate::{
     Address, Buffer, StoreContext,
 };
 
+// for rustdoc link resolution
+#[allow(unused_imports)]
+use crate::keys::{PreKey, PublicKey};
+
+/// A helper function for generating a new [`IdentityKeyPair`].
 pub fn generate_identity_key_pair(
     ctx: &Context,
 ) -> Result<IdentityKeyPair, Error> {
@@ -45,6 +50,7 @@ pub fn generate_identity_key_pair(
     }
 }
 
+/// Generate a normal elliptic curve key pair.
 pub fn generate_key_pair(ctx: &Context) -> Result<KeyPair, Error> {
     unsafe {
         let mut key_pair = ptr::null_mut();
@@ -56,6 +62,33 @@ pub fn generate_key_pair(ctx: &Context) -> Result<KeyPair, Error> {
     }
 }
 
+/// Calculate the signature for a message.
+///
+/// # Examples
+///
+/// This is the counterpart to [`PublicKey::verify_signature`].
+///
+/// ```rust
+/// # use libsignal_protocol::{keys::PublicKey, Context};
+/// # use failure::Error;
+/// # fn main() -> Result<(), Error> {
+/// let ctx = Context::default();
+/// let key_pair = libsignal_protocol::generate_key_pair(&ctx)?;
+///
+/// let msg = "Hello, World!";
+/// let private_key = key_pair.private();
+/// let signature = libsignal_protocol::calculate_signature(
+///     &ctx,
+///     &private_key,
+///     msg.as_bytes(),
+/// )?;
+///
+/// let public = key_pair.public();
+/// let got = public.verify_signature(msg.as_bytes(), signature.as_slice());
+/// assert!(got.is_ok());
+/// # Ok(())
+/// # }
+/// ```
 pub fn calculate_signature(
     ctx: &Context,
     private: &PrivateKey,
@@ -76,6 +109,7 @@ pub fn calculate_signature(
     }
 }
 
+/// Generate a new registration ID.
 pub fn generate_registration_id(
     ctx: &Context,
     extended_range: i32,
@@ -93,6 +127,12 @@ pub fn generate_registration_id(
     Ok(id)
 }
 
+/// Generate a list of [`PreKey`]s. Clients should do this at install time, and
+/// subsequently any time the list of [`PreKey`]s stored on the server runs low.
+///
+/// Pre key IDs are shorts, so they will eventually be repeated. Clients should
+/// store pre keys in a circular buffer, so that they are repeated as
+/// infrequently as possible.
 pub fn generate_pre_keys(
     ctx: &Context,
     start: u32,
@@ -112,6 +152,7 @@ pub fn generate_pre_keys(
     }
 }
 
+/// Generate a signed pre-key.
 pub fn generate_signed_pre_key(
     ctx: &Context,
     identity_key_pair: &IdentityKeyPair,
@@ -141,6 +182,7 @@ pub fn generate_signed_pre_key(
     }
 }
 
+/// Create a container for the state used by the signal protocol.
 pub fn store_context<P, K, S, I>(
     ctx: &Context,
     pre_key_store: P,
@@ -191,6 +233,7 @@ where
     }
 }
 
+/// Create a new HMAC-based key derivation function.
 pub fn create_hkdf(
     ctx: &Context,
     version: i32,
@@ -198,6 +241,8 @@ pub fn create_hkdf(
     HMACBasedKeyDerivationFunction::new(version, ctx)
 }
 
+/// Create a new session builder for communication with the user with the
+/// specified address.
 pub fn session_builder(
     ctx: &Context,
     store_context: &StoreContext,
@@ -214,12 +259,14 @@ pub fn session_builder(
 pub struct Context(pub(crate) Rc<ContextInner>);
 
 impl Context {
+    /// Create a new [`Context`] using the provided cryptographic functions.
     pub fn new<C: Crypto + 'static>(crypto: C) -> Result<Context, Error> {
         ContextInner::new(crypto)
             .map(|c| Context(Rc::new(c)))
             .map_err(Error::from)
     }
 
+    /// Access the original [`Crypto`] object.
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
