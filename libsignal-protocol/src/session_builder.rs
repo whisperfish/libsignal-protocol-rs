@@ -5,7 +5,11 @@ use crate::{
     pre_key_bundle::PreKeyBundle,
     store_context::{StoreContext, StoreContextInner},
 };
-use std::{ptr, rc::Rc};
+use std::{
+    fmt::{self, Debug, Formatter},
+    ptr,
+    rc::Rc,
+};
 
 pub struct SessionBuilder {
     raw: *mut sys::session_builder,
@@ -56,5 +60,11 @@ impl Drop for SessionBuilder {
         unsafe {
             sys::session_builder_free(self.raw);
         }
+    }
+}
+
+impl Debug for SessionBuilder {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("SessionBuilder").finish()
     }
 }

@@ -1,5 +1,8 @@
 use crate::{keys::PreKey, raw_ptr::Raw};
-use std::marker::PhantomData;
+use std::{
+    fmt::{self, Debug, Formatter},
+    marker::PhantomData,
+};
 
 pub struct PreKeyList {
     head: *mut sys::signal_protocol_key_helper_pre_key_list_node,
@@ -25,6 +28,12 @@ impl Drop for PreKeyList {
         unsafe {
             sys::signal_protocol_key_helper_key_list_free(self.head);
         }
+    }
+}
+
+impl Debug for PreKeyList {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("PreKeyList").finish()
     }
 }
 

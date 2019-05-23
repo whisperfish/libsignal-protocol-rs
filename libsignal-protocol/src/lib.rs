@@ -53,7 +53,12 @@
 #![deny(
     missing_docs,
     missing_debug_implementations,
-    missing_copy_implementations
+    missing_copy_implementations,
+    elided_lifetimes_in_paths,
+    rust_2018_idioms,
+    clippy::cargo_common_metadata,
+    clippy::fallible_impl_from,
+    clippy::missing_const_for_fn
 )]
 
 extern crate libsignal_protocol_sys as sys;

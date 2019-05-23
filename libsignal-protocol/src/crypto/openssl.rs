@@ -8,6 +8,7 @@ use openssl::{
     symm::{Cipher, Crypter, Mode},
 };
 
+#[derive(Debug, Copy, Clone)]
 pub struct OpenSSLCrypto;
 
 impl OpenSSLCrypto {
@@ -61,7 +62,7 @@ impl Crypto for OpenSSLCrypto {
 
     fn hmac_sha256(
         &self,
-        key: &[u8],
+        _key: &[u8],
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
         let nid = Nid::HMACWITHSHA256;
         let ty = MessageDigest::from_nid(nid)

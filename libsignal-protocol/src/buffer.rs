@@ -106,7 +106,9 @@ impl Default for Buffer {
 }
 
 impl Debug for Buffer {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result { self.as_slice().fmt(f) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        self.as_slice().fmt(f)
+    }
 }
 
 impl From<Vec<u8>> for Buffer {

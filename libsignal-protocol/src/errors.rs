@@ -133,7 +133,7 @@ impl<T> IntoInternalErrorCode for Result<T, InternalError> {
 }
 
 impl Display for InternalError {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             InternalError::NoMemory => write!(f, "No Memory"),
             InternalError::InvalidArgument => write!(f, "Invalid argument"),

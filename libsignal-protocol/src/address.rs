@@ -29,7 +29,7 @@ impl<'a> Address<'a> {
     ///
     /// The `name` pointed to by the [`sys::signal_protocol_address`] must
     /// outlive this [`Address`].
-    pub(crate) unsafe fn from_raw(
+    pub(crate) const unsafe fn from_raw(
         raw: sys::signal_protocol_address,
     ) -> Address<'a> {
         Address {

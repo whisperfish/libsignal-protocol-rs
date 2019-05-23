@@ -290,7 +290,7 @@ fn test_basic_pre_key_v2() {
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
 
-    let bob_public_identity_key_pair = bob_identity_key_pair.public().unwrap();
+    let bob_public_identity_key_pair = bob_identity_key_pair.public();
     let bob_public_pre_key = bob_pre_key_pair.public();
     let bob_pre_key_bundle = PreKeyBundle::builder()
         .registration_id(registration_id)

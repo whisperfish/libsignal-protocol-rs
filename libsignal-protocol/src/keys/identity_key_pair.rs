@@ -4,7 +4,10 @@ use crate::{
     raw_ptr::Raw,
 };
 use failure::Error;
-use std::ptr;
+use std::{
+    fmt::{self, Debug, Formatter},
+    ptr,
+};
 
 pub struct IdentityKeyPair {
     pub(crate) raw: Raw<sys::ratchet_identity_key_pair>,
@@ -30,16 +33,37 @@ impl IdentityKeyPair {
         }
     }
 
-    pub fn public(&self) -> Result<PublicKey, Error> {
+    pub fn public(&self) -> PublicKey {
         unsafe {
             let raw = sys::ratchet_identity_key_pair_get_public(
                 self.raw.as_const_ptr(),
             );
             assert!(!raw.is_null());
-            Ok(PublicKey {
+            PublicKey {
                 raw: Raw::copied_from(raw),
-            })
+            }
         }
+    }
+
+    pub fn private(&self) -> PrivateKey {
+        unsafe {
+            let raw = sys::ratchet_identity_key_pair_get_private(
+                self.raw.as_const_ptr(),
+            );
+            assert!(!raw.is_null());
+            PrivateKey {
+                raw: Raw::copied_from(raw),
+            }
+        }
+    }
+}
+
+impl Debug for IdentityKeyPair {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_struct("IdentityKeyPair")
+            .field("public", &self.public())
+            .field("private", &self.private())
+            .finish()
     }
 }
 
