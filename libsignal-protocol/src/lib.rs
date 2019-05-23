@@ -61,6 +61,8 @@
     clippy::missing_const_for_fn
 )]
 
+// we use the *-sys crate everywhere so give it a shorter name
+#[allow(unused_extern_crates)]
 extern crate libsignal_protocol_sys as sys;
 
 pub use crate::{
