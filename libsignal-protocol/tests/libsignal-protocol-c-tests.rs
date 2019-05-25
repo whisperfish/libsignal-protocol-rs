@@ -387,9 +387,12 @@ fn test_optional_one_time_pre_key() {
     let msg = "L'homme est condamn� � �tre libre";
     let outgoing_message =
         alice_session_cipher.encrypt(msg.as_bytes()).unwrap();
-    assert_eq!(outgoing_message.get_type().unwrap(), CiphertextType::PreKey);
 
-    // Convert to an incoming message
+    // Convert to an incoming message (this is technically a downcast from
+    // CiphertextMessage to PreKeySignalMessage)
     let incoming_message =
         PreKeySignalMessage::try_from(outgoing_message).unwrap();
+
+    let has_pre_key_id = incoming_message.has_pre_key_id();
+    assert!(!has_pre_key_id);
 }
