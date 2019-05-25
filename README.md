@@ -8,6 +8,50 @@
 
 A Rust interface to the [Signal Protocol][upstream].
 
+## Examples
+
+The simplest thing you can do with this library is generate a private identity
+key. This is normally only ever done once when you first start (sometimes called
+*install time*).
+
+```rust,skt-main
+// create our global context (for things like crypto and locking)
+let ctx = Context::default();
+
+let identity = libsignal_protocol::generate_identity_key_pair(&ctx)?;
+```
+
+Next, you'll normally want to generate a bunch of unsigned pre-keys which 
+people can use when contacting you, and one signed pre-key.
+
+```rust,skt-main
+let ctx = Context::default();
+
+let identity = libsignal_protocol::generate_identity_key_pair(&ctx)?;
+
+let signed_pre_key = libsignal_protocol::generate_signed_pre_key(
+    &ctx,
+    &identity,
+    5,
+    SystemTime::now(),
+)?;
+
+let start = 123;
+let count = 20;
+
+let pre_keys = libsignal_protocol::generate_pre_keys(&ctx, start, count)?
+    .collect::<Vec<PreKey>>();
+```
+
+A Registration ID should also be created at install time.
+
+```rust,skt-main
+let ctx = Context::default();
+let extended_range = 42;
+
+let registration_id = libsignal_protocol::generate_registration_id(&ctx, extended_range)?;
+```
+
 ## Legal things
 
 ### Cryptography Notice
