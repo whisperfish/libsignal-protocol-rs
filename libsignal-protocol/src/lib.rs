@@ -81,6 +81,8 @@ pub use crate::{
     session_builder::SessionBuilder,
     session_cipher::SessionCipher,
     store_context::StoreContext,
+    session_record::SessionRecord,
+    session_state::SessionState,
 };
 
 #[macro_use]
@@ -98,6 +100,8 @@ mod pre_key_bundle;
 pub(crate) mod raw_ptr;
 mod session_builder;
 mod session_cipher;
+mod session_record;
+mod session_state;
 mod store_context;
 pub mod stores;
 

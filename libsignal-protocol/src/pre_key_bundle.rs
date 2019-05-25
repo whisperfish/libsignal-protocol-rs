@@ -177,18 +177,16 @@ impl PreKeyBundleBuilder {
         }
     }
 
-    fn get_pre_key(&self) -> Result<(u32, *mut sys::ec_public_key), Error> {
+    fn get_pre_key(&self) -> (u32, *mut sys::ec_public_key) {
         if let PreKeyBundleBuilder {
             pre_key_id: Some(id),
             pre_key_public: Some(ref public),
             ..
         } = self
         {
-            Ok((*id, public.raw.as_ptr()))
+            (*id, public.raw.as_ptr())
         } else {
-            Err(failure::err_msg(
-                "PreKey ID and PreKey public key are required",
-            ))
+            (0, ptr::null_mut())
         }
     }
 
@@ -209,7 +207,7 @@ impl PreKeyBundleBuilder {
     pub fn build(self) -> Result<PreKeyBundle, Error> {
         let registration_id = self.get_registration_id()?;
         let device_id = self.get_device_id()?;
-        let (pre_key_id, pre_key_public) = self.get_pre_key()?;
+        let (pre_key_id, pre_key_public) = self.get_pre_key();
         let (signed_pre_key_id, signed_pre_key_public) =
             self.get_signed_pre_key();
         let signature =

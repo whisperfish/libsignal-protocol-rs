@@ -9,9 +9,13 @@ use sig::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
+    messages::{CiphertextType, PreKeySignalMessage},
     Address, Context, InternalError, PreKeyBundle, Serializable,
 };
-use std::time::{Duration, SystemTime};
+use std::{
+    convert::TryFrom,
+    time::{Duration, SystemTime},
+};
 
 fn mock_ctx() -> Context {
     Context::new(
@@ -307,4 +311,84 @@ fn test_basic_pre_key_v2() {
     // missing unsigned pre key.
     let got = alice_session_builder.process_pre_key_bundle(&bob_pre_key_bundle);
     assert_eq!(got, Err(InternalError::InvalidKey));
+}
+
+#[test]
+fn test_optional_one_time_pre_key() {
+    let bob_address = Address::new("+14152222222", 1);
+    let ctx = mock_ctx();
+
+    // Create Alice's data store and session builder
+    let alice_store = sig::store_context(
+        &ctx,
+        BasicPreKeyStore::default(),
+        BasicSignedPreKeyStore::default(),
+        BasicSessionStore::default(),
+        BasicIdentityKeyStore::default(),
+    )
+    .unwrap();
+    let alice_session_builder =
+        sig::session_builder(&ctx, &alice_store, bob_address.clone());
+
+    // Create Bob's data store and pre key bundle
+    let bob_store = sig::store_context(
+        &ctx,
+        BasicPreKeyStore::default(),
+        BasicSignedPreKeyStore::default(),
+        BasicSessionStore::default(),
+        BasicIdentityKeyStore::default(),
+    )
+    .unwrap();
+
+    let bob_local_registration_id = bob_store.registration_id().unwrap();
+
+    let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
+    let bob_signed_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
+    let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
+    let bob_signed_pre_key_public_serialized =
+        bob_signed_pre_key_pair.public().serialize().unwrap();
+    let bob_signed_pre_key_signature = sig::calculate_signature(
+        &ctx,
+        &bob_signed_pre_key_pair.private(),
+        bob_signed_pre_key_public_serialized.as_slice(),
+    )
+    .unwrap();
+
+    let bob_pre_key = PreKeyBundle::builder()
+        .registration_id(bob_local_registration_id)
+        .identity_key(&bob_identity_key_pair.public())
+        .device_id(1)
+        .signed_pre_key(22, &bob_signed_pre_key_pair.public())
+        .signature(bob_signed_pre_key_signature.as_slice())
+        .build()
+        .unwrap();
+
+    // Have Alice process Bob's pre key bundle
+    alice_session_builder
+        .process_pre_key_bundle(&bob_pre_key)
+        .unwrap();
+
+    // Find and verify the session version in Alice's store
+    let alice_knows_bob =
+        alice_store.contains_session(bob_address.clone()).unwrap();
+    assert!(alice_knows_bob);
+
+    let record = alice_store.load_session(bob_address.clone()).unwrap();
+    let state = record.state();
+    assert_eq!(state.version(), 3);
+
+    // create alice's session cipher
+    let alice_session_cipher =
+        sig::SessionCipher::new(&ctx, &alice_store, bob_address.clone())
+            .unwrap();
+
+    // Create an outgoing message
+    let msg = "L'homme est condamn� � �tre libre";
+    let outgoing_message =
+        alice_session_cipher.encrypt(msg.as_bytes()).unwrap();
+    assert_eq!(outgoing_message.get_type().unwrap(), CiphertextType::PreKey);
+
+    // Convert to an incoming message
+    let incoming_message =
+        PreKeySignalMessage::try_from(outgoing_message).unwrap();
 }
