@@ -8,6 +8,9 @@ addons:
     packages:
       - valgrind
 
+env:
+  - RUST_BACKTRACE=full
+
 script: 
   - cargo build --all --verbose
   - cargo test --all --verbose
