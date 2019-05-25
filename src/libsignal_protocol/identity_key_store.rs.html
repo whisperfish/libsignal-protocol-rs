@@ -105,12 +105,14 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
+<span id="108">108</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">errors</span>::<span class="ident">InternalError</span>, <span class="ident">Address</span>, <span class="ident">Buffer</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">os</span>::<span class="ident">raw</span>::{<span class="ident">c_int</span>, <span class="ident">c_void</span>};
 
+<span class="doccomment">/// Something used to store identity keys and track trusted identities.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IdentityKeyStore</span> {
-    <span class="comment">// Get the local client&#39;s identity key pair.</span>
+    <span class="doccomment">/// Get the local client&#39;s identity key pair.</span>
     <span class="kw">fn</span> <span class="ident">identity_key_pair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Buffer</span>, <span class="ident">Buffer</span>), <span class="ident">InternalError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get the local client&#39;s registration ID.</span>

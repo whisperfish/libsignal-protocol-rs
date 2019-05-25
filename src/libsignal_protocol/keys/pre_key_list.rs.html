@@ -54,26 +54,23 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
-<span id="57">57</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">keys</span>::<span class="ident">PreKey</span>, <span class="ident">raw_ptr</span>::<span class="ident">Raw</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>};
 
+<span class="doccomment">/// A list of pre-keys.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PreKeyList</span> {
     <span class="ident">head</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_pre_key_list_node</span>,
+    <span class="ident">current</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_pre_key_list_node</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PreKeyList</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_raw</span>(
         <span class="ident">head</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_pre_key_list_node</span>,
     ) <span class="op">-&gt;</span> <span class="ident">PreKeyList</span> {
-        <span class="ident">PreKeyList</span> { <span class="ident">head</span> }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;this</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;this</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">PreKey</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;this</span> {
-        <span class="ident">PreKeyListIter</span> {
-            <span class="ident">head</span>: <span class="self">self</span>.<span class="ident">head</span>,
-            <span class="ident">_lifetime</span>: <span class="ident">PhantomData</span>,
+        <span class="ident">PreKeyList</span> {
+            <span class="ident">head</span>,
+            <span class="ident">current</span>: <span class="ident">head</span>,
         }
     }
 }
@@ -86,26 +83,27 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PreKeyListIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">_lifetime</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
-    <span class="ident">head</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_pre_key_list_node</span>,
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">PreKeyList</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;PreKeyList&quot;</span>).<span class="ident">finish</span>()
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">PreKeyListIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">PreKeyList</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">PreKey</span>;
 
     <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">is_null</span>() {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">current</span>.<span class="ident">is_null</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">elem</span> <span class="op">=</span>
-                <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_key_list_element</span>(<span class="self">self</span>.<span class="ident">head</span>);
+                <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_key_list_element</span>(<span class="self">self</span>.<span class="ident">current</span>);
             <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">elem</span>.<span class="ident">is_null</span>());
 
-            <span class="self">self</span>.<span class="ident">head</span> <span class="op">=</span>
-                <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_key_list_next</span>(<span class="self">self</span>.<span class="ident">head</span>);
+            <span class="self">self</span>.<span class="ident">current</span> <span class="op">=</span>
+                <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_key_list_next</span>(<span class="self">self</span>.<span class="ident">current</span>);
 
             <span class="prelude-val">Some</span>(<span class="ident">PreKey</span> {
                 <span class="ident">raw</span>: <span class="ident">Raw</span>::<span class="ident">copied_from</span>(<span class="ident">elem</span>),

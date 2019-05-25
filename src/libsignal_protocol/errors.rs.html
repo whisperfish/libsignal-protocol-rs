@@ -160,10 +160,6 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert</span>::<span class="ident">TryFrom</span>,
@@ -171,6 +167,7 @@
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">failure_derive</span>::<span class="ident">Fail</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">InternalError</span> {
     <span class="ident">NoMemory</span>,
     <span class="ident">InvalidArgument</span>,
@@ -193,6 +190,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InternalError</span> {
+    <span class="doccomment">/// Try to figure out what type of error a code corresponds to.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_error_code</span>(<span class="ident">code</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">code</span> {
             <span class="ident">sys</span>::<span class="ident">SG_ERR_NOMEM</span> <span class="op">=&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">InternalError</span>::<span class="ident">NoMemory</span>),
@@ -230,6 +228,7 @@
         }
     }
 
+    <span class="doccomment">/// Get the code which corresponds to this error.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InternalError</span>::<span class="ident">NoMemory</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_ERR_NOMEM</span>,
@@ -254,24 +253,17 @@
             <span class="ident">InternalError</span>::<span class="ident">Other</span>(<span class="ident">c</span>) <span class="op">=&gt;</span> <span class="ident">c</span>,
         }
     }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>, <span class="ident">code</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
-        }
-
-        <span class="kw">match</span> <span class="ident">InternalError</span>::<span class="ident">from_error_code</span>(<span class="ident">code</span>) {
-            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Some</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-        }
-    }
 }
 
+<span class="doccomment">/// A helper trait for going from an [`InternalError`] to a `Result`.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromInternalErrorCode</span>: <span class="ident">Sized</span> {
+    <span class="doccomment">/// Make the conversion.</span>
     <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span>;
 }
 
+<span class="doccomment">/// A helper trait for going from a `Result` to an [`InternalError`].</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoInternalErrorCode</span>: <span class="ident">Sized</span> {
+    <span class="doccomment">/// Make the conversion.</span>
     <span class="kw">fn</span> <span class="ident">into_code</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span>;
 }
 
@@ -304,7 +296,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">InternalError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">InternalError</span>::<span class="ident">NoMemory</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;No Memory&quot;</span>),
             <span class="ident">InternalError</span>::<span class="ident">InvalidArgument</span> <span class="op">=&gt;</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid argument&quot;</span>),

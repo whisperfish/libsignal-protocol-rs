@@ -110,6 +110,9 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">errors</span>::{<span class="ident">FromInternalErrorCode</span>, <span class="ident">InternalError</span>},
@@ -122,12 +125,14 @@
     <span class="ident">ptr</span>,
 };
 
+<span class="doccomment">/// The public part of an elliptic curve key pair.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PublicKey</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">ec_public_key</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PublicKey</span> {
+    <span class="doccomment">/// Deserialize a [`PublicKey`] from the raw key data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_point</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
@@ -145,6 +150,7 @@
         }
     }
 
+    <span class="doccomment">/// Use this public key to check whether a message matches its signature.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_signature</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
