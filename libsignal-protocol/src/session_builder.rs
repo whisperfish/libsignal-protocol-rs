@@ -12,7 +12,7 @@ use std::{
 };
 
 /// Create a new session.
-pub struct SessionBuilder {
+pub struct SessionBuilder<'a> {
     raw: *mut sys::session_builder,
     // both these fields must outlive `session_builder`
     _store_ctx: Rc<StoreContextInner>,
@@ -20,8 +20,9 @@ pub struct SessionBuilder {
     _addr: Address,
 }
 
-impl SessionBuilder {
-    /// Create a new session builder.
+impl<'a> SessionBuilder<'a> {
+    /// Create a new session builder for communication with the user with the
+    /// specified address.
     pub fn new(
         ctx: &Context,
         store_context: &StoreContext,
@@ -60,7 +61,7 @@ impl SessionBuilder {
     }
 }
 
-impl Drop for SessionBuilder {
+impl<'a> Drop for SessionBuilder<'a> {
     fn drop(&mut self) {
         unsafe {
             sys::session_builder_free(self.raw);
@@ -68,8 +69,10 @@ impl Drop for SessionBuilder {
     }
 }
 
-impl Debug for SessionBuilder {
+impl<'a> Debug for SessionBuilder<'a> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("SessionBuilder").finish()
+        f.debug_struct("SessionBuilder")
+            .field("address", &self.address)
+            .finish()
     }
 }
