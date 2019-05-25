@@ -17,11 +17,24 @@ impl TryFrom<CiphertextMessage> for PreKeySignalMessage {
         if other.get_type()? != CiphertextType::PreKey {
             Err(failure::err_msg("Expected a pre-key ciphertext message"))
         } else {
-            Ok(PreKeySignalMessage {
-                raw: Raw::copied_from(
+            // safety: the `CiphertextType` check tells us this is actually a
+            // pointer to a `pre_key_signal_message`
+            let raw = unsafe {
+                Raw::copied_from(
                     other.raw.as_ptr() as *mut sys::pre_key_signal_message
-                ),
-            })
+                )
+            };
+            Ok(PreKeySignalMessage { raw })
         }
     }
 }
+
+impl From<PreKeySignalMessage> for CiphertextMessage {
+    fn from(other: PreKeySignalMessage) -> CiphertextMessage {
+        CiphertextMessage {
+            raw: other.raw.upcast(),
+        }
+    }
+}
+
+impl_is_a!(sys::pre_key_signal_message => sys::ciphertext_message);
