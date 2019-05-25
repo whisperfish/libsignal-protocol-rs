@@ -54,7 +54,6 @@ fn main() -> Result<(), Error> {
     let pre_keys = sig::generate_pre_keys(&ctx, start, pre_key_count)?;
 
     let pre_key_ids: Vec<_> = pre_keys
-        .iter()
         .map(|session_key| session_key.id())
         .collect();
 

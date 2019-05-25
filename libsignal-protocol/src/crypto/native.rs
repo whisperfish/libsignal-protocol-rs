@@ -8,6 +8,7 @@ use sha2::{Digest, Sha256, Sha512};
 // Create alias for HMAC-SHA256
 type HmacSha256 = Hmac<Sha256>;
 
+/// Cryptography routines using native Rust crates.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct DefaultCrypto;
 

@@ -1,7 +1,15 @@
 use crate::{context::ContextInner, errors::FromInternalErrorCode};
 use failure::Error;
-use std::rc::Rc;
+use std::{
+    fmt::{self, Debug, Formatter},
+    rc::Rc,
+};
 
+/// Something which contains state used by the signal protocol.
+///
+/// Under the hood this contains several "Stores" for various keys and session
+/// state (e.g. which identities are trusted, and their pre-keys).
+#[derive(Debug, Clone)]
 pub struct StoreContext(pub(crate) Rc<StoreContextInner>);
 
 impl StoreContext {
@@ -15,6 +23,7 @@ impl StoreContext {
         }))
     }
 
+    /// Get the registration ID.
     pub fn registration_id(&self) -> Result<u32, Error> {
         unsafe {
             let mut id = 0;
@@ -45,5 +54,11 @@ impl Drop for StoreContextInner {
         unsafe {
             sys::signal_protocol_store_context_destroy(self.raw);
         }
+    }
+}
+
+impl Debug for StoreContextInner {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("StoreContextInner").finish()
     }
 }

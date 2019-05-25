@@ -5,6 +5,11 @@ authors = ["Michael Bryan <michaelfbryan@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
 readme = "../README.md"
+description = "An idiomatic high-level interface to the libsignal-protocol-c crate."
+homepage = "https://github.com/Michael-F-Bryan/libsignal-protocol-rs"
+repository = "https://github.com/Michael-F-Bryan/libsignal-protocol-rs"
+keywords = ["signal", "libsignal", "whisper", "protocol"]
+categories = ["api-bindings", "cryptography"]
 
 [dependencies]
 libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }

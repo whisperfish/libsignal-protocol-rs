@@ -7,12 +7,14 @@ use std::{
     ptr,
 };
 
+/// The private half of an elliptic curve key pair.
 #[derive(Clone, Debug)]
 pub struct PrivateKey {
     pub(crate) raw: Raw<sys::ec_private_key>,
 }
 
 impl PrivateKey {
+    /// Decode a [`PrivateKey`] from raw key data.
     pub fn decode_point(
         ctx: &Context,
         key: &[u8],
@@ -33,6 +35,7 @@ impl PrivateKey {
         }
     }
 
+    /// Derive the public part of this key pair.
     pub fn generate_public_key(&self) -> Result<PublicKey, Error> {
         unsafe {
             let mut raw = ptr::null_mut();

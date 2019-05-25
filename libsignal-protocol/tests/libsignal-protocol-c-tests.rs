@@ -82,14 +82,13 @@ fn test_generate_pre_keys() {
 
     let ctx = mock_ctx();
 
-    let pre_keys = sig::generate_pre_keys(&ctx, 1, 4).unwrap();
-    let mut iter = pre_keys.iter();
+    let mut pre_keys = sig::generate_pre_keys(&ctx, 1, 4).unwrap();
 
-    let pre_key_1 = iter.next().unwrap();
-    let pre_key_2 = iter.next().unwrap();
-    let pre_key_3 = iter.next().unwrap();
-    let pre_key_4 = iter.next().unwrap();
-    assert!(iter.next().is_none());
+    let pre_key_1 = pre_keys.next().unwrap();
+    let pre_key_2 = pre_keys.next().unwrap();
+    let pre_key_3 = pre_keys.next().unwrap();
+    let pre_key_4 = pre_keys.next().unwrap();
+    assert!(pre_keys.next().is_none());
 
     let pre_key_1_serialized = pre_key_1.serialize().unwrap();
     let pre_key_2_serialized = pre_key_2.serialize().unwrap();
@@ -162,11 +161,11 @@ fn test_curve25519_large_signatures() {
     let pair = sig::generate_key_pair(&ctx).unwrap();
 
     let mut msg = vec![0; 1048576];
-    let private = pair.private().unwrap();
+    let private = pair.private();
 
     let signature = sig::calculate_signature(&ctx, &private, &msg).unwrap();
 
-    let public = pair.public().unwrap();
+    let public = pair.public();
     let got = public.verify_signature(&msg, signature.as_slice());
     assert!(got.is_ok());
 
@@ -290,8 +289,8 @@ fn test_basic_pre_key_v2() {
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
 
-    let bob_public_identity_key_pair = bob_identity_key_pair.public().unwrap();
-    let bob_public_pre_key = bob_pre_key_pair.public().unwrap();
+    let bob_public_identity_key_pair = bob_identity_key_pair.public();
+    let bob_public_pre_key = bob_pre_key_pair.public();
     let bob_pre_key_bundle = PreKeyBundle::builder()
         .registration_id(registration_id)
         .device_id(1)

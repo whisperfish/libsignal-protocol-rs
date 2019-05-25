@@ -16,15 +16,15 @@
 //!
 //! ## Sessions
 //!
-//! The Signal Protocol is session-oriented. Clients establish a "session,"
+//! The Signal Protocol is session-oriented. Clients establish a "session"
 //! which is then used for all subsequent encrypt/decrypt operations. There is
 //! no need to ever tear down a session once one has been established.
 //!
 //! Sessions are established in one of three ways:
 //!
 //! 1. [`PreKeyBundle`]. A client that wishes to send a message to a recipient
-//!    can establish a session by retrieving a PreKeyBundle for that recipient
-//!    from the server.
+//!    can establish a session by retrieving a [`PreKeyBundle`] for that
+//!    recipient from the server.
 //! 2. PreKeySignalMessages.  A client can receive a PreKeySignalMessage from a
 //!    recipient and use it to establish a session.
 //! 3. KeyExchangeMessages.  Two clients can exchange KeyExchange messages to
@@ -50,6 +50,19 @@
 //!
 //! [libsignal-protocol-c]: https://github.com/signalapp/libsignal-protocol-c
 
+#![deny(
+    missing_docs,
+    missing_debug_implementations,
+    missing_copy_implementations,
+    elided_lifetimes_in_paths,
+    rust_2018_idioms,
+    clippy::cargo_common_metadata,
+    clippy::fallible_impl_from,
+    clippy::missing_const_for_fn
+)]
+
+// we use the *-sys crate everywhere so give it a shorter name
+#[allow(unused_extern_crates)]
 extern crate libsignal_protocol_sys as sys;
 
 pub use crate::{
@@ -92,13 +105,17 @@ mod store_context;
 use failure::Error;
 use std::io::Write;
 
+/// A helper trait for something which can be serialized to protobufs.
 pub trait Serializable {
+    /// Serialize the object to a buffer.
     fn serialize(&self) -> Result<Buffer, Error>;
 
+    /// Parse the provided data in the protobuf format.
     fn deserialize(data: &[u8]) -> Result<Self, Error>
     where
         Self: Sized;
 
+    /// Helper for serializing to anything which implements [`Write`].
     fn serialize_to<W: Write>(&self, mut writer: W) -> Result<(), Error> {
         let buffer = self.serialize()?;
         writer.write_all(buffer.as_slice())?;

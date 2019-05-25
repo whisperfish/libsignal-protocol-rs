@@ -5,8 +5,13 @@ use crate::{
     pre_key_bundle::PreKeyBundle,
     store_context::{StoreContext, StoreContextInner},
 };
-use std::{ptr, rc::Rc};
+use std::{
+    fmt::{self, Debug, Formatter},
+    ptr,
+    rc::Rc,
+};
 
+/// Create a new session.
 pub struct SessionBuilder {
     raw: *mut sys::session_builder,
     // both these fields must outlive `session_builder`
@@ -15,6 +20,7 @@ pub struct SessionBuilder {
 }
 
 impl SessionBuilder {
+    /// Create a new session builder.
     pub fn new(
         ctx: &Context,
         store_context: &StoreContext,
@@ -37,6 +43,7 @@ impl SessionBuilder {
         }
     }
 
+    /// Build a session using a pre-key retrieved from the server.
     pub fn process_pre_key_bundle(
         &self,
         pre_key_bundle: &PreKeyBundle,
@@ -56,5 +63,11 @@ impl Drop for SessionBuilder {
         unsafe {
             sys::session_builder_free(self.raw);
         }
+    }
+}
+
+impl Debug for SessionBuilder {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("SessionBuilder").finish()
     }
 }

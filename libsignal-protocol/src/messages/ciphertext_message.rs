@@ -1,5 +1,6 @@
 use crate::{raw_ptr::Raw, Buffer, Serializable};
 
+/// An encrypted message ("ciphertext").
 #[derive(Debug, Clone)]
 pub struct CiphertextMessage {
     pub(crate) raw: Raw<sys::ciphertext_message>,

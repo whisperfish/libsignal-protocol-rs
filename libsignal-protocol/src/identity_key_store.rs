@@ -1,8 +1,9 @@
 use crate::{errors::InternalError, Address, Buffer};
 use std::os::raw::{c_int, c_void};
 
+/// Something used to store identity keys and track trusted identities.
 pub trait IdentityKeyStore {
-    // Get the local client's identity key pair.
+    /// Get the local client's identity key pair.
     fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError>;
 
     /// Get the local client's registration ID.

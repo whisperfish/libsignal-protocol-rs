@@ -8,8 +8,13 @@ use crate::{
 };
 
 use failure::Error;
-use std::{ptr, rc::Rc};
+use std::{
+    fmt::{self, Debug, Formatter},
+    ptr,
+    rc::Rc,
+};
 
+/// The cipher context used for encryption.
 pub struct SessionCipher {
     raw: *mut sys::session_cipher,
     _ctx: Rc<ContextInner>,
@@ -17,6 +22,7 @@ pub struct SessionCipher {
 }
 
 impl SessionCipher {
+    /// Create a new cipher for sending messages to the addressed recipient.
     pub fn new(
         ctx: &Context,
         store_ctx: &StoreContext,
@@ -40,6 +46,7 @@ impl SessionCipher {
         }
     }
 
+    /// Encrypt a message.
     pub fn encrypt(&self, message: &[u8]) -> Result<CiphertextMessage, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
@@ -55,5 +62,11 @@ impl SessionCipher {
                 raw: Raw::from_ptr(raw),
             })
         }
+    }
+}
+
+impl Debug for SessionCipher {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("SessionCipher").finish()
     }
 }

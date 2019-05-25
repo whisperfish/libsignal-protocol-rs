@@ -1,6 +1,6 @@
 use crate::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
-    errors::{FromInternalErrorCode, InternalError, IntoInternalErrorCode},
+    errors::InternalError,
 };
 use openssl::{
     hash::{Hasher, MessageDigest},
@@ -8,6 +8,8 @@ use openssl::{
     symm::{Cipher, Crypter, Mode},
 };
 
+/// Cryptography routines built on top of the system's `openssl` library.
+#[derive(Debug, Copy, Clone)]
 pub struct OpenSSLCrypto;
 
 impl OpenSSLCrypto {
@@ -61,7 +63,7 @@ impl Crypto for OpenSSLCrypto {
 
     fn hmac_sha256(
         &self,
-        key: &[u8],
+        _key: &[u8],
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
         let nid = Nid::HMACWITHSHA256;
         let ty = MessageDigest::from_nid(nid)

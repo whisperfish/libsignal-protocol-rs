@@ -15,7 +15,7 @@ impl Buffer {
     /// Create a new empty buffer.
     pub fn new() -> Buffer { Buffer::with_capacity(0) }
 
-    pub unsafe fn from_raw(raw: *mut sys::signal_buffer) -> Buffer {
+    pub(crate) unsafe fn from_raw(raw: *mut sys::signal_buffer) -> Buffer {
         assert!(!raw.is_null());
         Buffer { raw }
     }
@@ -106,7 +106,9 @@ impl Default for Buffer {
 }
 
 impl Debug for Buffer {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result { self.as_slice().fmt(f) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        self.as_slice().fmt(f)
+    }
 }
 
 impl From<Vec<u8>> for Buffer {

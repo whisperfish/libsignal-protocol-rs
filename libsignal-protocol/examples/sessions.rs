@@ -65,10 +65,9 @@ fn main() -> Result<(), Error> {
     let bob_address = Address::new("+14159998888", 1);
     let bob_identity_keys = sig::generate_identity_key_pair(&ctx)
         .context("Unable to generate bob's keys")?;
-    let bob_public_identity_key = bob_identity_keys.public()?;
+    let bob_public_identity_key = bob_identity_keys.public();
     let bob_pre_keys: Vec<_> = sig::generate_pre_keys(&ctx, 0, 10)
         .context("Unable to generate bob's pre-keys")?
-        .iter()
         .collect();
     let pre_key = &bob_pre_keys[0];
     let bob_signed_pre_key = sig::generate_signed_pre_key(
@@ -96,10 +95,10 @@ fn main() -> Result<(), Error> {
         .registration_id(42)
         .device_id(bob_address.device_id())
         .identity_key(&bob_public_identity_key)
-        .pre_key(pre_key.id(), &pre_key.key_pair().public()?)
+        .pre_key(pre_key.id(), &pre_key.key_pair().public())
         .signed_pre_key(
             bob_signed_pre_key.id(),
-            &bob_signed_pre_key.key_pair().public()?,
+            &bob_signed_pre_key.key_pair().public(),
         )
         .signature(bob_signed_pre_key.signature())
         .build()

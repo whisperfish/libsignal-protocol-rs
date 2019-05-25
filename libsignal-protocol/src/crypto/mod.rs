@@ -25,14 +25,18 @@ use crate::{
 };
 
 /// The error returned from a failed conversion to [`SignalCipherType`].
-#[derive(Debug, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct SignalCipherTypeError(i32);
 
-#[derive(Copy, Clone)]
-pub enum CipherMode {
+#[derive(Debug, Copy, Clone)]
+enum CipherMode {
     Encrypt,
     Decrypt,
 }
+
+/// The type of AES cipher.
+#[derive(Debug, Copy, Clone)]
+#[allow(missing_docs)]
 pub enum SignalCipherType {
     AesCtrNoPadding,
     AesCbcPkcs5,
