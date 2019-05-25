@@ -6,6 +6,7 @@ use crate::{
 use failure::Error;
 use std::convert::TryFrom;
 
+/// A message containing everything necessary to establish a session.
 #[derive(Debug, Clone)]
 pub struct PreKeySignalMessage {
     pub(crate) raw: Raw<sys::pre_key_signal_message>,

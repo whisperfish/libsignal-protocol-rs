@@ -5,7 +5,7 @@ use std::ptr::NonNull;
 pub struct Raw<T: IsA<sys::signal_type_base>>(NonNull<T>);
 
 impl<T: IsA<sys::signal_type_base>> Raw<T> {
-    /// Create a new [`Raw<T>`] from an owned pointer (doesn't affect reference
+    /// Create a new [`Raw`] from an owned pointer (doesn't affect reference
     /// count).
     ///
     /// # Safety
@@ -16,7 +16,7 @@ impl<T: IsA<sys::signal_type_base>> Raw<T> {
         Raw(NonNull::new_unchecked(raw))
     }
 
-    /// Create a new [`Raw<T>`] after bumping the reference count.
+    /// Create a new [`Raw`] after bumping the reference count.
     ///
     /// # Safety
     ///
@@ -43,7 +43,7 @@ impl<T: IsA<sys::signal_type_base>> Raw<T> {
 
     pub fn as_ptr(&self) -> *mut T { self.0.as_ptr() }
 
-    /// Consume this [`Raw<T>`] and extract the underlying pointer **without**
+    /// Consume this [`Raw`] and extract the underlying pointer **without**
     /// decrementing its reference count.
     pub fn into_raw(self) -> *mut T {
         let ptr = self.0.as_ptr();
