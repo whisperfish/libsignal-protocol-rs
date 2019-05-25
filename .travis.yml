@@ -21,10 +21,17 @@ before_deploy:
   - cp -r target/doc public
 
 matrix:
+  fast_finish: true
+  allow_failures:
+    - name: "Code Style"
+
   include:
     - rust: stable
     - rust: 1.34.0
     - rust: nightly
+
+    - rust: nightly
+      name: "Code Style"
       before_script:
         - rustup component add rustfmt
         - rustup component add clippy
