@@ -314,7 +314,6 @@ fn test_basic_pre_key_v2() {
 }
 
 #[test]
-#[ignore = "Requires Michael-F-Bryan/libsignal-protocol-rs#29 (i think?)"]
 fn test_optional_one_time_pre_key() {
     let bob_address = Address::new("+14152222222", 1);
     let ctx = mock_ctx();
@@ -350,7 +349,7 @@ fn test_optional_one_time_pre_key() {
         bob_signed_pre_key_pair.public().serialize().unwrap();
     let bob_signed_pre_key_signature = sig::calculate_signature(
         &ctx,
-        &bob_signed_pre_key_pair.private(),
+        &bob_identity_key_pair.private(),
         bob_signed_pre_key_public_serialized.as_slice(),
     )
     .unwrap();
