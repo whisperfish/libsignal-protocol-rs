@@ -92,7 +92,7 @@ mod errors;
 mod hkdf;
 mod identity_key_store;
 pub mod keys;
-mod messages;
+pub mod messages;
 mod pre_key_bundle;
 mod pre_key_store;
 mod raw_ptr;
