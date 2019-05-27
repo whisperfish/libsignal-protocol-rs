@@ -111,7 +111,19 @@ unsafe extern "C" fn get_sub_device_sessions_func(
     let name = std::slice::from_raw_parts(name as *const _, name_len);
 
     match state.0.get_sub_device_sessions(name) {
-        Ok(got) => unimplemented!(),
+        Ok(got) => {
+            let list = sys::signal_int_list_alloc();
+            if list.is_null() {
+                return InternalError::NoMemory.code();
+            }
+
+            for device_id in got {
+                sys::signal_int_list_push_back(list, device_id);
+            }
+
+            *sessions = list;
+            sys::SG_SUCCESS as _
+        },
         Err(e) => e.code(),
     }
 }
