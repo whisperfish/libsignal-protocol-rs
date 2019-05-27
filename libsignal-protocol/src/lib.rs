@@ -71,13 +71,11 @@ pub use crate::{
     context::*,
     errors::{FromInternalErrorCode, InternalError, IntoInternalErrorCode},
     hkdf::HMACBasedKeyDerivationFunction,
-    identity_key_store::IdentityKeyStore,
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
-    pre_key_store::PreKeyStore,
     session_builder::SessionBuilder,
     session_cipher::SessionCipher,
-    session_store::{SerializedSession, SessionStore},
-    signed_pre_key_store::SignedPreKeyStore,
+    session_record::SessionRecord,
+    session_state::SessionState,
     store_context::StoreContext,
 };
 
@@ -90,17 +88,16 @@ mod context;
 pub mod crypto;
 mod errors;
 mod hkdf;
-mod identity_key_store;
 pub mod keys;
 mod messages;
 mod pre_key_bundle;
-mod pre_key_store;
-mod raw_ptr;
+pub(crate) mod raw_ptr;
 mod session_builder;
 mod session_cipher;
-mod session_store;
-mod signed_pre_key_store;
+mod session_record;
+mod session_state;
 mod store_context;
+pub mod stores;
 
 use failure::Error;
 use std::io::Write;

@@ -17,15 +17,17 @@ use crate::{
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     hkdf::HMACBasedKeyDerivationFunction,
-    identity_key_store::{self as iks, IdentityKeyStore},
     keys::{
         IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
     },
-    pre_key_store::{self as pks, PreKeyStore},
     raw_ptr::Raw,
     session_builder::SessionBuilder,
-    session_store::{self as sess, SessionStore},
-    signed_pre_key_store::{self as spks, SignedPreKeyStore},
+    stores::{
+        identity_key_store::{self as iks, IdentityKeyStore},
+        pre_key_store::{self as pks, PreKeyStore},
+        session_store::{self as sess, SessionStore},
+        signed_pre_key_store::{self as spks, SignedPreKeyStore},
+    },
     Address, Buffer, StoreContext,
 };
 
