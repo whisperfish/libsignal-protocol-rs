@@ -10,9 +10,9 @@ use std::{
 
 /// An in-memory [`PreKeyStore`].
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct BasicPreKeyStore(Inner);
+pub struct InMemoryPreKeyStore(Inner);
 
-impl PreKeyStore for BasicPreKeyStore {
+impl PreKeyStore for InMemoryPreKeyStore {
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()> {
         self.0.load(id, writer)
     }
@@ -28,9 +28,9 @@ impl PreKeyStore for BasicPreKeyStore {
 
 /// An in-memory [`SignedPreKeyStore`].
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct BasicSignedPreKeyStore(Inner);
+pub struct InMemorySignedPreKeyStore(Inner);
 
-impl SignedPreKeyStore for BasicSignedPreKeyStore {
+impl SignedPreKeyStore for InMemorySignedPreKeyStore {
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()> {
         self.0.load(id, writer)
     }

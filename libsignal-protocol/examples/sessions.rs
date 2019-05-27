@@ -51,8 +51,8 @@ mod helpers;
 use failure::{Error, ResultExt};
 use sig::{
     stores::{
-        BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
-        BasicSignedPreKeyStore,
+        InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
+        InMemorySignedPreKeyStore,
     },
     Address, Context, PreKeyBundle, Serializable, SessionBuilder,
     SessionCipher,
@@ -86,10 +86,10 @@ fn main() -> Result<(), Error> {
     // set up some key stores for alice
     let alice_store_ctx = sig::store_context(
         &ctx,
-        BasicPreKeyStore::default(),
-        BasicSignedPreKeyStore::default(),
-        BasicSessionStore::default(),
-        BasicIdentityKeyStore::new(alice_registration_id, &alice_identity),
+        InMemoryPreKeyStore::default(),
+        InMemorySignedPreKeyStore::default(),
+        InMemorySessionStore::default(),
+        InMemoryIdentityKeyStore::new(alice_registration_id, &alice_identity),
     )?;
 
     // Instantiate a session_builder for a recipient address.

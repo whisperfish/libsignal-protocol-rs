@@ -6,11 +6,11 @@ use std::{cell::RefCell, collections::HashMap};
 
 /// An in-memory [`SessionStore`].
 #[derive(Debug, Default, Clone)]
-pub struct BasicSessionStore {
+pub struct InMemorySessionStore {
     sessions: RefCell<HashMap<Address, SerializedSession>>,
 }
 
-impl SessionStore for BasicSessionStore {
+impl SessionStore for InMemorySessionStore {
     fn load_session(
         &self,
         address: Address,

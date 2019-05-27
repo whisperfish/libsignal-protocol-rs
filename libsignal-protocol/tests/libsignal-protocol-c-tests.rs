@@ -6,8 +6,8 @@ use sig::{
     crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
     stores::{
-        BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
-        BasicSignedPreKeyStore,
+        InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
+        InMemorySignedPreKeyStore,
     },
     Address, Context, InternalError, PreKeyBundle, Serializable,
 };
@@ -268,10 +268,10 @@ fn test_basic_pre_key_v2() {
     let alice_identity = sig::generate_identity_key_pair(&ctx).unwrap();
     let alice_store = sig::store_context(
         &ctx,
-        BasicPreKeyStore::default(),
-        BasicSignedPreKeyStore::default(),
-        BasicSessionStore::default(),
-        BasicIdentityKeyStore::new(
+        InMemoryPreKeyStore::default(),
+        InMemorySignedPreKeyStore::default(),
+        InMemorySessionStore::default(),
+        InMemoryIdentityKeyStore::new(
             sig::generate_registration_id(&ctx, 0).unwrap(),
             &alice_identity,
         ),
@@ -285,10 +285,10 @@ fn test_basic_pre_key_v2() {
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_store = sig::store_context(
         &ctx,
-        BasicPreKeyStore::default(),
-        BasicSignedPreKeyStore::default(),
-        BasicSessionStore::default(),
-        BasicIdentityKeyStore::new(registration_id, &bob_identity_key_pair),
+        InMemoryPreKeyStore::default(),
+        InMemorySignedPreKeyStore::default(),
+        InMemorySessionStore::default(),
+        InMemoryIdentityKeyStore::new(registration_id, &bob_identity_key_pair),
     )
     .unwrap();
 

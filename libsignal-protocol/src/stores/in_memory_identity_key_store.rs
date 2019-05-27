@@ -6,7 +6,7 @@ use std::{cell::RefCell, collections::HashMap};
 
 /// An in-memory [`IdentityKeyStore`].
 #[derive(Debug)]
-pub struct BasicIdentityKeyStore {
+pub struct InMemoryIdentityKeyStore {
     registration_id: u32,
     identity: IdentityKeyPair,
     trusted_identities: RefCell<HashMap<Address, Vec<u8>>>,
@@ -14,13 +14,13 @@ pub struct BasicIdentityKeyStore {
     pub trust_on_first_use: bool,
 }
 
-impl BasicIdentityKeyStore {
+impl InMemoryIdentityKeyStore {
     /// Create a new [`BasicIdentityKeyStore`].
     pub fn new(
         registration_id: u32,
         identity: &IdentityKeyPair,
-    ) -> BasicIdentityKeyStore {
-        BasicIdentityKeyStore {
+    ) -> InMemoryIdentityKeyStore {
+        InMemoryIdentityKeyStore {
             registration_id,
             trust_on_first_use: true,
             identity: identity.clone(),
@@ -29,7 +29,7 @@ impl BasicIdentityKeyStore {
     }
 }
 
-impl IdentityKeyStore for BasicIdentityKeyStore {
+impl IdentityKeyStore for InMemoryIdentityKeyStore {
     fn local_registration_id(&self) -> Result<u32, InternalError> {
         Ok(self.registration_id)
     }
