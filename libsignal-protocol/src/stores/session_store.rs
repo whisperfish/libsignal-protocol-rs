@@ -24,6 +24,27 @@ pub trait SessionStore {
         &self,
         name: &[u8],
     ) -> Result<Vec<i32>, InternalError>;
+
+    /// Determine whether there is a committed session record for a
+    /// recipient ID + device ID tuple.
+    fn contains_session(&self, addr: Address) -> Result<bool, InternalError>;
+
+    /// Commit to storage the session record for a given recipient ID + device
+    /// ID tuple.
+    fn store_session(
+        &self,
+        addr: Address,
+        session: SerializedSession,
+    ) -> Result<(), InternalError>;
+
+    /// Remove a session record for a recipient ID + device ID tuple.
+    fn delete_session(&self, addr: Address) -> Result<(), InternalError>;
+
+    /// Remove the session records corresponding to all devices of a recipient
+    /// ID.
+    ///
+    /// Returns the number of deleted sessions.
+    fn delete_all_sessions(&self, name: &[u8]) -> Result<usize, InternalError>;
 }
 
 pub(crate) fn new_vtable<S: SessionStore + 'static>(
@@ -77,45 +98,104 @@ unsafe extern "C" fn load_session_func(
 }
 
 unsafe extern "C" fn get_sub_device_sessions_func(
-    _sessions: *mut *mut sys::signal_int_list,
-    _name: *const c_char,
-    _name_len: usize,
-    _user_data: *mut c_void,
+    sessions: *mut *mut sys::signal_int_list,
+    name: *const c_char,
+    name_len: usize,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!sessions.is_null());
+    assert!(!name.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &*(user_data as *const State);
+    let name = std::slice::from_raw_parts(name as *const _, name_len);
+
+    match state.0.get_sub_device_sessions(name) {
+        Ok(got) => unimplemented!(),
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn store_session_func(
-    _address: *const sys::signal_protocol_address,
-    _record: *mut u8,
-    _record_len: usize,
-    _user_record: *mut u8,
-    _user_record_len: usize,
-    _user_data: *mut c_void,
+    address: *const sys::signal_protocol_address,
+    record: *mut u8,
+    record_len: usize,
+    user_record: *mut u8,
+    user_record_len: usize,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!address.is_null());
+    assert!(!record.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &*(user_data as *const State);
+    let addr = Address::from_ptr(address);
+    let record = std::slice::from_raw_parts(record, record_len);
+    let user_record = if user_record.is_null() {
+        None
+    } else {
+        Some(std::slice::from_raw_parts(user_record, user_record_len))
+    };
+
+    let session = SerializedSession {
+        session: Buffer::from(record),
+        extra_data: user_record.map(Buffer::from),
+    };
+
+    match state.0.store_session(addr, session) {
+        Ok(_) => sys::SG_SUCCESS as _,
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn contains_session_func(
-    _address: *const sys::signal_protocol_address,
-    _user_data: *mut c_void,
+    address: *const sys::signal_protocol_address,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!address.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &*(user_data as *const State);
+    let addr = Address::from_ptr(address);
+
+    match state.0.contains_session(addr) {
+        Ok(true) => 1,
+        Ok(false) => 0,
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn delete_session_func(
-    _address: *const sys::signal_protocol_address,
-    _user_data: *mut c_void,
+    address: *const sys::signal_protocol_address,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!address.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &*(user_data as *const State);
+    let addr = Address::from_ptr(address);
+
+    match state.0.delete_session(addr) {
+        Ok(_) => sys::SG_SUCCESS as _,
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn delete_all_sessions_func(
-    _name: *const c_char,
-    _name_len: usize,
-    _user_data: *mut c_void,
+    name: *const c_char,
+    name_len: usize,
+    user_data: *mut c_void,
 ) -> c_int {
-    unimplemented!()
+    assert!(!name.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &*(user_data as *const State);
+    let name = std::slice::from_raw_parts(name as *const _, name_len);
+
+    match state.0.delete_all_sessions(name) {
+        Ok(_) => sys::SG_SUCCESS as _,
+        Err(e) => e.code(),
+    }
 }
 
 unsafe extern "C" fn destroy_func(user_data: *mut c_void) {
