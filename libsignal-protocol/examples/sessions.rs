@@ -89,7 +89,7 @@ fn main() -> Result<(), Error> {
 
     // Instantiate a session_builder for a recipient address.
     let alice_session_builder =
-        SessionBuilder::new(&ctx, &alice_store_ctx, bob_address.clone());
+        SessionBuilder::new(&ctx, &alice_store_ctx, &bob_address);
 
     let pre_key_bundle = PreKeyBundle::builder()
         .registration_id(42)
@@ -112,7 +112,7 @@ fn main() -> Result<(), Error> {
     // Now we've established a session alice can start encrypting messages to
     // send to bob
     let cipher =
-        SessionCipher::new(&ctx, &alice_store_ctx, bob_address.clone())?;
+        SessionCipher::new(&ctx, &alice_store_ctx, &bob_address)?;
     let message = "Hello, World!";
     let encrypted_message = cipher
         .encrypt(message.as_bytes())

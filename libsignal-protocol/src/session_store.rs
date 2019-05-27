@@ -16,7 +16,7 @@ pub trait SessionStore {
     /// provided recipient [`Address`].
     fn load_session(
         &self,
-        address: Address<'_>,
+        address: Address,
     ) -> Result<Option<SerializedSession>, InternalError>;
 
     /// Get the IDs of all known devices with active sessions for a recipient.
