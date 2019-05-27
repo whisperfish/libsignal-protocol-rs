@@ -15,7 +15,7 @@ pub struct InMemoryIdentityKeyStore {
 }
 
 impl InMemoryIdentityKeyStore {
-    /// Create a new [`BasicIdentityKeyStore`].
+    /// Create a new [`InMemoryIdentityKeyStore`].
     pub fn new(
         registration_id: u32,
         identity: &IdentityKeyPair,

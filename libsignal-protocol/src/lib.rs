@@ -65,6 +65,12 @@
 #[allow(unused_extern_crates)]
 extern crate libsignal_protocol_sys as sys;
 
+// so rustdoc can resolve links
+#[allow(unused_imports)]
+use crate::stores::{
+    IdentityKeyStore, PreKeyStore, SessionStore, SignedPreKeyStore,
+};
+
 pub use crate::{
     address::Address,
     buffer::Buffer,
