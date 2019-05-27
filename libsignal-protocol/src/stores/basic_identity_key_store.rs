@@ -11,7 +11,7 @@ pub struct BasicIdentityKeyStore {
     identity: IdentityKeyPair,
     trusted_identities: RefCell<HashMap<Address, Vec<u8>>>,
     /// Should recipients be trusted the first time they are contacted?
-    pub trust_on_first_message: bool,
+    pub trust_on_first_use: bool,
 }
 
 impl BasicIdentityKeyStore {
@@ -22,7 +22,7 @@ impl BasicIdentityKeyStore {
     ) -> BasicIdentityKeyStore {
         BasicIdentityKeyStore {
             registration_id,
-            trust_on_first_message: true,
+            trust_on_first_use: true,
             identity: identity.clone(),
             trusted_identities: Default::default(),
         }
@@ -35,18 +35,18 @@ impl IdentityKeyStore for BasicIdentityKeyStore {
     }
 
     fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError> {
-        let private = self
-            .identity
-            .private()
-            .serialize()
-            .map_err(|_| InternalError::Unknown)?;
         let public = self
             .identity
             .public()
             .serialize()
             .map_err(|_| InternalError::Unknown)?;
+        let private = self
+            .identity
+            .private()
+            .serialize()
+            .map_err(|_| InternalError::Unknown)?;
 
-        Ok((private, public))
+        Ok((public, private))
     }
 
     fn is_trusted_identity(
@@ -59,7 +59,20 @@ impl IdentityKeyStore for BasicIdentityKeyStore {
         if let Some(identity) = identities.get(&address) {
             Ok(identity_key == identity.as_slice())
         } else {
-            Ok(self.trust_on_first_message)
+            Ok(self.trust_on_first_use)
         }
+    }
+
+    fn save_identity(
+        &self,
+        addr: Address,
+        identity_key: &[u8],
+    ) -> Result<(), InternalError> {
+        self.trusted_identities
+            .borrow_mut()
+            .entry(addr)
+            .or_insert_with(|| identity_key.to_vec());
+
+        Ok(())
     }
 }
