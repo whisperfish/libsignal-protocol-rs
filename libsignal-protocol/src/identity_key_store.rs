@@ -21,7 +21,7 @@ pub trait IdentityKeyStore {
     /// local store is it considered 'untrusted.'
     fn is_trusted_identity(
         &self,
-        address: Address<'_>,
+        address: Address,
         identity_key: &[u8],
     ) -> Result<bool, InternalError>;
 }

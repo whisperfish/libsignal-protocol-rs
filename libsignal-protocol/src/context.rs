@@ -246,7 +246,7 @@ pub fn create_hkdf(
 pub fn session_builder(
     ctx: &Context,
     store_context: &StoreContext,
-    address: Address<'_>,
+    address: Address,
 ) -> SessionBuilder {
     SessionBuilder::new(ctx, store_context, address)
 }

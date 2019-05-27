@@ -24,7 +24,7 @@ impl SessionBuilder {
     pub fn new(
         ctx: &Context,
         store_context: &StoreContext,
-        address: Address<'_>,
+        address: Address,
     ) -> SessionBuilder {
         unsafe {
             let mut raw = ptr::null_mut();

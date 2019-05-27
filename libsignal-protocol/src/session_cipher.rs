@@ -26,7 +26,7 @@ impl SessionCipher {
     pub fn new(
         ctx: &Context,
         store_ctx: &StoreContext,
-        address: Address<'_>,
+        address: Address,
     ) -> Result<SessionCipher, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
