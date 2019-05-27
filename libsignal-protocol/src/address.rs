@@ -9,6 +9,7 @@ use std::{
 
 /// A reference-counted pointer to a signal address (recipient name, device ID
 /// tuple).
+#[derive(PartialEq, Eq, Hash)]
 pub struct Address(Rc<OwnedAddress>);
 
 impl Address {
@@ -61,6 +62,10 @@ impl Address {
 
 impl Debug for Address {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { self.0.fmt(f) }
+}
+
+impl Clone for Address {
+    fn clone(&self) -> Address { Address(Rc::clone(&self.0)) }
 }
 
 struct OwnedAddress {

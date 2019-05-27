@@ -273,7 +273,7 @@ fn test_basic_pre_key_v2() {
     )
     .unwrap();
     let alice_session_builder =
-        sig::session_builder(&ctx, &alice_store, bob_address);
+        sig::session_builder(&ctx, &alice_store, &bob_address);
 
     // Create Bob's data store and pre key bundle
     let bob_store = sig::store_context(

@@ -19,6 +19,7 @@ pub struct SessionCipher {
     raw: *mut sys::session_cipher,
     _ctx: Rc<ContextInner>,
     _store_ctx: Rc<StoreContextInner>,
+    _addr: Address,
 }
 
 impl SessionCipher {
@@ -26,7 +27,7 @@ impl SessionCipher {
     pub fn new(
         ctx: &Context,
         store_ctx: &StoreContext,
-        address: Address,
+        address: &Address,
     ) -> Result<SessionCipher, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
@@ -42,6 +43,7 @@ impl SessionCipher {
                 raw,
                 _store_ctx: Rc::clone(&store_ctx.0),
                 _ctx: Rc::clone(&ctx.0),
+                _addr: address.clone(),
             })
         }
     }

@@ -17,6 +17,7 @@ pub struct SessionBuilder {
     // both these fields must outlive `session_builder`
     _store_ctx: Rc<StoreContextInner>,
     _ctx: Rc<ContextInner>,
+    _addr: Address,
 }
 
 impl SessionBuilder {
@@ -24,7 +25,7 @@ impl SessionBuilder {
     pub fn new(
         ctx: &Context,
         store_context: &StoreContext,
-        address: Address,
+        address: &Address,
     ) -> SessionBuilder {
         unsafe {
             let mut raw = ptr::null_mut();
@@ -39,6 +40,7 @@ impl SessionBuilder {
                 raw,
                 _store_ctx: Rc::clone(&store_context.0),
                 _ctx: Rc::clone(&ctx.0),
+                _addr: address.clone(),
             }
         }
     }

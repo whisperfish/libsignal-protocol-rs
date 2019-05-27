@@ -125,16 +125,14 @@ impl SignedPreKeyStore for BasicSignedPreKeyStore {
 
 #[derive(Default)]
 pub struct BasicSessionStore {
-    sessions: RefCell<HashMap<OwnedAddress, SerializedSession>>,
+    sessions: RefCell<HashMap<Address, SerializedSession>>,
 }
 
 impl SessionStore for BasicSessionStore {
     fn load_session(
         &self,
-        address: Address<'_>,
+        address: Address,
     ) -> Result<Option<SerializedSession>, InternalError> {
-        let address = OwnedAddress::from(address);
-
         Ok(self.sessions.borrow().get(&address).cloned())
     }
 
@@ -149,28 +147,7 @@ impl SessionStore for BasicSessionStore {
 #[derive(Debug, Default)]
 pub struct BasicIdentityKeyStore {
     registration_id: Cell<u32>,
-    trusted_identities: RefCell<Vec<(OwnedAddress, Vec<u8>)>>,
-}
-
-#[derive(Debug, Hash, PartialEq, Eq)]
-struct OwnedAddress {
-    name: Vec<u8>,
-    id: i32,
-}
-
-impl<'a> PartialEq<Address<'a>> for OwnedAddress {
-    fn eq(&self, other: &Address<'a>) -> bool {
-        self.id == other.device_id() && self.name.as_slice() == other.bytes()
-    }
-}
-
-impl<'a> From<Address<'a>> for OwnedAddress {
-    fn from(other: Address<'a>) -> OwnedAddress {
-        OwnedAddress {
-            name: other.bytes().to_vec(),
-            id: other.device_id(),
-        }
-    }
+    trusted_identities: RefCell<Vec<(Address, Vec<u8>)>>,
 }
 
 impl IdentityKeyStore for BasicIdentityKeyStore {
@@ -184,7 +161,7 @@ impl IdentityKeyStore for BasicIdentityKeyStore {
 
     fn is_trusted_identity(
         &self,
-        address: Address<'_>,
+        address: Address,
         identity_key: &[u8],
     ) -> Result<bool, InternalError> {
         let identities = self.trusted_identities.borrow();
