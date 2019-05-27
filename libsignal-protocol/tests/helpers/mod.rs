@@ -2,14 +2,9 @@
 
 use libsignal_protocol::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
-    Address, Buffer, IdentityKeyStore, InternalError, PreKeyStore,
-    SerializedSession, SessionStore, SignedPreKeyStore,
+    InternalError,
 };
-use std::{
-    cell::{Cell, RefCell},
-    collections::HashMap,
-    io::{self, Write},
-};
+use std::cell::Cell;
 
 pub(crate) struct MockCrypto<C> {
     inner: C,

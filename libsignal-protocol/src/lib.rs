@@ -74,8 +74,6 @@ pub use crate::{
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
     session_builder::SessionBuilder,
     session_cipher::SessionCipher,
-    session_record::SessionRecord,
-    session_state::SessionState,
     store_context::StoreContext,
 };
 
@@ -94,8 +92,6 @@ mod pre_key_bundle;
 pub(crate) mod raw_ptr;
 mod session_builder;
 mod session_cipher;
-mod session_record;
-mod session_state;
 mod store_context;
 pub mod stores;
 

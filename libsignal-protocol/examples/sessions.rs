@@ -48,13 +48,14 @@ extern crate libsignal_protocol as sig;
 #[path = "../tests/helpers/mod.rs"]
 mod helpers;
 
-use self::helpers::{
-    BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
-    BasicSignedPreKeyStore,
-};
 use failure::{Error, ResultExt};
 use sig::{
-    Address, Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
+    stores::{
+        BasicIdentityKeyStore, BasicPreKeyStore, BasicSessionStore,
+        BasicSignedPreKeyStore,
+    },
+    Address, Context, PreKeyBundle, Serializable, SessionBuilder,
+    SessionCipher,
 };
 use std::time::SystemTime;
 
@@ -78,13 +79,17 @@ fn main() -> Result<(), Error> {
     )
     .context("Unable to generate a signed pre-key for bob")?;
 
+    // alice will need an identity
+    let alice_registration_id = sig::generate_registration_id(&ctx, 0)?;
+    let alice_identity = sig::generate_identity_key_pair(&ctx)?;
+
     // set up some key stores for alice
     let alice_store_ctx = sig::store_context(
         &ctx,
         BasicPreKeyStore::default(),
         BasicSignedPreKeyStore::default(),
         BasicSessionStore::default(),
-        BasicIdentityKeyStore::default(),
+        BasicIdentityKeyStore::new(alice_registration_id, &alice_identity),
     )?;
 
     // Instantiate a session_builder for a recipient address.
@@ -111,8 +116,7 @@ fn main() -> Result<(), Error> {
 
     // Now we've established a session alice can start encrypting messages to
     // send to bob
-    let cipher =
-        SessionCipher::new(&ctx, &alice_store_ctx, &bob_address)?;
+    let cipher = SessionCipher::new(&ctx, &alice_store_ctx, &bob_address)?;
     let message = "Hello, World!";
     let encrypted_message = cipher
         .encrypt(message.as_bytes())

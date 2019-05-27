@@ -2,10 +2,7 @@ use crate::{
     keys::IdentityKeyPair, stores::IdentityKeyStore, Address, Buffer,
     InternalError, Serializable,
 };
-use std::{
-    cell::{Cell, RefCell},
-    collections::HashMap,
-};
+use std::{cell::RefCell, collections::HashMap};
 
 /// An in-memory [`IdentityKeyStore`].
 #[derive(Debug)]

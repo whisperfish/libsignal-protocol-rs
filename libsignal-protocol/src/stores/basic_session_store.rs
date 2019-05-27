@@ -20,7 +20,7 @@ impl SessionStore for BasicSessionStore {
 
     fn get_sub_device_sessions(
         &self,
-        name: &[u8],
+        _name: &[u8],
     ) -> Result<Vec<i32>, InternalError> {
         unimplemented!()
     }
