@@ -141,7 +141,7 @@
     <span class="doccomment">/// provided recipient [`Address`].</span>
     <span class="kw">fn</span> <span class="ident">load_session</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">address</span>: <span class="ident">Address</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">address</span>: <span class="ident">Address</span>,
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SerializedSession</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Get the IDs of all known devices with active sessions for a recipient.</span>
