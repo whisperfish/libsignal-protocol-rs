@@ -328,7 +328,7 @@ fn test_optional_one_time_pre_key() {
     )
     .unwrap();
     let alice_session_builder =
-        sig::session_builder(&ctx, &alice_store, bob_address.clone());
+        sig::session_builder(&ctx, &alice_store, &bob_address);
 
     // Create Bob's data store and pre key bundle
     let bob_store = sig::store_context(
@@ -369,18 +369,16 @@ fn test_optional_one_time_pre_key() {
         .unwrap();
 
     // Find and verify the session version in Alice's store
-    let alice_knows_bob =
-        alice_store.contains_session(bob_address.clone()).unwrap();
+    let alice_knows_bob = alice_store.contains_session(&bob_address).unwrap();
     assert!(alice_knows_bob);
 
-    let record = alice_store.load_session(bob_address.clone()).unwrap();
+    let record = alice_store.load_session(&bob_address).unwrap();
     let state = record.state();
     assert_eq!(state.version(), 3);
 
     // create alice's session cipher
     let alice_session_cipher =
-        sig::SessionCipher::new(&ctx, &alice_store, bob_address.clone())
-            .unwrap();
+        sig::SessionCipher::new(&ctx, &alice_store, &bob_address).unwrap();
 
     // Create an outgoing message
     let msg = "L'homme est condamn� � �tre libre";
