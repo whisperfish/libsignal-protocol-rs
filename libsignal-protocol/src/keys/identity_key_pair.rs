@@ -10,6 +10,7 @@ use std::{
 };
 
 /// A "ratcheting" key pair.
+#[derive(Clone)]
 pub struct IdentityKeyPair {
     pub(crate) raw: Raw<sys::ratchet_identity_key_pair>,
 }
