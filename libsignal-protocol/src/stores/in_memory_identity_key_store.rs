@@ -70,8 +70,7 @@ impl IdentityKeyStore for InMemoryIdentityKeyStore {
     ) -> Result<(), InternalError> {
         self.trusted_identities
             .borrow_mut()
-            .entry(addr)
-            .or_insert_with(|| identity_key.to_vec());
+            .insert(addr, identity_key.to_vec());
 
         Ok(())
     }
