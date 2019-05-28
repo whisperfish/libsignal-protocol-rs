@@ -46,7 +46,6 @@ pub enum SignalCipherType {
 impl TryFrom<i32> for SignalCipherType {
     type Error = SignalCipherTypeError;
 
-    #[inline]
     fn try_from(v: i32) -> Result<Self, Self::Error> {
         match v as u32 {
             sys::SG_CIPHER_AES_CTR_NOPADDING => {
@@ -352,7 +351,6 @@ unsafe extern "C" fn decrypt_func(
     )
 }
 
-#[inline]
 unsafe extern "C" fn internal_cipher(
     mode: CipherMode,
     output: *mut *mut signal_buffer,

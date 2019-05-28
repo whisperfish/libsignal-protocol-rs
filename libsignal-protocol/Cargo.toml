@@ -29,3 +29,6 @@ aes-ctr = { version = "0.3.0", optional = true }
 default = ["crypto-native"]
 crypto-native = ["sha2", "hmac", "aes", "block-modes", "aes-ctr"]
 crypto-openssl = ["openssl"]
+
+[dev-dependencies]
+cfg-if = "0.1.9"

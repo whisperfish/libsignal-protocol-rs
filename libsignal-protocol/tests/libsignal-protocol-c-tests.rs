@@ -3,13 +3,12 @@ mod helpers;
 
 use crate::helpers::{fake_random_generator, MockCrypto};
 use sig::{
-    crypto::DefaultCrypto,
     keys::{PrivateKey, PublicKey},
+    messages::PreKeySignalMessage,
     stores::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
-    messages::PreKeySignalMessage,
     Address, Context, InternalError, PreKeyBundle, Serializable,
 };
 use std::{
@@ -18,9 +17,18 @@ use std::{
 };
 
 fn mock_ctx() -> Context {
+    cfg_if::cfg_if! {
+        if #[cfg(feature = "crypto-openssl")] {
+            type Crypto = sig::crypto::OpenSSLCrypto;
+        } else if #[cfg(feature = "crypto-native")] {
+            type Crypto = sig::crypto::DefaultCrypto;
+        } else {
+            compile_error!("These tests require one of the crypto features to be enabled");
+        }
+    }
+
     Context::new(
-        MockCrypto::new(DefaultCrypto::default())
-            .random_func(fake_random_generator()),
+        MockCrypto::new(Crypto::default()).random_func(fake_random_generator()),
     )
     .unwrap()
 }
