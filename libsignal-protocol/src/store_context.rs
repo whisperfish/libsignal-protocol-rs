@@ -44,7 +44,7 @@ impl StoreContext {
     }
 
     /// Does this store already contain a session with the provided recipient?
-    pub fn contains_session(&self, addr: Address) -> Result<bool, Error> {
+    pub fn contains_session(&self, addr: &Address) -> Result<bool, Error> {
         unsafe {
             match sys::signal_protocol_session_contains_session(
                 self.raw(),
@@ -63,7 +63,7 @@ impl StoreContext {
     /// Load the session corresponding to the provided recipient.
     pub fn load_session(
         &self,
-        addr: Address,
+        addr: &Address,
     ) -> Result<SessionRecord, Error> {
         unsafe {
             let mut raw = ptr::null_mut();

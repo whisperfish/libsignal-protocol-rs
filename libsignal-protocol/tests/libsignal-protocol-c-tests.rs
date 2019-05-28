@@ -9,7 +9,7 @@ use sig::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
-    messages::{CiphertextType, PreKeySignalMessage},
+    messages::PreKeySignalMessage,
     Address, Context, InternalError, PreKeyBundle, Serializable,
 };
 use std::{
@@ -287,14 +287,6 @@ fn test_basic_pre_key_v2() {
     // Create Bob's data store and pre key bundle
     let registration_id = sig::generate_registration_id(&ctx, 0).unwrap();
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
-    let bob_store = sig::store_context(
-        &ctx,
-        InMemoryPreKeyStore::default(),
-        InMemorySignedPreKeyStore::default(),
-        InMemorySessionStore::default(),
-        InMemoryIdentityKeyStore::new(registration_id, &bob_identity_key_pair),
-    )
-    .unwrap();
 
     let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
     let bob_public_identity_key_pair = bob_identity_key_pair.public();
@@ -319,30 +311,35 @@ fn test_optional_one_time_pre_key() {
     let ctx = mock_ctx();
 
     // Create Alice's data store and session builder
+    let alice_identity = sig::generate_identity_key_pair(&ctx).unwrap();
     let alice_store = sig::store_context(
         &ctx,
-        BasicPreKeyStore::default(),
-        BasicSignedPreKeyStore::default(),
-        BasicSessionStore::default(),
-        BasicIdentityKeyStore::default(),
+        InMemoryPreKeyStore::default(),
+        InMemorySignedPreKeyStore::default(),
+        InMemorySessionStore::default(),
+        InMemoryIdentityKeyStore::new(
+            sig::generate_registration_id(&ctx, 0).unwrap(),
+            &alice_identity,
+        ),
     )
     .unwrap();
     let alice_session_builder =
         sig::session_builder(&ctx, &alice_store, &bob_address);
 
     // Create Bob's data store and pre key bundle
+    let registration_id = sig::generate_registration_id(&ctx, 0).unwrap();
+    let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_store = sig::store_context(
         &ctx,
-        BasicPreKeyStore::default(),
-        BasicSignedPreKeyStore::default(),
-        BasicSessionStore::default(),
-        BasicIdentityKeyStore::default(),
+        InMemoryPreKeyStore::default(),
+        InMemorySignedPreKeyStore::default(),
+        InMemorySessionStore::default(),
+        InMemoryIdentityKeyStore::new(registration_id, &bob_identity_key_pair),
     )
     .unwrap();
 
     let bob_local_registration_id = bob_store.registration_id().unwrap();
 
-    let bob_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
     let bob_signed_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_signed_pre_key_public_serialized =
