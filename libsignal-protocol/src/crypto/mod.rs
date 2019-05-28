@@ -5,7 +5,7 @@ use std::{
     convert::TryFrom,
     os::raw::{c_int, c_void},
     pin::Pin,
-    slice,
+    ptr, slice,
 };
 
 use sys::{signal_buffer, signal_crypto_provider};
@@ -170,7 +170,9 @@ unsafe extern "C" fn hmac_sha256_cleanup_func(
     hmac_context: *mut c_void,
     _user_data: *mut c_void,
 ) {
-    assert!(!hmac_context.is_null());
+    if hmac_context.is_null() {
+        return;
+    }
 
     let hmac_context: Box<HmacContext> =
         Box::from_raw(hmac_context as *mut HmacContext);
@@ -207,6 +209,9 @@ unsafe extern "C" fn hmac_sha256_init_func(
     assert!(!key.is_null());
     assert!(!user_data.is_null());
 
+    // make sure we initialize it to a sane value
+    *hmac_context = ptr::null_mut();
+
     let state = &*(user_data as *const State);
     let key = slice::from_raw_parts(key, key_len);
 
@@ -240,6 +245,9 @@ unsafe extern "C" fn sha512_digest_init_func(
     user_data: *mut c_void,
 ) -> c_int {
     assert!(!user_data.is_null());
+
+    // make sure we initialize it to a sane value
+    *digest_context = ptr::null_mut();
 
     let user_data = &*(user_data as *const State);
     let hasher = match user_data.0.sha512_digest() {
@@ -294,7 +302,9 @@ unsafe extern "C" fn sha512_digest_cleanup_func(
     digest_context: *mut c_void,
     _user_data: *mut c_void,
 ) {
-    assert!(!digest_context.is_null());
+    if digest_context.is_null() {
+        return;
+    }
 
     let digest_context: Box<DigestContext> =
         Box::from_raw(digest_context as *mut DigestContext);
