@@ -209,15 +209,15 @@ unsafe extern "C" fn hmac_sha256_init_func(
     assert!(!key.is_null());
     assert!(!user_data.is_null());
 
-    // make sure we initialize it to a sane value
-    *hmac_context = ptr::null_mut();
-
     let state = &*(user_data as *const State);
     let key = slice::from_raw_parts(key, key_len);
 
     let hasher = match state.0.hmac_sha256(key) {
         Ok(h) => h,
-        Err(e) => return e.code(),
+        Err(e) => {
+            *hmac_context = ptr::null_mut();
+            return e.code();
+        },
     };
 
     *hmac_context = Box::into_raw(Box::new(HmacContext(RefCell::new(hasher))))
@@ -246,13 +246,13 @@ unsafe extern "C" fn sha512_digest_init_func(
 ) -> c_int {
     assert!(!user_data.is_null());
 
-    // make sure we initialize it to a sane value
-    *digest_context = ptr::null_mut();
-
     let user_data = &*(user_data as *const State);
     let hasher = match user_data.0.sha512_digest() {
         Ok(h) => h,
-        Err(e) => return e.code(),
+        Err(e) => {
+            *digest_context = ptr::null_mut();
+            return e.code();
+        },
     };
 
     let dc = Box::new(DigestContext(RefCell::new(hasher)));
