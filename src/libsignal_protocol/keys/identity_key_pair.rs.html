@@ -72,6 +72,7 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">errors</span>::<span class="ident">FromInternalErrorCode</span>,
@@ -85,6 +86,7 @@
 };
 
 <span class="doccomment">/// A &quot;ratcheting&quot; key pair.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdentityKeyPair</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">ratchet_identity_key_pair</span><span class="op">&gt;</span>,
 }

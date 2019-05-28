@@ -122,7 +122,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A Rust interface to the [libsignal-protocol-c] library.</span>
 <span class="doccomment">//!</span>
@@ -191,19 +190,21 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_extern_crates</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">libsignal_protocol_sys</span> <span class="kw">as</span> <span class="ident">sys</span>;
 
+<span class="comment">// so rustdoc can resolve links</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">stores</span>::{
+    <span class="ident">IdentityKeyStore</span>, <span class="ident">PreKeyStore</span>, <span class="ident">SessionStore</span>, <span class="ident">SignedPreKeyStore</span>,
+};
+
 <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">address</span>::<span class="ident">Address</span>,
     <span class="ident">buffer</span>::<span class="ident">Buffer</span>,
     <span class="ident">context</span>::<span class="kw-2">*</span>,
     <span class="ident">errors</span>::{<span class="ident">FromInternalErrorCode</span>, <span class="ident">InternalError</span>, <span class="ident">IntoInternalErrorCode</span>},
     <span class="ident">hkdf</span>::<span class="ident">HMACBasedKeyDerivationFunction</span>,
-    <span class="ident">identity_key_store</span>::<span class="ident">IdentityKeyStore</span>,
     <span class="ident">pre_key_bundle</span>::{<span class="ident">PreKeyBundle</span>, <span class="ident">PreKeyBundleBuilder</span>},
-    <span class="ident">pre_key_store</span>::<span class="ident">PreKeyStore</span>,
     <span class="ident">session_builder</span>::<span class="ident">SessionBuilder</span>,
     <span class="ident">session_cipher</span>::<span class="ident">SessionCipher</span>,
-    <span class="ident">session_store</span>::{<span class="ident">SerializedSession</span>, <span class="ident">SessionStore</span>},
-    <span class="ident">signed_pre_key_store</span>::<span class="ident">SignedPreKeyStore</span>,
     <span class="ident">store_context</span>::<span class="ident">StoreContext</span>,
 };
 
@@ -216,17 +217,14 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">crypto</span>;
 <span class="kw">mod</span> <span class="ident">errors</span>;
 <span class="kw">mod</span> <span class="ident">hkdf</span>;
-<span class="kw">mod</span> <span class="ident">identity_key_store</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">keys</span>;
 <span class="kw">mod</span> <span class="ident">messages</span>;
 <span class="kw">mod</span> <span class="ident">pre_key_bundle</span>;
-<span class="kw">mod</span> <span class="ident">pre_key_store</span>;
-<span class="kw">mod</span> <span class="ident">raw_ptr</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">raw_ptr</span>;
 <span class="kw">mod</span> <span class="ident">session_builder</span>;
 <span class="kw">mod</span> <span class="ident">session_cipher</span>;
-<span class="kw">mod</span> <span class="ident">session_store</span>;
-<span class="kw">mod</span> <span class="ident">signed_pre_key_store</span>;
 <span class="kw">mod</span> <span class="ident">store_context</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">stores</span>;
 
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::<span class="ident">Write</span>;

@@ -385,6 +385,8 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
 
@@ -405,15 +407,17 @@
     <span class="ident">crypto</span>::{<span class="ident">Crypto</span>, <span class="ident">CryptoProvider</span>},
     <span class="ident">errors</span>::{<span class="ident">FromInternalErrorCode</span>, <span class="ident">InternalError</span>},
     <span class="ident">hkdf</span>::<span class="ident">HMACBasedKeyDerivationFunction</span>,
-    <span class="ident">identity_key_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">iks</span>, <span class="ident">IdentityKeyStore</span>},
     <span class="ident">keys</span>::{
         <span class="ident">IdentityKeyPair</span>, <span class="ident">KeyPair</span>, <span class="ident">PreKeyList</span>, <span class="ident">PrivateKey</span>, <span class="ident">SessionSignedPreKey</span>,
     },
-    <span class="ident">pre_key_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">pks</span>, <span class="ident">PreKeyStore</span>},
     <span class="ident">raw_ptr</span>::<span class="ident">Raw</span>,
     <span class="ident">session_builder</span>::<span class="ident">SessionBuilder</span>,
-    <span class="ident">session_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sess</span>, <span class="ident">SessionStore</span>},
-    <span class="ident">signed_pre_key_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">spks</span>, <span class="ident">SignedPreKeyStore</span>},
+    <span class="ident">stores</span>::{
+        <span class="ident">identity_key_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">iks</span>, <span class="ident">IdentityKeyStore</span>},
+        <span class="ident">pre_key_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">pks</span>, <span class="ident">PreKeyStore</span>},
+        <span class="ident">session_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sess</span>, <span class="ident">SessionStore</span>},
+        <span class="ident">signed_pre_key_store</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">spks</span>, <span class="ident">SignedPreKeyStore</span>},
+    },
     <span class="ident">Address</span>, <span class="ident">Buffer</span>, <span class="ident">StoreContext</span>,
 };
 
