@@ -7,7 +7,7 @@ from os import path
 import os
 from pathlib import Path
 
-ignored = ["sessions", "libsignal-protocol-c-tests"]
+ignored = ["sessions", "libsignal-protocol-c-tests", "skeptic"]
 
 PROJECT_ROOT = Path(__file__).parent.parent
 CARGO_TOML = PROJECT_ROOT.joinpath("libsignal-protocol", "Cargo.toml")
@@ -60,8 +60,8 @@ def integration_tests():
 
 
 def run_valgrind(original_cmd):
-    args = ["valgrind", "--leak-check=full", "--trace-children=yes",
-            "--show-leak-kinds=all", "--error-exitcode=1"]
+    args = ["valgrind", "--leak-check=full", "--show-leak-kinds=all",
+            "--error-exitcode=1"]
     args.extend(original_cmd)
 
     env = os.environ.copy()

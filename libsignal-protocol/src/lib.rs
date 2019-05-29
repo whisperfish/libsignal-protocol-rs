@@ -93,7 +93,7 @@ pub mod crypto;
 mod errors;
 mod hkdf;
 pub mod keys;
-mod messages;
+pub mod messages;
 mod pre_key_bundle;
 pub(crate) mod raw_ptr;
 mod session_builder;
