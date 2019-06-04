@@ -25,9 +25,11 @@
 
 extern crate libsignal_protocol as sig;
 
-use failure::Error;
-use sig::Context;
 use std::time::SystemTime;
+
+use failure::Error;
+
+use sig::Context;
 
 fn main() -> Result<(), Error> {
     let ctx = Context::default();
@@ -53,9 +55,8 @@ fn main() -> Result<(), Error> {
 
     let pre_keys = sig::generate_pre_keys(&ctx, start, pre_key_count)?;
 
-    let pre_key_ids: Vec<_> = pre_keys
-        .map(|session_key| session_key.id())
-        .collect();
+    let pre_key_ids: Vec<_> =
+        pre_keys.map(|session_key| session_key.id()).collect();
 
     println!("Pre Key session IDs:");
     println!("{:?}", pre_key_ids);

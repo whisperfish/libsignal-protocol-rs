@@ -1,15 +1,5 @@
 //! Underlying cryptographic routines.
 
-#[cfg(feature = "crypto-native")]
-mod native;
-#[cfg(feature = "crypto-native")]
-pub use self::native::DefaultCrypto;
-
-#[cfg(feature = "crypto-openssl")]
-mod openssl;
-#[cfg(feature = "crypto-openssl")]
-pub use self::openssl::OpenSSLCrypto;
-
 use std::{
     cell::RefCell,
     convert::TryFrom,
@@ -17,12 +7,23 @@ use std::{
     pin::Pin,
     slice,
 };
+
 use sys::{signal_buffer, signal_crypto_provider};
 
 use crate::{
     buffer::Buffer,
     errors::{InternalError, IntoInternalErrorCode},
 };
+
+#[cfg(feature = "crypto-native")]
+pub use self::native::DefaultCrypto;
+#[cfg(feature = "crypto-openssl")]
+pub use self::openssl::OpenSSLCrypto;
+
+#[cfg(feature = "crypto-native")]
+mod native;
+#[cfg(feature = "crypto-openssl")]
+mod openssl;
 
 /// The error returned from a failed conversion to [`SignalCipherType`].
 #[derive(Debug, Copy, Clone)]
@@ -396,5 +397,48 @@ unsafe extern "C" fn internal_cipher(
             sys::SG_SUCCESS as c_int
         },
         Err(e) => e.code(),
+    }
+}
+
+#[cfg(all(test, feature = "crypto-native", feature = "crypto-openssl"))]
+mod crypto_tests {
+    use super::*;
+
+    #[test]
+    fn test_crypter() {
+        // Here is a test to see the behavior of DefaultCrypto vs OpenSSLCrypto
+        let native_crypto = DefaultCrypto::default();
+        let openssl_crypto = OpenSSLCrypto::default();
+        let data = [1, 2, 3, 4, 5, 6, 7];
+        let mut key = [0u8; 16];
+        let mut iv = [0u8; 16];
+        native_crypto.fill_random(&mut key).unwrap();
+        native_crypto.fill_random(&mut iv).unwrap();
+
+        let cipher_text_native = native_crypto
+            .encrypt(SignalCipherType::AesCbcPkcs5, &key, &iv, &data)
+            .unwrap();
+        let cipher_text_openssl = openssl_crypto
+            .encrypt(SignalCipherType::AesCbcPkcs5, &key, &iv, &data)
+            .unwrap();
+        assert_eq!(cipher_text_native, cipher_text_openssl);
+        let plain_text_native = native_crypto
+            .decrypt(
+                SignalCipherType::AesCbcPkcs5,
+                &key,
+                &iv,
+                &cipher_text_openssl,
+            )
+            .unwrap();
+        let plain_text_openssl = openssl_crypto
+            .decrypt(
+                SignalCipherType::AesCbcPkcs5,
+                &key,
+                &iv,
+                &cipher_text_native,
+            )
+            .unwrap();
+        assert_eq!(plain_text_native, data);
+        assert_eq!(plain_text_openssl, data);
     }
 }

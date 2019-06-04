@@ -1,16 +1,111 @@
+use aes::{Aes128, Aes192, Aes256};
+use aes_ctr::{
+    Aes128Ctr,
+    Aes192Ctr, Aes256Ctr, stream_cipher::{NewStreamCipher, SyncStreamCipher},
+};
+use block_modes::{block_padding::Pkcs7, BlockMode, Cbc};
+use hmac::{Hmac, Mac};
+use sha2::{Digest, Sha256, Sha512};
+
 use crate::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
     errors::InternalError,
 };
-use hmac::{Hmac, Mac};
-use sha2::{Digest, Sha256, Sha512};
+
+// FWI, PKCS5 padding is a subset of PKCS7
+type Aes128Cbc = Cbc<Aes128, Pkcs7>;
+type Aes192Cbc = Cbc<Aes192, Pkcs7>;
+type Aes256Cbc = Cbc<Aes256, Pkcs7>;
 
 // Create alias for HMAC-SHA256
 type HmacSha256 = Hmac<Sha256>;
 
+#[derive(Copy, Clone, Ord, PartialOrd, PartialEq, Eq)]
+pub enum Mode {
+    Encrypt,
+    Decrypt,
+}
+
 /// Cryptography routines using native Rust crates.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct DefaultCrypto;
+
+impl DefaultCrypto {
+    fn crypter(
+        &self,
+        mode: Mode,
+        cipher: SignalCipherType,
+        key: &[u8],
+        iv: &[u8],
+        data: &[u8],
+    ) -> Result<Vec<u8>, InternalError> {
+        let result = match (cipher, key.len()) {
+            (SignalCipherType::AesCtrNoPadding, 16) => {
+                let mut buf = data.to_vec();
+                // a side note here is that Ctr mode takes a nonce as 2nd param,
+                // not an IV but if we for example use a
+                // randomly nonce generated every call, it would fail
+                // i mean by fail here, fail in decryption the cipher text
+                // created by the same key. so i think it's not
+                // not meant to be nonce here, but just an IV.
+                // and now it works same as the openssl
+                let mut c = Aes128Ctr::new_var(key, iv)
+                    .map_err(|_| InternalError::Unknown)?;
+                c.apply_keystream(&mut buf);
+                buf
+            },
+            (SignalCipherType::AesCtrNoPadding, 24) => {
+                let mut buf = data.to_vec();
+                let mut c = Aes192Ctr::new_var(key, iv)
+                    .map_err(|_| InternalError::Unknown)?;
+                c.apply_keystream(&mut buf);
+                buf
+            },
+            (SignalCipherType::AesCtrNoPadding, 32) => {
+                let mut buf = data.to_vec();
+                let mut c = Aes256Ctr::new_var(key, iv)
+                    .map_err(|_| InternalError::Unknown)?;
+                c.apply_keystream(&mut buf);
+                buf
+            },
+            (SignalCipherType::AesCbcPkcs5, 16) => {
+                let c = Aes128Cbc::new_var(&key, &iv)
+                    .map_err(|_| InternalError::Unknown)?;
+                let buf = match mode {
+                    Mode::Encrypt => c.encrypt_vec(data),
+                    Mode::Decrypt => c
+                        .decrypt_vec(data)
+                        .map_err(|_| InternalError::Unknown)?,
+                };
+                buf
+            },
+            (SignalCipherType::AesCbcPkcs5, 24) => {
+                let c = Aes192Cbc::new_var(&key, &iv)
+                    .map_err(|_| InternalError::Unknown)?;
+                let buf = match mode {
+                    Mode::Encrypt => c.encrypt_vec(data),
+                    Mode::Decrypt => c
+                        .decrypt_vec(data)
+                        .map_err(|_| InternalError::Unknown)?,
+                };
+                buf
+            },
+            (SignalCipherType::AesCbcPkcs5, 32) => {
+                let c = Aes256Cbc::new_var(&key, &iv)
+                    .map_err(|_| InternalError::Unknown)?;
+                let buf = match mode {
+                    Mode::Encrypt => c.encrypt_vec(data),
+                    Mode::Decrypt => c
+                        .decrypt_vec(data)
+                        .map_err(|_| InternalError::Unknown)?,
+                };
+                buf
+            },
+            _ => unreachable!(),
+        };
+        Ok(result)
+    }
+}
 
 #[cfg(feature = "crypto-native")]
 impl Crypto for DefaultCrypto {
@@ -36,22 +131,22 @@ impl Crypto for DefaultCrypto {
 
     fn encrypt(
         &self,
-        _cipher: SignalCipherType,
-        _key: &[u8],
-        _iv: &[u8],
-        _data: &[u8],
+        cipher: SignalCipherType,
+        key: &[u8],
+        iv: &[u8],
+        data: &[u8],
     ) -> Result<Vec<u8>, InternalError> {
-        unimplemented!()
+        self.crypter(Mode::Encrypt, cipher, key, iv, data)
     }
 
     fn decrypt(
         &self,
-        _cipher: SignalCipherType,
-        _key: &[u8],
-        _iv: &[u8],
-        _data: &[u8],
+        cipher: SignalCipherType,
+        key: &[u8],
+        iv: &[u8],
+        data: &[u8],
     ) -> Result<Vec<u8>, InternalError> {
-        unimplemented!()
+        self.crypter(Mode::Decrypt, cipher, key, iv, data)
     }
 }
 
