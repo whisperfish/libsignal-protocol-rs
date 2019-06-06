@@ -16,21 +16,21 @@ call), and will never consume more than one file handle per process.</p>
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
 <span class="ident">os_rng</span>.<span class="ident">fill_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">key</span>);
 <span class="kw">let</span> <span class="ident">random_u64</span> <span class="op">=</span> <span class="ident">os_rng</span>.<span class="ident">next_u64</span>();</pre></div>
-<h1 id="platform-sources" class="section-header"><a href="#platform-sources">Platform sources</a></h1><table><thead><tr><th>OS               </th><th>interface</th></tr></thead><tbody>
-<tr><td>Linux, Android   </td><td><a href="http://man7.org/linux/man-pages/man2/getrandom.2.html"><code>getrandom</code></a> system call if available, otherwise <a href="http://man7.org/linux/man-pages/man4/urandom.4.html"><code>/dev/urandom</code></a> after reading from <code>/dev/random</code> once</td></tr>
-<tr><td>Windows          </td><td><a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa387694.aspx"><code>RtlGenRandom</code></a></td></tr>
-<tr><td>macOS, iOS       </td><td><a href="https://developer.apple.com/documentation/security/1399291-secrandomcopybytes?language=objc"><code>SecRandomCopyBytes</code></a></td></tr>
-<tr><td>FreeBSD          </td><td><a href="https://www.freebsd.org/cgi/man.cgi?query=random&amp;sektion=4"><code>kern.arandom</code></a></td></tr>
-<tr><td>OpenBSD, Bitrig  </td><td><a href="https://man.openbsd.org/getentropy.2"><code>getentropy</code></a></td></tr>
-<tr><td>NetBSD           </td><td><a href="http://netbsd.gw.com/cgi-bin/man-cgi?random+4+NetBSD-current"><code>/dev/urandom</code></a> after reading from <code>/dev/random</code> once</td></tr>
-<tr><td>Dragonfly BSD    </td><td><a href="https://leaf.dragonflybsd.org/cgi/web-man?command=random&amp;section=4"><code>/dev/random</code></a></td></tr>
-<tr><td>Solaris, illumos </td><td><a href="https://docs.oracle.com/cd/E88353_01/html/E37841/getrandom-2.html"><code>getrandom</code></a> system call if available, otherwise <a href="https://docs.oracle.com/cd/E86824_01/html/E54777/random-7d.html"><code>/dev/random</code></a></td></tr>
-<tr><td>Fuchsia OS       </td><td><a href="https://fuchsia.googlesource.com/zircon/+/HEAD/docs/syscalls/cprng_draw.md"><code>cprng_draw</code></a></td></tr>
-<tr><td>Redox            </td><td><a href="https://github.com/redox-os/randd/blob/master/src/main.rs"><code>rand:</code></a></td></tr>
-<tr><td>CloudABI         </td><td><a href="https://github.com/NuxiNL/cloudabi/blob/v0.20/cloudabi.txt#L1826"><code>random_get</code></a></td></tr>
-<tr><td>Haiku            </td><td><code>/dev/random</code> (identical to <code>/dev/urandom</code>)</td></tr>
-<tr><td>Web browsers     </td><td><a href="https://www.w3.org/TR/WebCryptoAPI/#Crypto-method-getRandomValues"><code>Crypto.getRandomValues</code></a> (see <a href="https://www.w3.org/TR/WebCryptoAPI/#Crypto-method-getRandomValues">Support for WebAssembly and ams.js</a>)</td></tr>
-<tr><td>Node.js          </td><td><a href="https://nodejs.org/api/crypto.html#crypto_crypto_randombytes_size_callback"><code>crypto.randomBytes</code></a> (see <a href="#support-for-webassembly-and-amsjs">Support for WebAssembly and ams.js</a>)</td></tr>
+<h1 id="platform-sources" class="section-header"><a href="#platform-sources">Platform sources</a></h1><table><thead><tr><th>OS</th><th>interface</th></tr></thead><tbody>
+<tr><td>Linux, Android</td><td><a href="http://man7.org/linux/man-pages/man2/getrandom.2.html"><code>getrandom</code></a> system call if available, otherwise <a href="http://man7.org/linux/man-pages/man4/urandom.4.html"><code>/dev/urandom</code></a> after reading from <code>/dev/random</code> once</td></tr>
+<tr><td>Windows</td><td><a href="https://msdn.microsoft.com/en-us/library/windows/desktop/aa387694.aspx"><code>RtlGenRandom</code></a></td></tr>
+<tr><td>macOS, iOS</td><td><a href="https://developer.apple.com/documentation/security/1399291-secrandomcopybytes?language=objc"><code>SecRandomCopyBytes</code></a></td></tr>
+<tr><td>FreeBSD</td><td><a href="https://www.freebsd.org/cgi/man.cgi?query=random&amp;sektion=4"><code>kern.arandom</code></a></td></tr>
+<tr><td>OpenBSD, Bitrig</td><td><a href="https://man.openbsd.org/getentropy.2"><code>getentropy</code></a></td></tr>
+<tr><td>NetBSD</td><td><a href="http://netbsd.gw.com/cgi-bin/man-cgi?random+4+NetBSD-current"><code>/dev/urandom</code></a> after reading from <code>/dev/random</code> once</td></tr>
+<tr><td>Dragonfly BSD</td><td><a href="https://leaf.dragonflybsd.org/cgi/web-man?command=random&amp;section=4"><code>/dev/random</code></a></td></tr>
+<tr><td>Solaris, illumos</td><td><a href="https://docs.oracle.com/cd/E88353_01/html/E37841/getrandom-2.html"><code>getrandom</code></a> system call if available, otherwise <a href="https://docs.oracle.com/cd/E86824_01/html/E54777/random-7d.html"><code>/dev/random</code></a></td></tr>
+<tr><td>Fuchsia OS</td><td><a href="https://fuchsia.googlesource.com/zircon/+/HEAD/docs/syscalls/cprng_draw.md"><code>cprng_draw</code></a></td></tr>
+<tr><td>Redox</td><td><a href="https://github.com/redox-os/randd/blob/master/src/main.rs"><code>rand:</code></a></td></tr>
+<tr><td>CloudABI</td><td><a href="https://github.com/NuxiNL/cloudabi/blob/v0.20/cloudabi.txt#L1826"><code>random_get</code></a></td></tr>
+<tr><td>Haiku</td><td><code>/dev/random</code> (identical to <code>/dev/urandom</code>)</td></tr>
+<tr><td>Web browsers</td><td><a href="https://www.w3.org/TR/WebCryptoAPI/#Crypto-method-getRandomValues"><code>Crypto.getRandomValues</code></a> (see <a href="https://www.w3.org/TR/WebCryptoAPI/#Crypto-method-getRandomValues">Support for WebAssembly and ams.js</a>)</td></tr>
+<tr><td>Node.js</td><td><a href="https://nodejs.org/api/crypto.html#crypto_crypto_randombytes_size_callback"><code>crypto.randomBytes</code></a> (see <a href="#support-for-webassembly-and-amsjs">Support for WebAssembly and ams.js</a>)</td></tr>
 </tbody></table>
 <p>Rand doesn't have a blanket implementation for all Unix-like operating
 systems that reads from <code>/dev/urandom</code>. This ensures all supported operating
