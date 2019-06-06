@@ -1,11 +1,12 @@
-use crate::{
-    crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
-    errors::InternalError,
-};
 use openssl::{
     hash::{Hasher, MessageDigest},
     nid::Nid,
     symm::{Cipher, Crypter, Mode},
+};
+
+use crate::{
+    crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
+    errors::InternalError,
 };
 
 /// Cryptography routines built on top of the system's `openssl` library.
@@ -38,20 +39,24 @@ impl OpenSSLCrypto {
             (SignalCipherType::AesCbcPkcs5, 32) => Cipher::aes_256_cbc(),
             _ => unreachable!(),
         };
-
         let block_size = signal_cipher_type.block_size();
-        let mut result = Vec::with_capacity(data.len() + block_size);
         let mut crypter = Crypter::new(signal_cipher_type, mode, key, Some(iv))
             .map_err(|_e| InternalError::Unknown)?;
-
-        crypter
+        let mut result = match cipher {
+            SignalCipherType::AesCtrNoPadding => {
+                crypter.pad(false); // in ctr we need to set padding to false
+                vec![0u8; data.len()]
+            },
+            SignalCipherType::AesCbcPkcs5 => vec![0u8; data.len() + block_size],
+        };
+        let mut count = crypter
             .update(data, &mut result)
             .map_err(|_e| InternalError::Unknown)?;
 
-        crypter
+        count += crypter
             .finalize(&mut result)
             .map_err(|_e| InternalError::Unknown)?;
-
+        result.truncate(count);
         Ok(result)
     }
 }
