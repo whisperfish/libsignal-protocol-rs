@@ -42,13 +42,6 @@ impl DefaultCrypto {
         let result = match (cipher, key.len()) {
             (SignalCipherType::AesCtrNoPadding, 16) => {
                 let mut buf = data.to_vec();
-                // a side note here is that Ctr mode takes a nonce as 2nd param,
-                // not an IV but if we for example use a
-                // randomly nonce generated every call, it would fail
-                // i mean by fail here, fail in decryption the cipher text
-                // created by the same key. so i think it's not
-                // not meant to be nonce here, but just an IV.
-                // and now it works same as the openssl
                 let mut c = Aes128Ctr::new_var(key, iv)
                     .map_err(|_| InternalError::Unknown)?;
                 c.apply_keystream(&mut buf);
@@ -101,7 +94,10 @@ impl DefaultCrypto {
                 };
                 buf
             },
-            _ => unreachable!(),
+            (cipher, size) => unreachable!(
+                "A combination of {:?} and {} doesn't make sense",
+                cipher, size
+            ),
         };
         Ok(result)
     }

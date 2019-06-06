@@ -400,12 +400,13 @@ unsafe extern "C" fn internal_cipher(
     }
 }
 
-#[cfg(all(test, feature = "crypto-native", feature = "crypto-openssl"))]
+#[cfg(test)]
 mod crypto_tests {
     use super::*;
 
+    #[cfg(all(feature = "crypto-native", feature = "crypto-openssl"))]
     #[test]
-    fn test_crypter() {
+    fn test_crypter_cbc() {
         // Here is a test to see the behavior of DefaultCrypto vs OpenSSLCrypto
         let native_crypto = DefaultCrypto::default();
         let openssl_crypto = OpenSSLCrypto::default();
@@ -418,6 +419,7 @@ mod crypto_tests {
         let cipher_text_native = native_crypto
             .encrypt(SignalCipherType::AesCbcPkcs5, &key, &iv, &data)
             .unwrap();
+
         let cipher_text_openssl = openssl_crypto
             .encrypt(SignalCipherType::AesCbcPkcs5, &key, &iv, &data)
             .unwrap();
@@ -433,6 +435,46 @@ mod crypto_tests {
         let plain_text_openssl = openssl_crypto
             .decrypt(
                 SignalCipherType::AesCbcPkcs5,
+                &key,
+                &iv,
+                &cipher_text_native,
+            )
+            .unwrap();
+        assert_eq!(plain_text_native, data);
+        assert_eq!(plain_text_openssl, data);
+    }
+
+    #[cfg(all(feature = "crypto-native", feature = "crypto-openssl"))]
+    #[test]
+    fn test_crypter_ctr() {
+        // Here is a test to see the behavior of DefaultCrypto vs OpenSSLCrypto
+        let native_crypto = DefaultCrypto::default();
+        let openssl_crypto = OpenSSLCrypto::default();
+        let data = [1, 2, 3, 4, 5, 6, 7];
+        let mut key = [0u8; 16];
+        let mut iv = [0u8; 16];
+        native_crypto.fill_random(&mut key).unwrap();
+        native_crypto.fill_random(&mut iv).unwrap();
+
+        let cipher_text_native = native_crypto
+            .encrypt(SignalCipherType::AesCtrNoPadding, &key, &iv, &data)
+            .unwrap();
+
+        let cipher_text_openssl = openssl_crypto
+            .encrypt(SignalCipherType::AesCtrNoPadding, &key, &iv, &data)
+            .unwrap();
+        assert_eq!(cipher_text_native, cipher_text_openssl);
+        let plain_text_native = native_crypto
+            .decrypt(
+                SignalCipherType::AesCtrNoPadding,
+                &key,
+                &iv,
+                &cipher_text_openssl,
+            )
+            .unwrap();
+        let plain_text_openssl = openssl_crypto
+            .decrypt(
+                SignalCipherType::AesCtrNoPadding,
                 &key,
                 &iv,
                 &cipher_text_native,

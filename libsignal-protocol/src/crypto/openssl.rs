@@ -40,35 +40,23 @@ impl OpenSSLCrypto {
             _ => unreachable!(),
         };
         let block_size = signal_cipher_type.block_size();
-        // turns out that we have to fill the buffer with some initial value
-        // to pass it to the openssl library.
-        // also it depends on the mode, in the AesCtr (aka stream cipher) mode
-        // we had to provide the same exact size as the input.
-        // in the AesCbs, the buffer should be `data.len() + blocks_ize`
-        // but there is a small problem here, that the returned value **the result buffer**
-        // has a `data.len()` 0's tail at the end of the buffer !
-        // for example, if the `data = [1, 2, 3, 4]`
-        // the native (aka DefaultCrypto) will result for example
-        // [70, 108, 98, 83, 33, 54, 241, 25, 86, 110, 44, 34, 228, 183, 215, 251]
-        // and the openssl (aka OpenSSLCrypto) will result
-        // [70, 108, 98, 83, 33, 54, 241, 25, 86, 110, 44, 34, 228, 183, 215, 251, 0, 0, 0, 0]
-        // note the [..., 0, 0, 0, 0] at the end, it always has the same len of the input `data`.
-        // see `test_crypter` unit test in the [`./crypto/mod.rs`]
-        //
-        // FIXME (@shekohex): Find why openssl has that behavior
-        let mut result = match cipher {
-            SignalCipherType::AesCtrNoPadding => vec![0u8; data.len()],
-            SignalCipherType::AesCbcPkcs5 => vec![0u8; data.len() + block_size],
-        };
         let mut crypter = Crypter::new(signal_cipher_type, mode, key, Some(iv))
             .map_err(|_e| InternalError::Unknown)?;
-        crypter
+        let mut result = match cipher {
+            SignalCipherType::AesCtrNoPadding => {
+                crypter.pad(false); // in ctr we need to set padding to false
+                vec![0u8; data.len()]
+            },
+            SignalCipherType::AesCbcPkcs5 => vec![0u8; data.len() + block_size],
+        };
+        let mut count = crypter
             .update(data, &mut result)
             .map_err(|_e| InternalError::Unknown)?;
 
-        crypter
+        count += crypter
             .finalize(&mut result)
             .map_err(|_e| InternalError::Unknown)?;
+        result.truncate(count);
         Ok(result)
     }
 }
