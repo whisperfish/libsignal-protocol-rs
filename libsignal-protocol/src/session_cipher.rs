@@ -67,6 +67,14 @@ impl SessionCipher {
     }
 }
 
+impl Drop for SessionCipher {
+    fn drop(&mut self) {
+        unsafe {
+            sys::session_cipher_free(self.raw);
+        }
+    }
+}
+
 impl Debug for SessionCipher {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_tuple("SessionCipher").finish()

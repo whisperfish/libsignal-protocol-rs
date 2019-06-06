@@ -240,7 +240,6 @@ fn test_curve25519_signature() {
 }
 
 #[test]
-#[ignore = "Requires DefaultCrypto to be implemented"]
 fn test_hkdf_vector_v2() {
     const IKM: &[u8] = &[
         0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b, 0x0b,

@@ -1,4 +1,3 @@
-
 use crate::{raw_ptr::Raw, Buffer, Serializable};
 use failure::Error;
 use std::convert::TryFrom;
@@ -48,14 +47,23 @@ impl Serializable for CiphertextMessage {
 
     fn serialize(&self) -> Result<Buffer, failure::Error> {
         unsafe {
+            // get a reference to the *cached* serialized message
             let buffer =
                 sys::ciphertext_message_get_serialized(self.raw.as_const_ptr());
 
             if buffer.is_null() {
-                Err(failure::err_msg("Unable to serialize the message"))
-            } else {
-                Ok(Buffer::from_raw(buffer))
+                return Err(failure::err_msg(
+                    "Unable to serialize the message",
+                ));
             }
+
+            let temporary_not_owned_buffer = Buffer::from_raw(buffer);
+            let copied = temporary_not_owned_buffer.clone();
+
+            // We don't want to free our reference to the serialized message!
+            std::mem::forget(temporary_not_owned_buffer);
+
+            Ok(copied)
         }
     }
 }
