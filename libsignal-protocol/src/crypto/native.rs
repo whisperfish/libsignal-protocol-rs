@@ -32,7 +32,7 @@ pub struct DefaultCrypto;
 
 impl DefaultCrypto {
     fn crypter(
-        &self,
+        self,
         mode: Mode,
         cipher: SignalCipherType,
         key: &[u8],
@@ -64,35 +64,32 @@ impl DefaultCrypto {
             (SignalCipherType::AesCbcPkcs5, 16) => {
                 let c = Aes128Cbc::new_var(&key, &iv)
                     .map_err(|_| InternalError::Unknown)?;
-                let buf = match mode {
+                match mode {
                     Mode::Encrypt => c.encrypt_vec(data),
                     Mode::Decrypt => c
                         .decrypt_vec(data)
                         .map_err(|_| InternalError::Unknown)?,
-                };
-                buf
+                }
             },
             (SignalCipherType::AesCbcPkcs5, 24) => {
                 let c = Aes192Cbc::new_var(&key, &iv)
                     .map_err(|_| InternalError::Unknown)?;
-                let buf = match mode {
+                match mode {
                     Mode::Encrypt => c.encrypt_vec(data),
                     Mode::Decrypt => c
                         .decrypt_vec(data)
                         .map_err(|_| InternalError::Unknown)?,
-                };
-                buf
+                }
             },
             (SignalCipherType::AesCbcPkcs5, 32) => {
                 let c = Aes256Cbc::new_var(&key, &iv)
                     .map_err(|_| InternalError::Unknown)?;
-                let buf = match mode {
+                match mode {
                     Mode::Encrypt => c.encrypt_vec(data),
                     Mode::Decrypt => c
                         .decrypt_vec(data)
                         .map_err(|_| InternalError::Unknown)?,
-                };
-                buf
+                }
             },
             (cipher, size) => unreachable!(
                 "A combination of {:?} and {} doesn't make sense",

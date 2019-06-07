@@ -94,7 +94,7 @@ impl OwnedAddress {
         std::str::from_utf8(self.name_bytes())
     }
 
-    pub fn device_id(&self) -> i32 { self.raw.device_id }
+    pub const fn device_id(&self) -> i32 { self.raw.device_id }
 }
 
 impl Debug for OwnedAddress {

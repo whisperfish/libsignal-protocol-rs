@@ -8,7 +8,7 @@ pub struct PreKeyList {
 }
 
 impl PreKeyList {
-    pub(crate) fn from_raw(
+    pub(crate) const fn from_raw(
         head: *mut sys::signal_protocol_key_helper_pre_key_list_node,
     ) -> PreKeyList {
         PreKeyList {
