@@ -13,7 +13,9 @@ pub enum CiphertextType {
     Signal = 2,
     /// A [`PreKeySignalMessage`].
     PreKey = 3,
+    /// A sender key message.
     SenderKey = 4,
+    /// A sender key distribution message.
     SenderKeyDistribution = 5,
 }
 

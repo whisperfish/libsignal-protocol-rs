@@ -43,6 +43,7 @@ impl SignalMessage {
         }
     }
 
+    /// Get the signal message counter.
     pub fn counter(&self) -> u32 {
         unsafe { sys::signal_message_get_counter(self.raw.as_const_ptr()) }
     }
@@ -60,6 +61,7 @@ impl SignalMessage {
         }
     }
 
+    /// Verify the MAC on the signal message.
     pub fn verify_mac(
         &self,
         sender_identity_key: &PublicKey,
