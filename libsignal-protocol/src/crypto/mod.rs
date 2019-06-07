@@ -410,6 +410,7 @@ unsafe extern "C" fn internal_cipher(
 
 #[cfg(test)]
 mod crypto_tests {
+    #[allow(unused_imports)]
     use super::*;
 
     #[cfg(all(feature = "crypto-native", feature = "crypto-openssl"))]
