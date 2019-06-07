@@ -25,9 +25,9 @@
 //! 1. [`PreKeyBundle`]. A client that wishes to send a message to a recipient
 //!    can establish a session by retrieving a [`PreKeyBundle`] for that
 //!    recipient from the server.
-//! 2. PreKeySignalMessages.  A client can receive a PreKeySignalMessage from a
-//!    recipient and use it to establish a session.
-//! 3. KeyExchangeMessages.  Two clients can exchange KeyExchange messages to
+//! 2. [`PreKeySignalMessage`]s.  A client can receive a [`PreKeySignalMessage`]
+//!    from a recipient and use it to establish a session.
+//! 3. KeyExchangeMessages. Two clients can exchange KeyExchange messages to
 //!    establish a session.
 //!
 //! ## State
@@ -58,7 +58,8 @@
     rust_2018_idioms,
     clippy::cargo_common_metadata,
     clippy::fallible_impl_from,
-    clippy::missing_const_for_fn
+    clippy::missing_const_for_fn,
+    intra_doc_link_resolution_failure
 )]
 
 // we use the *-sys crate everywhere so give it a shorter name
@@ -80,6 +81,8 @@ pub use crate::{
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
     session_builder::SessionBuilder,
     session_cipher::SessionCipher,
+    session_record::SessionRecord,
+    session_state::SessionState,
     store_context::StoreContext,
 };
 
@@ -98,11 +101,17 @@ mod pre_key_bundle;
 pub(crate) mod raw_ptr;
 mod session_builder;
 mod session_cipher;
+mod session_record;
+mod session_state;
 mod store_context;
 pub mod stores;
 
 use failure::Error;
 use std::io::Write;
+
+// bring into scope for rustdoc
+#[allow(unused_imports)]
+use crate::messages::PreKeySignalMessage;
 
 /// A helper trait for something which can be serialized to protobufs.
 pub trait Serializable {

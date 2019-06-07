@@ -9,7 +9,7 @@ use std::cell::Cell;
 pub(crate) struct MockCrypto<C> {
     inner: C,
     random_func:
-        Option<Box<Fn(&mut [u8]) -> Result<(), InternalError> + 'static>>,
+        Option<Box<dyn Fn(&mut [u8]) -> Result<(), InternalError> + 'static>>,
 }
 
 impl<C: Crypto> MockCrypto<C> {

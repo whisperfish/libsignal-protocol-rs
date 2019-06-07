@@ -22,3 +22,18 @@ macro_rules! impl_serializable {
         }
     };
 }
+
+macro_rules! impl_is_a {
+    ($child:ty => $parent:ty) => {
+        unsafe impl $crate::raw_ptr::IsA<$parent> for $child {
+            unsafe fn upcast(this: *mut Self) -> *mut $parent {
+                this as *mut $parent
+            }
+        }
+    };
+    ($($child:ty => $parent:ty),* $(,)*) => {
+        $(
+            impl_is_a!($child => $parent);
+        )*
+    };
+}

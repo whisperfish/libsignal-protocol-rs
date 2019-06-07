@@ -1,5 +1,8 @@
 use crate::{
-    context::ContextInner, errors::FromInternalErrorCode, raw_ptr::Raw, Context,
+    context::ContextInner,
+    errors::{FromInternalErrorCode, InternalError},
+    raw_ptr::Raw,
+    Context,
 };
 use failure::Error;
 use std::{ptr, rc::Rc};
@@ -39,7 +42,7 @@ impl HMACBasedKeyDerivationFunction {
     ) -> Result<Vec<u8>, Error> {
         unsafe {
             let mut secret = ptr::null_mut();
-            sys::hkdf_derive_secrets(
+            let prk_len = sys::hkdf_derive_secrets(
                 self.raw.as_ptr(),
                 &mut secret,
                 input_key_material.as_ptr(),
@@ -49,8 +52,13 @@ impl HMACBasedKeyDerivationFunction {
                 info.as_ptr(),
                 info.len(),
                 secret_length,
-            )
-            .into_result()?;
+            );
+
+            if prk_len < 0 {
+                return Err(InternalError::from_error_code(prk_len as i32)
+                    .unwrap_or(InternalError::Unknown)
+                    .into());
+            }
 
             // Note: I'm not 100% sure this is sound. `secret` was allocated
             // using malloc, but the allocator used to free our Vec is

@@ -17,11 +17,12 @@ pub struct SessionBuilder {
     // both these fields must outlive `session_builder`
     _store_ctx: Rc<StoreContextInner>,
     _ctx: Rc<ContextInner>,
-    _addr: Address,
+    address: Address,
 }
 
 impl SessionBuilder {
-    /// Create a new session builder.
+    /// Create a new session builder for communication with the user with the
+    /// specified address.
     pub fn new(
         ctx: &Context,
         store_context: &StoreContext,
@@ -40,7 +41,7 @@ impl SessionBuilder {
                 raw,
                 _store_ctx: Rc::clone(&store_context.0),
                 _ctx: Rc::clone(&ctx.0),
-                _addr: address.clone(),
+                address: address.clone(),
             }
         }
     }
@@ -70,6 +71,8 @@ impl Drop for SessionBuilder {
 
 impl Debug for SessionBuilder {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("SessionBuilder").finish()
+        f.debug_struct("SessionBuilder")
+            .field("address", &self.address)
+            .finish()
     }
 }

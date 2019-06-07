@@ -5,7 +5,7 @@ use std::{
     convert::TryFrom,
     os::raw::{c_int, c_void},
     pin::Pin,
-    slice,
+    ptr, slice,
 };
 
 use sys::{signal_buffer, signal_crypto_provider};
@@ -46,7 +46,6 @@ pub enum SignalCipherType {
 impl TryFrom<i32> for SignalCipherType {
     type Error = SignalCipherTypeError;
 
-    #[inline]
     fn try_from(v: i32) -> Result<Self, Self::Error> {
         match v as u32 {
             sys::SG_CIPHER_AES_CTR_NOPADDING => {
@@ -171,7 +170,9 @@ unsafe extern "C" fn hmac_sha256_cleanup_func(
     hmac_context: *mut c_void,
     _user_data: *mut c_void,
 ) {
-    assert!(!hmac_context.is_null());
+    if hmac_context.is_null() {
+        return;
+    }
 
     let hmac_context: Box<HmacContext> =
         Box::from_raw(hmac_context as *mut HmacContext);
@@ -213,7 +214,10 @@ unsafe extern "C" fn hmac_sha256_init_func(
 
     let hasher = match state.0.hmac_sha256(key) {
         Ok(h) => h,
-        Err(e) => return e.code(),
+        Err(e) => {
+            *hmac_context = ptr::null_mut();
+            return e.code();
+        },
     };
 
     *hmac_context = Box::into_raw(Box::new(HmacContext(RefCell::new(hasher))))
@@ -245,7 +249,10 @@ unsafe extern "C" fn sha512_digest_init_func(
     let user_data = &*(user_data as *const State);
     let hasher = match user_data.0.sha512_digest() {
         Ok(h) => h,
-        Err(e) => return e.code(),
+        Err(e) => {
+            *digest_context = ptr::null_mut();
+            return e.code();
+        },
     };
 
     let dc = Box::new(DigestContext(RefCell::new(hasher)));
@@ -295,7 +302,9 @@ unsafe extern "C" fn sha512_digest_cleanup_func(
     digest_context: *mut c_void,
     _user_data: *mut c_void,
 ) {
-    assert!(!digest_context.is_null());
+    if digest_context.is_null() {
+        return;
+    }
 
     let digest_context: Box<DigestContext> =
         Box::from_raw(digest_context as *mut DigestContext);
@@ -352,7 +361,6 @@ unsafe extern "C" fn decrypt_func(
     )
 }
 
-#[inline]
 unsafe extern "C" fn internal_cipher(
     mode: CipherMode,
     output: *mut *mut signal_buffer,
@@ -402,6 +410,7 @@ unsafe extern "C" fn internal_cipher(
 
 #[cfg(test)]
 mod crypto_tests {
+    #[allow(unused_imports)]
     use super::*;
 
     #[cfg(all(feature = "crypto-native", feature = "crypto-openssl"))]

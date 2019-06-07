@@ -1,7 +1,13 @@
-use crate::{context::ContextInner, errors::FromInternalErrorCode};
+use crate::{
+    context::ContextInner,
+    errors::{FromInternalErrorCode, InternalError},
+    raw_ptr::Raw,
+    Address, SessionRecord,
+};
 use failure::Error;
 use std::{
     fmt::{self, Debug, Formatter},
+    ptr,
     rc::Rc,
 };
 
@@ -34,6 +40,40 @@ impl StoreContext {
             .into_result()?;
 
             Ok(id)
+        }
+    }
+
+    /// Does this store already contain a session with the provided recipient?
+    pub fn contains_session(&self, addr: &Address) -> Result<bool, Error> {
+        unsafe {
+            match sys::signal_protocol_session_contains_session(
+                self.raw(),
+                addr.raw(),
+            ) {
+                0 => Ok(false),
+                1 => Ok(true),
+                code => Err(Error::from(
+                    InternalError::from_error_code(code)
+                        .unwrap_or(InternalError::Unknown),
+                )),
+            }
+        }
+    }
+
+    /// Load the session corresponding to the provided recipient.
+    pub fn load_session(&self, addr: &Address) -> Result<SessionRecord, Error> {
+        unsafe {
+            let mut raw = ptr::null_mut();
+            sys::signal_protocol_session_load_session(
+                self.raw(),
+                &mut raw,
+                addr.raw(),
+            )
+            .into_result()?;
+
+            Ok(SessionRecord {
+                raw: Raw::from_ptr(raw),
+            })
         }
     }
 

@@ -8,9 +8,13 @@ addons:
     packages:
       - valgrind
 
+env:
+  - RUST_BACKTRACE=full
+
 script: 
   - cargo build --all --verbose
   - cargo test --all --verbose
+  - cargo test --all --verbose --all-features
   - cargo doc --all --verbose
     # Check that the (non-blacklisted) examples and tests don't have memory bugs
   - python3 ./scripts/valgrind.py
