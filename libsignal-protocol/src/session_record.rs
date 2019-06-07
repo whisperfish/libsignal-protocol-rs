@@ -1,5 +1,3 @@
-#![allow(missing_docs)]
-
 use crate::{raw_ptr::Raw, SessionState};
 
 #[derive(Debug, Clone)]

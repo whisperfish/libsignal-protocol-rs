@@ -1,5 +1,4 @@
 //! Common message types.
-#![allow(missing_docs)]
 
 mod ciphertext_message;
 mod pre_key_signal_message;
