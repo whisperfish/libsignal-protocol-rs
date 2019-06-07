@@ -96,7 +96,6 @@ pub mod crypto;
 mod errors;
 mod hkdf;
 pub mod keys;
-pub mod stores;
 pub mod messages;
 mod pre_key_bundle;
 pub(crate) mod raw_ptr;
@@ -105,6 +104,7 @@ mod session_cipher;
 mod session_record;
 mod session_state;
 mod store_context;
+pub mod stores;
 
 use failure::Error;
 use std::io::Write;

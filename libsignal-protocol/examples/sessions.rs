@@ -125,7 +125,7 @@ fn main() -> Result<(), Error> {
     let serialized = encrypted_message
         .serialize()
         .context("Unable to serialize the message for transmission")?;
-    
+
     println!("Encrypted Message: {:?}", serialized.as_slice());
 
     Ok(())

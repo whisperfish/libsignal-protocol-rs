@@ -16,9 +16,7 @@ pub struct SignalMessage {
 
 impl SignalMessage {
     pub fn is_legacy(msg: &[u8]) -> bool {
-        unsafe {
-            sys::signal_message_is_legacy(msg.as_ptr(), msg.len()) != 0
-        }
+        unsafe { sys::signal_message_is_legacy(msg.as_ptr(), msg.len()) != 0 }
     }
 
     pub fn sender_ratchet_key(&self) -> PublicKey {

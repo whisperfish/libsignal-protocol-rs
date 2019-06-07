@@ -61,10 +61,7 @@ impl StoreContext {
     }
 
     /// Load the session corresponding to the provided recipient.
-    pub fn load_session(
-        &self,
-        addr: &Address,
-    ) -> Result<SessionRecord, Error> {
+    pub fn load_session(&self, addr: &Address) -> Result<SessionRecord, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::signal_protocol_session_load_session(
