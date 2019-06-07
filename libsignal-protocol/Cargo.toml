@@ -24,6 +24,7 @@ hmac = { version = "0.7.0", optional = true }
 aes = { version = "0.3.2", optional = true }
 block-modes = { version = "0.3.3", optional = true }
 aes-ctr = { version = "0.3.0", optional = true }
+log = "0.4.6"
 
 [features]
 default = ["crypto-native"]

@@ -1,16 +1,5 @@
 use failure::Error;
 
-use lock_api::RawMutex as _;
-use parking_lot::RawMutex;
-use std::{
-    ffi::c_void,
-    fmt::{self, Debug, Formatter},
-    pin::Pin,
-    ptr,
-    rc::Rc,
-    time::SystemTime,
-};
-
 #[cfg(feature = "crypto-native")]
 use crate::crypto::DefaultCrypto;
 use crate::{
@@ -29,6 +18,18 @@ use crate::{
         signed_pre_key_store::{self as spks, SignedPreKeyStore},
     },
     Address, Buffer, StoreContext,
+};
+use lock_api::RawMutex as _;
+use log::Level;
+use parking_lot::RawMutex;
+use std::{
+    convert::TryFrom,
+    fmt::{self, Debug, Formatter},
+    os::raw::{c_char, c_int, c_void},
+    pin::Pin,
+    ptr,
+    rc::Rc,
+    time::SystemTime,
 };
 
 // for rustdoc link resolution
@@ -311,6 +312,7 @@ impl ContextInner {
             let crypto = CryptoProvider::new(crypto);
             let mut state = Pin::new(Box::new(State {
                 mux: RawMutex::INIT,
+                log_func: Box::new(default_log_func),
             }));
 
             let user_data =
@@ -326,6 +328,11 @@ impl ContextInner {
                 global_context,
                 Some(lock_function),
                 Some(unlock_function),
+            )
+            .into_result()?;
+            sys::signal_context_set_log_function(
+                global_context,
+                Some(log_trampoline),
             )
             .into_result()?;
 
@@ -354,6 +361,39 @@ impl Debug for ContextInner {
     }
 }
 
+fn default_log_func(level: Level, message: &str) {
+    log::log!(level, "{}", message);
+}
+
+unsafe extern "C" fn log_trampoline(
+    level: c_int,
+    msg: *const c_char,
+    len: usize,
+    user_data: *mut c_void,
+) {
+    assert!(!msg.is_null());
+    assert!(!user_data.is_null());
+
+    let state = &*(user_data as *const State);
+    let buffer = std::slice::from_raw_parts(msg as *const u8, len);
+
+    if let Ok(message) = std::str::from_utf8(buffer) {
+        let level = translate_log_level(level);
+        (state.log_func)(level, message);
+    }
+}
+
+fn translate_log_level(raw: c_int) -> Level {
+    match u32::try_from(raw) {
+        Ok(sys::SG_LOG_ERROR) => Level::Error,
+        Ok(sys::SG_LOG_WARNING) => Level::Warn,
+        Ok(sys::SG_LOG_INFO) => Level::Info,
+        Ok(sys::SG_LOG_DEBUG) => Level::Debug,
+        Ok(sys::SG_LOG_NOTICE) => Level::Trace,
+        _ => Level::Info,
+    }
+}
+
 unsafe extern "C" fn lock_function(user_data: *mut c_void) {
     let state = &*(user_data as *const State);
     state.mux.lock();
@@ -374,6 +414,7 @@ unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
 /// appropriate synchronisation mechanisms (i.e. `RefCell` or atomics).
 struct State {
     mux: RawMutex,
+    log_func: Box<dyn Fn(Level, &str)>,
 }
 
 #[cfg(test)]
