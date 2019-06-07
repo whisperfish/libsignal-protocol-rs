@@ -8,17 +8,23 @@ use crate::{
 use failure::Error;
 use std::convert::TryFrom;
 
-/// The base message type.
+// For rustdoc link resolution
+#[allow(unused_imports)]
+use crate::keys::IdentityKeyPair;
+
+/// A message with an arbitrary payload.
 #[derive(Debug, Clone)]
 pub struct SignalMessage {
     pub(crate) raw: Raw<sys::signal_message>,
 }
 
 impl SignalMessage {
+    /// Is this a legacy message?
     pub fn is_legacy(msg: &[u8]) -> bool {
         unsafe { sys::signal_message_is_legacy(msg.as_ptr(), msg.len()) != 0 }
     }
 
+    /// Get the public half of the sender's [`IdentityKeyPair`].
     pub fn sender_ratchet_key(&self) -> PublicKey {
         unsafe {
             let raw = sys::signal_message_get_sender_ratchet_key(
@@ -30,6 +36,7 @@ impl SignalMessage {
         }
     }
 
+    /// The message format version.
     pub fn message_version(&self) -> u8 {
         unsafe {
             sys::signal_message_get_message_version(self.raw.as_const_ptr())
@@ -40,6 +47,7 @@ impl SignalMessage {
         unsafe { sys::signal_message_get_counter(self.raw.as_const_ptr()) }
     }
 
+    /// The message body.
     pub fn body(&self) -> &[u8] {
         unsafe {
             let buffer = sys::signal_message_get_body(self.raw.as_const_ptr());
