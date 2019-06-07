@@ -32,7 +32,9 @@ use failure::Error;
 use sig::Context;
 
 fn main() -> Result<(), Error> {
+    env_logger::init();
     let ctx = Context::default();
+
     let extended_range = 0;
     let start = 123;
     let pre_key_count = 20;
