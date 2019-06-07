@@ -18,10 +18,10 @@ use std::{
 
 fn mock_ctx() -> Context {
     cfg_if::cfg_if! {
-        if #[cfg(feature = "crypto-openssl")] {
-            type Crypto = sig::crypto::OpenSSLCrypto;
-        } else if #[cfg(feature = "crypto-native")] {
+        if #[cfg(feature = "crypto-native")] {
             type Crypto = sig::crypto::DefaultCrypto;
+        } else if #[cfg(feature = "crypto-openssl")] {
+            type Crypto = sig::crypto::OpenSSLCrypto;
         } else {
             compile_error!("These tests require one of the crypto features to be enabled");
         }
