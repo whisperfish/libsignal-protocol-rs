@@ -22,6 +22,21 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_serializable</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">serialize</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">deserialize</span>:<span class="ident">ident</span>) <span class="op">=&gt;</span> {
@@ -45,6 +60,21 @@
                 }
             }
         }
+    };
+}
+
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_is_a</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>:<span class="ident">ty</span> <span class="op">=&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">ty</span>) <span class="op">=&gt;</span> {
+        <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">raw_ptr</span>::<span class="ident">IsA</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span> {
+            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">upcast</span>(<span class="ident">this</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="self">Self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span> {
+                <span class="ident">this</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>
+            }
+        }
+    };
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span>:<span class="ident">ty</span> <span class="op">=&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">ty</span>),<span class="op">*</span> $(,)<span class="kw-2">*</span>) <span class="op">=&gt;</span> {
+        $(
+            <span class="macro">impl_is_a</span><span class="macro">!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">child</span> <span class="op">=&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>);
+        )<span class="op">*</span>
     };
 }
 </pre></div>

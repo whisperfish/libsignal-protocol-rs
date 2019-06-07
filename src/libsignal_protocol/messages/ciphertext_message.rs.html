@@ -27,13 +27,84 @@
 <span id="27">27</span>
 <span id="28">28</span>
 <span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">raw_ptr</span>::<span class="ident">Raw</span>, <span class="ident">Buffer</span>, <span class="ident">Serializable</span>};
+<span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CiphertextType</span> {
+    <span class="ident">Signal</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">PreKey</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">SenderKey</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">SenderKeyDistribution</span> <span class="op">=</span> <span class="number">5</span>,
+}
 
 <span class="doccomment">/// An encrypted message (&quot;ciphertext&quot;).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CiphertextMessage</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">ciphertext_message</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">CiphertextMessage</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CiphertextType</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">ciphertext_message_get_type</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>());
+
+            <span class="kw">match</span> <span class="ident">u32</span>::<span class="ident">try_from</span>(<span class="ident">ty</span>).<span class="ident">unwrap</span>() {
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_PREKEY_TYPE</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">PreKey</span>),
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SIGNAL_TYPE</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">Signal</span>),
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SENDERKEY_TYPE</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">SenderKey</span>),
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE</span> <span class="op">=&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">SenderKeyDistribution</span>)
+                },
+                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="macro">format_err</span><span class="macro">!</span>(
+                    <span class="string">&quot;Unknown ciphertext type: {}&quot;</span>,
+                    <span class="ident">other</span>
+                )),
+            }
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Serializable</span> <span class="kw">for</span> <span class="ident">CiphertextMessage</span> {
@@ -46,14 +117,23 @@
 
     <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Buffer</span>, <span class="ident">failure</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
+            <span class="comment">// get a reference to the *cached* serialized message</span>
             <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span>
                 <span class="ident">sys</span>::<span class="ident">ciphertext_message_get_serialized</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>());
 
             <span class="kw">if</span> <span class="ident">buffer</span>.<span class="ident">is_null</span>() {
-                <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;Unable to serialize the message&quot;</span>))
-            } <span class="kw">else</span> {
-                <span class="prelude-val">Ok</span>(<span class="ident">Buffer</span>::<span class="ident">from_raw</span>(<span class="ident">buffer</span>))
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="ident">err_msg</span>(
+                    <span class="string">&quot;Unable to serialize the message&quot;</span>,
+                ));
             }
+
+            <span class="kw">let</span> <span class="ident">temporary_not_owned_buffer</span> <span class="op">=</span> <span class="ident">Buffer</span>::<span class="ident">from_raw</span>(<span class="ident">buffer</span>);
+            <span class="kw">let</span> <span class="ident">copied</span> <span class="op">=</span> <span class="ident">temporary_not_owned_buffer</span>.<span class="ident">clone</span>();
+
+            <span class="comment">// We don&#39;t want to free our reference to the serialized message!</span>
+            <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">temporary_not_owned_buffer</span>);
+
+            <span class="prelude-val">Ok</span>(<span class="ident">copied</span>)
         }
     }
 }
