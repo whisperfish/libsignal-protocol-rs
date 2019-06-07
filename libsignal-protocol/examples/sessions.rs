@@ -60,6 +60,7 @@ use sig::{
 use std::time::SystemTime;
 
 fn main() -> Result<(), Error> {
+    env_logger::init();
     let ctx = Context::default();
 
     // first we'll need a copy of bob's public key and some of his pre-keys
