@@ -22,8 +22,9 @@ before_deploy:
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - name: "Code Style"
+  # Uncomment the following lines whenever clippy fails to install on nightly
+  #allow_failures:
+  #  - name: "Code Style"
 
   include:
     - rust: stable
