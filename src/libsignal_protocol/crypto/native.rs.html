@@ -173,14 +173,11 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">aes</span>::{<span class="ident">Aes128</span>, <span class="ident">Aes192</span>, <span class="ident">Aes256</span>};
 <span class="kw">use</span> <span class="ident">aes_ctr</span>::{
-    <span class="ident">Aes128Ctr</span>,
-    <span class="ident">Aes192Ctr</span>, <span class="ident">Aes256Ctr</span>, <span class="ident">stream_cipher</span>::{<span class="ident">NewStreamCipher</span>, <span class="ident">SyncStreamCipher</span>},
+    <span class="ident">stream_cipher</span>::{<span class="ident">NewStreamCipher</span>, <span class="ident">SyncStreamCipher</span>},
+    <span class="ident">Aes128Ctr</span>, <span class="ident">Aes192Ctr</span>, <span class="ident">Aes256Ctr</span>,
 };
 <span class="kw">use</span> <span class="ident">block_modes</span>::{<span class="ident">block_padding</span>::<span class="ident">Pkcs7</span>, <span class="ident">BlockMode</span>, <span class="ident">Cbc</span>};
 <span class="kw">use</span> <span class="ident">hmac</span>::{<span class="ident">Hmac</span>, <span class="ident">Mac</span>};
@@ -211,7 +208,7 @@
 
 <span class="kw">impl</span> <span class="ident">DefaultCrypto</span> {
     <span class="kw">fn</span> <span class="ident">crypter</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="self">self</span>,
         <span class="ident">mode</span>: <span class="ident">Mode</span>,
         <span class="ident">cipher</span>: <span class="ident">SignalCipherType</span>,
         <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -243,35 +240,32 @@
             (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">16</span>) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes128Cbc</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
+                <span class="kw">match</span> <span class="ident">mode</span> {
                     <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
                     <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>
                         .<span class="ident">decrypt_vec</span>(<span class="ident">data</span>)
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>,
-                };
-                <span class="ident">buf</span>
+                }
             },
             (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">24</span>) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes192Cbc</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
+                <span class="kw">match</span> <span class="ident">mode</span> {
                     <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
                     <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>
                         .<span class="ident">decrypt_vec</span>(<span class="ident">data</span>)
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>,
-                };
-                <span class="ident">buf</span>
+                }
             },
             (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">32</span>) <span class="op">=&gt;</span> {
                 <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes256Cbc</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
+                <span class="kw">match</span> <span class="ident">mode</span> {
                     <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
                     <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>
                         .<span class="ident">decrypt_vec</span>(<span class="ident">data</span>)
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>,
-                };
-                <span class="ident">buf</span>
+                }
             },
             (<span class="ident">cipher</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(
                 <span class="string">&quot;A combination of {:?} and {} doesn&#39;t make sense&quot;</span>,

@@ -65,7 +65,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">PreKeyList</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_raw</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(
         <span class="ident">head</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_key_helper_pre_key_list_node</span>,
     ) <span class="op">-&gt;</span> <span class="ident">PreKeyList</span> {
         <span class="ident">PreKeyList</span> {
