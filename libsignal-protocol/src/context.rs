@@ -363,6 +363,10 @@ impl Debug for ContextInner {
 
 fn default_log_func(level: Level, message: &str) {
     log::log!(level, "{}", message);
+
+    if level == Level::Error && std::env::var("RUST_BACKTRACE").is_ok() {
+        log::error!("{}", failure::Backtrace::new());
+    }
 }
 
 unsafe extern "C" fn log_trampoline(
