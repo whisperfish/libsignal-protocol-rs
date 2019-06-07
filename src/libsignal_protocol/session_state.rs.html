@@ -13,16 +13,16 @@
 <span id="13">13</span>
 <span id="14">14</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">raw_ptr</span>::<span class="ident">Raw</span>;
 
+<span class="doccomment">/// The internal state associated with a session.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionState</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">session_state</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SessionState</span> {
+    <span class="doccomment">/// Get the session version.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">session_state_get_session_version</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>()) }
     }

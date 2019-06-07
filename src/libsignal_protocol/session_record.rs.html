@@ -25,16 +25,16 @@
 <span id="25">25</span>
 <span id="26">26</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">raw_ptr</span>::<span class="ident">Raw</span>, <span class="ident">SessionState</span>};
 
+<span class="doccomment">/// The serialized state of a session.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionRecord</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">session_record</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SessionRecord</span> {
+    <span class="doccomment">/// Get the state.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">SessionState</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">session_record_get_state</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>());
