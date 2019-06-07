@@ -13,6 +13,7 @@ pub struct PreKeySignalMessage {
 }
 
 impl PreKeySignalMessage {
+    /// Get the message format version.
     pub fn message_version(&self) -> u8 {
         unsafe {
             sys::pre_key_signal_message_get_message_version(
@@ -21,6 +22,7 @@ impl PreKeySignalMessage {
         }
     }
 
+    /// The sender's public pre-key.
     pub fn identity_key(&self) -> PublicKey {
         unsafe {
             let ptr = sys::pre_key_signal_message_get_identity_key(
@@ -33,6 +35,7 @@ impl PreKeySignalMessage {
         }
     }
 
+    /// The registration ID for this pre-key.
     pub fn registration_id(&self) -> u32 {
         unsafe {
             sys::pre_key_signal_message_get_registration_id(
@@ -41,6 +44,7 @@ impl PreKeySignalMessage {
         }
     }
 
+    /// Does this message contain a pre-key ID?
     pub fn has_pre_key_id(&self) -> bool {
         unsafe {
             sys::pre_key_signal_message_has_pre_key_id(self.raw.as_const_ptr())
@@ -48,6 +52,7 @@ impl PreKeySignalMessage {
         }
     }
 
+    /// Get the pre-key's ID.
     pub fn pre_key_id(&self) -> Option<u32> {
         if !self.has_pre_key_id() {
             return None;
@@ -60,6 +65,7 @@ impl PreKeySignalMessage {
         }
     }
 
+    /// Get the signed pre-key ID.
     pub fn signed_pre_key_id(&self) -> u32 {
         unsafe {
             sys::pre_key_signal_message_get_signed_pre_key_id(
@@ -68,6 +74,7 @@ impl PreKeySignalMessage {
         }
     }
 
+    /// Get this message's base key.
     pub fn base_key(&self) -> PublicKey {
         unsafe {
             let raw = sys::pre_key_signal_message_get_base_key(
@@ -80,6 +87,7 @@ impl PreKeySignalMessage {
         }
     }
 
+    /// Get the internal [`SignalMessage`].
     pub fn signal_message(&self) -> SignalMessage {
         unsafe {
             let raw = sys::pre_key_signal_message_get_signal_message(

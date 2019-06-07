@@ -2,21 +2,36 @@ use crate::{raw_ptr::Raw, Buffer, Serializable};
 use failure::Error;
 use std::convert::TryFrom;
 
+// For rustdoc link resolution
+#[allow(unused_imports)]
+use crate::messages::{PreKeySignalMessage, SignalMessage};
+
+/// The type of ciphertext message.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum CiphertextType {
+    /// A [`SignalMessage`].
     Signal = 2,
+    /// A [`PreKeySignalMessage`].
     PreKey = 3,
+    /// A sender key message.
     SenderKey = 4,
+    /// A sender key distribution message.
     SenderKeyDistribution = 5,
 }
 
-/// An encrypted message ("ciphertext").
+/// The base class for a ciphertext message.
+///
+/// See also:
+///
+/// - [`SignalMessage`]
+/// - [`PreKeySignalMessage`]
 #[derive(Debug, Clone)]
 pub struct CiphertextMessage {
     pub(crate) raw: Raw<sys::ciphertext_message>,
 }
 
 impl CiphertextMessage {
+    /// Which type of message is this?
     pub fn get_type(&self) -> Result<CiphertextType, Error> {
         unsafe {
             let ty = sys::ciphertext_message_get_type(self.raw.as_ptr());
