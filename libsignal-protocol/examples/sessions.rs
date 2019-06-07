@@ -61,7 +61,7 @@ use std::time::SystemTime;
 
 fn main() -> Result<(), Error> {
     env_logger::init();
-    let ctx = new_context();
+    let ctx = Context::default();
 
     // first we'll need a copy of bob's public key and some of his pre-keys
     let bob_address = Address::new("+14159998888", 1);
@@ -130,14 +130,4 @@ fn main() -> Result<(), Error> {
     println!("Encrypted Message: {:?}", serialized.as_slice());
 
     Ok(())
-}
-
-cfg_if::cfg_if! {
-    if #[cfg(feature = "crypto-openssl")] {
-        fn new_context() -> Context { Context::new(sig::crypto::OpenSSLCrypto::default()).unwrap() }
-    } else if #[cfg(feature = "crypto-native")] {
-        fn new_context() -> Context { Context::default() }
-    } else {
-        compile_error!("Please enable a crypto feature flag");
-    }
 }
