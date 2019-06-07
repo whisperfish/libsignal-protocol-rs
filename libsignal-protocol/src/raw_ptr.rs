@@ -38,14 +38,14 @@ impl<T: IsA<sys::signal_type_base>> Raw<T> {
     {
         // safety: self.0 is guaranteed to point to a valid `T` instance.
         // It also assums the `upcast()` method is sound.
-        unsafe { Raw::from_ptr(T::upcast(self.into_raw())) }
+        unsafe { Raw::from_ptr(T::upcast(self.into_inner())) }
     }
 
     pub fn as_ptr(&self) -> *mut T { self.0.as_ptr() }
 
     /// Consume this [`Raw`] and extract the underlying pointer **without**
     /// decrementing its reference count.
-    pub fn into_raw(self) -> *mut T {
+    pub fn into_inner(self) -> *mut T {
         let ptr = self.0.as_ptr();
         std::mem::forget(self);
         ptr
