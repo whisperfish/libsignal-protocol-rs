@@ -303,7 +303,7 @@ pub(crate) struct ContextInner {
 }
 
 impl ContextInner {
-    pub fn new<C: Crypto + 'static>(
+    pub(crate) fn new<C: Crypto + 'static>(
         crypto: C,
     ) -> Result<ContextInner, InternalError> {
         unsafe {
@@ -337,7 +337,7 @@ impl ContextInner {
         }
     }
 
-    pub fn raw(&self) -> *mut sys::signal_context { self.raw }
+    pub(crate) const fn raw(&self) -> *mut sys::signal_context { self.raw }
 }
 
 impl Drop for ContextInner {

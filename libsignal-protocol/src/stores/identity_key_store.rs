@@ -69,8 +69,8 @@ unsafe extern "C" fn get_identity_key_pair(
 
     match user_data.0.identity_key_pair() {
         Ok((public, private)) => {
-            *public_data = Buffer::from(public).into_raw();
-            *private_data = Buffer::from(private).into_raw();
+            *public_data = public.into_raw();
+            *private_data = private.into_raw();
             sys::SG_SUCCESS as c_int
         },
         Err(e) => e.code(),
