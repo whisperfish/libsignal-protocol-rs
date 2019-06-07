@@ -23,6 +23,7 @@ ALIASES["libc"] = {};
 ALIASES["libsignal_protocol"] = {};
 ALIASES["libsignal_protocol_sys"] = {};
 ALIASES["lock_api"] = {};
+ALIASES["log"] = {};
 ALIASES["opaque_debug"] = {};
 ALIASES["parking_lot"] = {};
 ALIASES["parking_lot_core"] = {};

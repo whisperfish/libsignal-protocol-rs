@@ -23,6 +23,7 @@ sourcesIndex["libc"] = {"name":"","dirs":[{"name":"unix","dirs":[{"name":"notbsd
 sourcesIndex["libsignal_protocol"] = {"name":"","dirs":[{"name":"crypto","files":["mod.rs","native.rs"]},{"name":"keys","files":["identity_key_pair.rs","key_pair.rs","mod.rs","pre_key.rs","pre_key_list.rs","private.rs","public.rs","signed_pre_key.rs"]},{"name":"messages","files":["ciphertext_message.rs","mod.rs","pre_key_signal_message.rs","signal_message.rs"]},{"name":"stores","files":["identity_key_store.rs","in_memory_identity_key_store.rs","in_memory_pre_key_stores.rs","in_memory_session_store.rs","mod.rs","pre_key_store.rs","session_store.rs","signed_pre_key_store.rs"]}],"files":["address.rs","buffer.rs","context.rs","errors.rs","hkdf.rs","lib.rs","macros.rs","pre_key_bundle.rs","raw_ptr.rs","session_builder.rs","session_cipher.rs","session_record.rs","session_state.rs","store_context.rs"]};
 sourcesIndex["libsignal_protocol_sys"] = {"name":"","files":["bindings.rs","lib.rs"]};
 sourcesIndex["lock_api"] = {"name":"","files":["lib.rs","mutex.rs","remutex.rs","rwlock.rs"]};
+sourcesIndex["log"] = {"name":"","files":["lib.rs","macros.rs"]};
 sourcesIndex["opaque_debug"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["parking_lot"] = {"name":"","files":["condvar.rs","deadlock.rs","elision.rs","lib.rs","mutex.rs","once.rs","raw_mutex.rs","raw_rwlock.rs","remutex.rs","rwlock.rs","util.rs"]};
 sourcesIndex["parking_lot_core"] = {"name":"","dirs":[{"name":"thread_parker","files":["linux.rs"]}],"files":["lib.rs","parking_lot.rs","spinwait.rs","util.rs","word_lock.rs"]};
