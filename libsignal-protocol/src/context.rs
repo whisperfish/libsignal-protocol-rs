@@ -245,7 +245,7 @@ pub fn create_hkdf(
 
 /// Create a new session builder for communication with the user with the
 /// specified address.
-pub fn session_builder<'addr>(
+pub fn session_builder(
     ctx: &Context,
     store_context: &StoreContext,
     address: &Address,
