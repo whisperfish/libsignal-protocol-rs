@@ -289,17 +289,6 @@ impl Default for Context {
     }
 }
 
-#[cfg(feature = "crypto-openssl")]
-impl Default for Context {
-    fn default() -> Context {
-        match Context::new(OpenSSLCrypto::default()) {
-            Ok(c) => c,
-            Err(e) => {
-                panic!("Unable to create a context using the defaults: {}", e)
-            },
-        }
-    }
-}
 
 /// Our Rust wrapper around the [`sys::signal_context`].
 ///
@@ -439,9 +428,18 @@ struct State {
 mod tests {
     use super::*;
 
+    #[cfg(feature = "crypto-native")]
     #[test]
-    fn library_initialization_example_from_readme() {
+    fn library_initialization_example_from_readme_native() {
         let ctx = Context::default();
+
+        drop(ctx);
+    }
+
+    #[cfg(feature = "crypto-openssl")]
+    #[test]
+    fn library_initialization_example_from_readme_openssl() {
+        let ctx = Context::new(OpenSSLCrypto::default()).unwrap();
 
         drop(ctx);
     }
