@@ -50,12 +50,12 @@ use std::time::SystemTime;
 use failure::{Error, ResultExt};
 
 use sig::{
-    Address,
-    Context, PreKeyBundle, Serializable, SessionBuilder, SessionCipher,
     stores::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
+    Address, Context, PreKeyBundle, Serializable, SessionBuilder,
+    SessionCipher,
 };
 
 #[path = "../tests/helpers/mod.rs"]

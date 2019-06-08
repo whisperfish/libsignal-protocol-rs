@@ -6,13 +6,13 @@ use std::{
 };
 
 use sig::{
-    Address,
-    Context,
-    InternalError,
-    keys::{PrivateKey, PublicKey}, messages::PreKeySignalMessage, PreKeyBundle, Serializable, stores::{
+    keys::{PrivateKey, PublicKey},
+    messages::PreKeySignalMessage,
+    stores::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
+    Address, Context, InternalError, PreKeyBundle, Serializable,
 };
 
 use crate::helpers::{fake_random_generator, MockCrypto};

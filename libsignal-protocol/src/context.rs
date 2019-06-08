@@ -13,9 +13,9 @@ use lock_api::RawMutex as _;
 use log::Level;
 use parking_lot::RawMutex;
 
+#[cfg(feature = "crypto-native")]
+use crate::crypto::DefaultCrypto;
 use crate::{
-    Address,
-    Buffer,
     crypto::{Crypto, CryptoProvider},
     errors::{FromInternalErrorCode, InternalError},
     hkdf::HMACBasedKeyDerivationFunction,
@@ -23,15 +23,15 @@ use crate::{
         IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
     },
     raw_ptr::Raw,
-    session_builder::SessionBuilder, StoreContext, stores::{
+    session_builder::SessionBuilder,
+    stores::{
         identity_key_store::{self as iks, IdentityKeyStore},
         pre_key_store::{self as pks, PreKeyStore},
         session_store::{self as sess, SessionStore},
         signed_pre_key_store::{self as spks, SignedPreKeyStore},
     },
+    Address, Buffer, StoreContext,
 };
-#[cfg(feature = "crypto-native")]
-use crate::crypto::DefaultCrypto;
 // for rustdoc link resolution
 #[allow(unused_imports)]
 use crate::keys::{PreKey, PublicKey};
