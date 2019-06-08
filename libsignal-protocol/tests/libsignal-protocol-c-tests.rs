@@ -1,20 +1,23 @@
 extern crate libsignal_protocol as sig;
-mod helpers;
 
-use crate::helpers::{fake_random_generator, MockCrypto};
-use sig::{
-    keys::{PrivateKey, PublicKey},
-    messages::PreKeySignalMessage,
-    stores::{
-        InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
-        InMemorySignedPreKeyStore,
-    },
-    Address, Context, InternalError, PreKeyBundle, Serializable,
-};
 use std::{
     convert::TryFrom,
     time::{Duration, SystemTime},
 };
+
+use sig::{
+    Address,
+    Context,
+    InternalError,
+    keys::{PrivateKey, PublicKey}, messages::PreKeySignalMessage, PreKeyBundle, Serializable, stores::{
+        InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
+        InMemorySignedPreKeyStore,
+    },
+};
+
+use crate::helpers::{fake_random_generator, MockCrypto};
+
+mod helpers;
 
 fn mock_ctx() -> Context {
     cfg_if::cfg_if! {
@@ -45,7 +48,7 @@ fn test_curve25519_generate_public() {
         0x94, 0x2b, 0xb2, 0xa4, 0x66, 0xa1, 0xc0, 0x8b, 0x8d, 0x78, 0xca, 0x3f,
         0x4d, 0x6d, 0xf8, 0xb8, 0xbf, 0xa2, 0xe4, 0xee, 0x28,
     ];
-    let ctx = Context::default();
+    let ctx = mock_ctx();
 
     let alice_private_key =
         PrivateKey::decode_point(&ctx, ALICE_PRIVATE).unwrap();
@@ -170,7 +173,7 @@ fn test_generate_identity_key_pair() {
 
 #[test]
 fn test_curve25519_large_signatures() {
-    let ctx = Context::default();
+    let ctx = mock_ctx();
     let pair = sig::generate_key_pair(&ctx).unwrap();
 
     let mut msg = vec![0; 1048576];

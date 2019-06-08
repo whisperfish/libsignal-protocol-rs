@@ -15,6 +15,8 @@ script:
   - cargo build --all --verbose
   - cargo test --all --verbose
   - cargo test --all --verbose --all-features
+  - cargo test --all --verbose --no-default-features --features="crypto-openssl"
+  - cargo test --all --verbose --no-default-features --features="crypto-native"
   - cargo doc --all --verbose
     # Check that the (non-blacklisted) examples and tests don't have memory bugs
   - python3 ./scripts/valgrind.py
