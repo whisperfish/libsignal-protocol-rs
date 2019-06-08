@@ -1,7 +1,7 @@
 use openssl::{
     hash::{Hasher, MessageDigest},
     nid::Nid,
-    pkey::PKey,
+    pkey::{PKey, Private},
     sign::Signer,
     symm::{Cipher, Crypter, Mode},
 };
@@ -72,16 +72,15 @@ impl Crypto for OpenSSLCrypto {
         &self,
         key: &[u8],
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
-        // HEEEELP xD
-        // FIXME(@shekohex): i'm fighting the borrow checker here
-        // cuz the `Signer` takes a ref to the `pkey`
-        // and of course the compiler will complain about the pkey drops at the
-        // end of the function. `returns a value referencing data owned
-        // by the current function`
-        let pkey = PKey::hmac(key).map_err(|_e| InternalError::Unknown)?;
-        let signer = Signer::new(MessageDigest::sha256(), &pkey)
-            .map_err(|_e| InternalError::Unknown)?;
-
+        let pkey =
+            Box::new(PKey::hmac(key).map_err(|_e| InternalError::Unknown)?);
+        let signer = {
+            // a little bit a hack here, but i think it's safe, since the
+            // `Sha256Hmac` is static anyway !
+            let static_ref: &'static PKey<Private> = Box::leak(pkey);
+            Signer::new(MessageDigest::sha256(), &static_ref)
+                .map_err(|_e| InternalError::Unknown)?
+        };
         Ok(Box::new(signer))
     }
 
