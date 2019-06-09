@@ -45,10 +45,10 @@
 
 extern crate libsignal_protocol as sig;
 
-#[path = "../tests/helpers/mod.rs"]
-mod helpers;
+use std::time::SystemTime;
 
 use failure::{Error, ResultExt};
+
 use sig::{
     stores::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
@@ -57,11 +57,22 @@ use sig::{
     Address, Context, PreKeyBundle, Serializable, SessionBuilder,
     SessionCipher,
 };
-use std::time::SystemTime;
 
+#[path = "../tests/helpers/mod.rs"]
+mod helpers;
+
+cfg_if::cfg_if! {
+    if #[cfg(feature = "crypto-native")] {
+        type Crypto = sig::crypto::DefaultCrypto;
+    } else if #[cfg(feature = "crypto-openssl")] {
+        type Crypto = sig::crypto::OpenSSLCrypto;
+    } else {
+        compile_error!("These tests require one of the crypto features to be enabled");
+    }
+}
 fn main() -> Result<(), Error> {
     env_logger::init();
-    let ctx = Context::default();
+    let ctx = Context::new(Crypto::default()).unwrap();
 
     // first we'll need a copy of bob's public key and some of his pre-keys
     let bob_address = Address::new("+14159998888", 1);

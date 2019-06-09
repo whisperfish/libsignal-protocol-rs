@@ -65,12 +65,13 @@
 // we use the *-sys crate everywhere so give it a shorter name
 #[allow(unused_extern_crates)]
 extern crate libsignal_protocol_sys as sys;
+#[cfg(feature = "crypto-openssl")]
+#[macro_use]
+extern crate rental;
 
-// so rustdoc can resolve links
-#[allow(unused_imports)]
-use crate::stores::{
-    IdentityKeyStore, PreKeyStore, SessionStore, SignedPreKeyStore,
-};
+use std::io::Write;
+
+use failure::Error;
 
 pub use crate::{
     address::Address,
@@ -84,6 +85,14 @@ pub use crate::{
     session_record::SessionRecord,
     session_state::SessionState,
     store_context::StoreContext,
+};
+// bring into scope for rustdoc
+#[allow(unused_imports)]
+use crate::messages::PreKeySignalMessage;
+// so rustdoc can resolve links
+#[allow(unused_imports)]
+use crate::stores::{
+    IdentityKeyStore, PreKeyStore, SessionStore, SignedPreKeyStore,
 };
 
 #[macro_use]
@@ -105,13 +114,6 @@ mod session_record;
 mod session_state;
 mod store_context;
 pub mod stores;
-
-use failure::Error;
-use std::io::Write;
-
-// bring into scope for rustdoc
-#[allow(unused_imports)]
-use crate::messages::PreKeySignalMessage;
 
 /// A helper trait for something which can be serialized to protobufs.
 pub trait Serializable {

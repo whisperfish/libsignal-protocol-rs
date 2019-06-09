@@ -1,4 +1,17 @@
+use std::{
+    convert::TryFrom,
+    fmt::{self, Debug, Formatter},
+    os::raw::{c_char, c_int, c_void},
+    pin::Pin,
+    ptr,
+    rc::Rc,
+    time::SystemTime,
+};
+
 use failure::Error;
+use lock_api::RawMutex as _;
+use log::Level;
+use parking_lot::RawMutex;
 
 #[cfg(feature = "crypto-native")]
 use crate::crypto::DefaultCrypto;
@@ -19,19 +32,6 @@ use crate::{
     },
     Address, Buffer, StoreContext,
 };
-use lock_api::RawMutex as _;
-use log::Level;
-use parking_lot::RawMutex;
-use std::{
-    convert::TryFrom,
-    fmt::{self, Debug, Formatter},
-    os::raw::{c_char, c_int, c_void},
-    pin::Pin,
-    ptr,
-    rc::Rc,
-    time::SystemTime,
-};
-
 // for rustdoc link resolution
 #[allow(unused_imports)]
 use crate::keys::{PreKey, PublicKey};
@@ -74,8 +74,19 @@ pub fn generate_key_pair(ctx: &Context) -> Result<KeyPair, Error> {
 /// ```rust
 /// # use libsignal_protocol::{keys::PublicKey, Context};
 /// # use failure::Error;
+/// # use cfg_if::cfg_if;
 /// # fn main() -> Result<(), Error> {
-/// let ctx = Context::default();
+/// # cfg_if::cfg_if! {
+/// #  if #[cfg(feature = "crypto-native")] {
+/// #      type Crypto = libsignal_protocol::crypto::DefaultCrypto;
+/// #  } else if #[cfg(feature = "crypto-openssl")] {
+/// #      type Crypto = libsignal_protocol::crypto::OpenSSLCrypto;
+/// #  } else {
+/// #      compile_error!("These tests require one of the crypto features to be enabled");
+/// #  }
+/// # }
+/// // the `Crypto` here is a type alias to one of `OpenSSLCrypto` or `DefaultCrypto`.
+/// let ctx = Context::new(Crypto::default()).unwrap();
 /// let key_pair = libsignal_protocol::generate_key_pair(&ctx)?;
 ///
 /// let msg = "Hello, World!";
@@ -425,9 +436,19 @@ struct State {
 mod tests {
     use super::*;
 
+    #[cfg(feature = "crypto-native")]
     #[test]
-    fn library_initialization_example_from_readme() {
-        let ctx = Context::new(DefaultCrypto::default()).unwrap();
+    fn library_initialization_example_from_readme_native() {
+        let ctx = Context::default();
+
+        drop(ctx);
+    }
+
+    #[cfg(feature = "crypto-openssl")]
+    #[test]
+    fn library_initialization_example_from_readme_openssl() {
+        use crate::crypto::OpenSSLCrypto;
+        let ctx = Context::new(OpenSSLCrypto::default()).unwrap();
 
         drop(ctx);
     }

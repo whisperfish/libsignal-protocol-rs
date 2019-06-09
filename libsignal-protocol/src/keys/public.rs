@@ -1,12 +1,14 @@
+use std::{
+    cmp::{Ord, Ordering},
+    ptr,
+};
+
+use failure::Error;
+
 use crate::{
     errors::{FromInternalErrorCode, InternalError},
     raw_ptr::Raw,
     Context,
-};
-use failure::Error;
-use std::{
-    cmp::{Ord, Ordering},
-    ptr,
 };
 
 /// The public part of an elliptic curve key pair.
@@ -101,9 +103,19 @@ impl_serializable!(PublicKey, ec_public_key_serialize, asd);
 mod tests {
     use super::*;
 
+    #[cfg(any(feature = "crypto-native", feature = "crypto-openssl"))]
     #[test]
     fn decode_from_binary() {
-        let ctx = Context::default();
+        cfg_if::cfg_if! {
+            if #[cfg(feature = "crypto-native")] {
+                type Crypto = crate::crypto::DefaultCrypto;
+            } else if #[cfg(feature = "crypto-openssl")] {
+                type Crypto = crate::crypto::OpenSSLCrypto;
+            } else {
+                compile_error!("These tests require one of the crypto features to be enabled");
+            }
+        }
+        let ctx = Context::new(Crypto::default()).unwrap();
         let public = &[
             0x05, 0x1b, 0xb7, 0x59, 0x66, 0xf2, 0xe9, 0x3a, 0x36, 0x91, 0xdf,
             0xff, 0x94, 0x2b, 0xb2, 0xa4, 0x66, 0xa1, 0xc0, 0x8b, 0x8d, 0x78,

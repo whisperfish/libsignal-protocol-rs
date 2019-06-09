@@ -1,6 +1,8 @@
 use openssl::{
     hash::{Hasher, MessageDigest},
     nid::Nid,
+    pkey::{PKey, Private},
+    sign::Signer,
     symm::{Cipher, Crypter, Mode},
 };
 
@@ -8,6 +10,17 @@ use crate::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
     errors::InternalError,
 };
+
+rental! {
+    mod hmac {
+        use super::*;
+        #[rental]
+        pub struct HmacSigner {
+            pkey: Box<PKey<Private>>,
+            signer: Signer<'pkey>,
+        }
+    }
+}
 
 /// Cryptography routines built on top of the system's `openssl` library.
 #[derive(Debug, Copy, Clone)]
@@ -68,14 +81,15 @@ impl Crypto for OpenSSLCrypto {
 
     fn hmac_sha256(
         &self,
-        _key: &[u8],
+        key: &[u8],
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
-        let nid = Nid::HMACWITHSHA256;
-        let ty = MessageDigest::from_nid(nid)
-            .ok_or_else(|| InternalError::Unknown)?;
-        let hasher = Hasher::new(ty).map_err(|_e| InternalError::Unknown)?;
-
-        Ok(Box::new(hasher))
+        let pkey =
+            Box::new(PKey::hmac(key).map_err(|_e| InternalError::Unknown)?);
+        let hmac_signer = hmac::HmacSigner::try_new(pkey, |pkey| {
+            Signer::new(MessageDigest::sha256(), pkey)
+        })
+        .map_err(|_e| InternalError::Unknown)?;
+        Ok(Box::new(hmac_signer))
     }
 
     fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError> {
@@ -110,14 +124,14 @@ impl Default for OpenSSLCrypto {
     fn default() -> OpenSSLCrypto { OpenSSLCrypto }
 }
 
-impl Sha256Hmac for Hasher {
+impl Sha256Hmac for hmac::HmacSigner {
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError> {
-        self.update(data).map_err(|_| InternalError::Unknown)
+        self.rent_mut(|signer| signer.update(data))
+            .map_err(|_| InternalError::Unknown)
     }
 
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError> {
-        self.finish()
-            .map(|bytes| bytes.as_ref().to_vec())
+        self.rent_mut(|signer| signer.sign_to_vec())
             .map_err(|_| InternalError::Unknown)
     }
 }
