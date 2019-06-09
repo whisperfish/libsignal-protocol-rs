@@ -6,9 +6,9 @@ use std::{
 use failure::Error;
 
 use crate::{
+    Context,
     errors::{FromInternalErrorCode, InternalError},
     raw_ptr::Raw,
-    Context,
 };
 
 /// The public part of an elliptic curve key pair.
@@ -103,6 +103,7 @@ impl_serializable!(PublicKey, ec_public_key_serialize, asd);
 mod tests {
     use super::*;
 
+    #[cfg(any(feature = "crypto-native", feature = "crypto-openssl"))]
     #[test]
     fn decode_from_binary() {
         cfg_if::cfg_if! {
