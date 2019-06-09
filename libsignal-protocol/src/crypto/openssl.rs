@@ -88,7 +88,7 @@ impl Crypto for OpenSSLCrypto {
         let hmac_signer = hmac::HmacSigner::try_new(pkey, |pkey| {
             Signer::new(MessageDigest::sha256(), pkey)
         })
-            .map_err(|_e| InternalError::Unknown)?;
+        .map_err(|_e| InternalError::Unknown)?;
         Ok(Box::new(hmac_signer))
     }
 

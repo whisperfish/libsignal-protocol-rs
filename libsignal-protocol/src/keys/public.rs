@@ -6,9 +6,9 @@ use std::{
 use failure::Error;
 
 use crate::{
-    Context,
     errors::{FromInternalErrorCode, InternalError},
     raw_ptr::Raw,
+    Context,
 };
 
 /// The public part of an elliptic curve key pair.
