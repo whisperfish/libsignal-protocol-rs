@@ -11,6 +11,17 @@ use crate::{
     errors::InternalError,
 };
 
+rental! {
+    mod hmac {
+        use super::*;
+        #[rental]
+        pub struct HmacSigner {
+            pkey: Box<PKey<Private>>,
+            signer: Signer<'pkey>,
+        }
+    }
+}
+
 /// Cryptography routines built on top of the system's `openssl` library.
 #[derive(Debug, Copy, Clone)]
 pub struct OpenSSLCrypto;
@@ -74,14 +85,11 @@ impl Crypto for OpenSSLCrypto {
     ) -> Result<Box<dyn Sha256Hmac>, InternalError> {
         let pkey =
             Box::new(PKey::hmac(key).map_err(|_e| InternalError::Unknown)?);
-        let signer = {
-            // a little bit a hack here, but i think it's safe, since the
-            // `Sha256Hmac` is static anyway !
-            let static_ref: &'static PKey<Private> = Box::leak(pkey);
-            Signer::new(MessageDigest::sha256(), &static_ref)
-                .map_err(|_e| InternalError::Unknown)?
-        };
-        Ok(Box::new(signer))
+        let hmac_signer = hmac::HmacSigner::try_new(pkey, |pkey| {
+            Signer::new(MessageDigest::sha256(), pkey)
+        })
+            .map_err(|_e| InternalError::Unknown)?;
+        Ok(Box::new(hmac_signer))
     }
 
     fn sha512_digest(&self) -> Result<Box<dyn Sha512Digest>, InternalError> {
@@ -116,13 +124,15 @@ impl Default for OpenSSLCrypto {
     fn default() -> OpenSSLCrypto { OpenSSLCrypto }
 }
 
-impl Sha256Hmac for Signer<'_> {
+impl Sha256Hmac for hmac::HmacSigner {
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError> {
-        self.update(data).map_err(|_| InternalError::Unknown)
+        self.rent_mut(|signer| signer.update(data))
+            .map_err(|_| InternalError::Unknown)
     }
 
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError> {
-        self.sign_to_vec().map_err(|_| InternalError::Unknown)
+        self.rent_mut(|signer| signer.sign_to_vec())
+            .map_err(|_| InternalError::Unknown)
     }
 }
 
