@@ -432,8 +432,42 @@
 <span id="432">432</span>
 <span id="433">433</span>
 <span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">convert</span>::<span class="ident">TryFrom</span>,
+    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>},
+    <span class="ident">os</span>::<span class="ident">raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>, <span class="ident">c_void</span>},
+    <span class="ident">pin</span>::<span class="ident">Pin</span>,
+    <span class="ident">ptr</span>,
+    <span class="ident">rc</span>::<span class="ident">Rc</span>,
+    <span class="ident">time</span>::<span class="ident">SystemTime</span>,
+};
+
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
+<span class="kw">use</span> <span class="ident">lock_api</span>::<span class="ident">RawMutex</span> <span class="kw">as</span> <span class="kw">_</span>;
+<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">Level</span>;
+<span class="kw">use</span> <span class="ident">parking_lot</span>::<span class="ident">RawMutex</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;crypto-native&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">crypto</span>::<span class="ident">DefaultCrypto</span>;
@@ -454,19 +488,6 @@
     },
     <span class="ident">Address</span>, <span class="ident">Buffer</span>, <span class="ident">StoreContext</span>,
 };
-<span class="kw">use</span> <span class="ident">lock_api</span>::<span class="ident">RawMutex</span> <span class="kw">as</span> <span class="kw">_</span>;
-<span class="kw">use</span> <span class="ident">log</span>::<span class="ident">Level</span>;
-<span class="kw">use</span> <span class="ident">parking_lot</span>::<span class="ident">RawMutex</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert</span>::<span class="ident">TryFrom</span>,
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>},
-    <span class="ident">os</span>::<span class="ident">raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>, <span class="ident">c_void</span>},
-    <span class="ident">pin</span>::<span class="ident">Pin</span>,
-    <span class="ident">ptr</span>,
-    <span class="ident">rc</span>::<span class="ident">Rc</span>,
-    <span class="ident">time</span>::<span class="ident">SystemTime</span>,
-};
-
 <span class="comment">// for rustdoc link resolution</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">keys</span>::{<span class="ident">PreKey</span>, <span class="ident">PublicKey</span>};
@@ -509,8 +530,19 @@
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// # use libsignal_protocol::{keys::PublicKey, Context};</span>
 <span class="doccomment">/// # use failure::Error;</span>
+<span class="doccomment">/// # use cfg_if::cfg_if;</span>
 <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">/// let ctx = Context::default();</span>
+<span class="doccomment">/// # cfg_if::cfg_if! {</span>
+<span class="doccomment">/// #  if #[cfg(feature = &quot;crypto-native&quot;)] {</span>
+<span class="doccomment">/// #      type Crypto = libsignal_protocol::crypto::DefaultCrypto;</span>
+<span class="doccomment">/// #  } else if #[cfg(feature = &quot;crypto-openssl&quot;)] {</span>
+<span class="doccomment">/// #      type Crypto = libsignal_protocol::crypto::OpenSSLCrypto;</span>
+<span class="doccomment">/// #  } else {</span>
+<span class="doccomment">/// #      compile_error!(&quot;These tests require one of the crypto features to be enabled&quot;);</span>
+<span class="doccomment">/// #  }</span>
+<span class="doccomment">/// # }</span>
+<span class="doccomment">/// // the `Crypto` here is a type alias to one of `OpenSSLCrypto` or `DefaultCrypto`.</span>
+<span class="doccomment">/// let ctx = Context::new(Crypto::default()).unwrap();</span>
 <span class="doccomment">/// let key_pair = libsignal_protocol::generate_key_pair(&amp;ctx)?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let msg = &quot;Hello, World!&quot;;</span>
@@ -860,9 +892,19 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;crypto-native&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">library_initialization_example_from_readme</span>() {
-        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span>::<span class="ident">new</span>(<span class="ident">DefaultCrypto</span>::<span class="ident">default</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">fn</span> <span class="ident">library_initialization_example_from_readme_native</span>() {
+        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span>::<span class="ident">default</span>();
+
+        <span class="ident">drop</span>(<span class="ident">ctx</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;crypto-openssl&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">library_initialization_example_from_readme_openssl</span>() {
+        <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">crypto</span>::<span class="ident">OpenSSLCrypto</span>;
+        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context</span>::<span class="ident">new</span>(<span class="ident">OpenSSLCrypto</span>::<span class="ident">default</span>()).<span class="ident">unwrap</span>();
 
         <span class="ident">drop</span>(<span class="ident">ctx</span>);
     }
