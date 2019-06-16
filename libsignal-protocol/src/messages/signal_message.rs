@@ -3,10 +3,10 @@ use crate::{
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType},
     raw_ptr::Raw,
-    Context,
+    Context, ContextInner,
 };
 use failure::Error;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, rc::Rc};
 
 // For rustdoc link resolution
 #[allow(unused_imports)]
@@ -16,6 +16,7 @@ use crate::keys::IdentityKeyPair;
 #[derive(Debug, Clone)]
 pub struct SignalMessage {
     pub(crate) raw: Raw<sys::signal_message>,
+    pub(crate) _ctx: Rc<ContextInner>,
 }
 
 impl SignalMessage {
@@ -101,7 +102,10 @@ impl TryFrom<CiphertextMessage> for SignalMessage {
             let raw = unsafe {
                 Raw::copied_from(other.raw.as_ptr() as *mut sys::signal_message)
             };
-            Ok(SignalMessage { raw })
+            Ok(SignalMessage {
+                raw,
+                _ctx: other._ctx,
+            })
         }
     }
 }
@@ -110,6 +114,7 @@ impl From<SignalMessage> for CiphertextMessage {
     fn from(other: SignalMessage) -> CiphertextMessage {
         CiphertextMessage {
             raw: other.raw.upcast(),
+            _ctx: other._ctx,
         }
     }
 }

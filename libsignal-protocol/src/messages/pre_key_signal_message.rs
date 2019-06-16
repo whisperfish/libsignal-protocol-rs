@@ -2,14 +2,16 @@ use crate::{
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType, SignalMessage},
     raw_ptr::Raw,
+    ContextInner,
 };
 use failure::Error;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, rc::Rc};
 
 /// A message containing everything necessary to establish a session.
 #[derive(Debug, Clone)]
 pub struct PreKeySignalMessage {
     pub(crate) raw: Raw<sys::pre_key_signal_message>,
+    pub(crate) _ctx: Rc<ContextInner>,
 }
 
 impl PreKeySignalMessage {
@@ -96,6 +98,7 @@ impl PreKeySignalMessage {
             assert!(!raw.is_null());
             SignalMessage {
                 raw: Raw::copied_from(raw),
+                _ctx: Rc::clone(&self._ctx),
             }
         }
     }
@@ -115,7 +118,10 @@ impl TryFrom<CiphertextMessage> for PreKeySignalMessage {
                     other.raw.as_ptr() as *mut sys::pre_key_signal_message
                 )
             };
-            Ok(PreKeySignalMessage { raw })
+            Ok(PreKeySignalMessage {
+                raw,
+                _ctx: other._ctx,
+            })
         }
     }
 }
@@ -124,6 +130,7 @@ impl From<PreKeySignalMessage> for CiphertextMessage {
     fn from(other: PreKeySignalMessage) -> CiphertextMessage {
         CiphertextMessage {
             raw: other.raw.upcast(),
+            _ctx: other._ctx,
         }
     }
 }

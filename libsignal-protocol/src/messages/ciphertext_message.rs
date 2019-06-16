@@ -1,6 +1,6 @@
-use crate::{raw_ptr::Raw, Buffer, Serializable};
+use crate::{raw_ptr::Raw, Buffer, ContextInner, Serializable};
 use failure::Error;
-use std::convert::TryFrom;
+use std::{convert::TryFrom, rc::Rc};
 
 // For rustdoc link resolution
 #[allow(unused_imports)]
@@ -28,6 +28,7 @@ pub enum CiphertextType {
 #[derive(Debug, Clone)]
 pub struct CiphertextMessage {
     pub(crate) raw: Raw<sys::ciphertext_message>,
+    pub(crate) _ctx: Rc<ContextInner>,
 }
 
 impl CiphertextMessage {
