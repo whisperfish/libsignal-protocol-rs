@@ -61,9 +61,9 @@ unsafe extern "C" fn get_identity_key_pair(
     private_data: *mut *mut sys::signal_buffer,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
-    assert!(!public_data.is_null());
-    assert!(!private_data.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!public_data.is_null());
+    signal_assert!(!private_data.is_null());
 
     let user_data = &*(user_data as *const State);
 
@@ -81,7 +81,7 @@ unsafe extern "C" fn get_local_registration_id(
     user_data: *mut c_void,
     registration_id: *mut u32,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
 
@@ -100,8 +100,8 @@ unsafe extern "C" fn save_identity(
     key_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
     let address = Address::from_ptr(address);
@@ -123,9 +123,9 @@ unsafe extern "C" fn is_trusted_identity(
     key_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!key_data.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!key_data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
     let address = Address::from_raw(sys::signal_protocol_address {

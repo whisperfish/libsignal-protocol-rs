@@ -72,10 +72,10 @@ unsafe extern "C" fn load_session_func(
     address: *const sys::signal_protocol_address,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!record.is_null());
-    assert!(!user_record.is_null());
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!record.is_null());
+    signal_assert!(!user_record.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let address = Address::from_ptr(address);
@@ -103,9 +103,9 @@ unsafe extern "C" fn get_sub_device_sessions_func(
     name_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!sessions.is_null());
-    assert!(!name.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!sessions.is_null());
+    signal_assert!(!name.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let name = std::slice::from_raw_parts(name as *const _, name_len);
@@ -136,9 +136,9 @@ unsafe extern "C" fn store_session_func(
     user_record_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!record.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!record.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let addr = Address::from_ptr(address);
@@ -164,8 +164,8 @@ unsafe extern "C" fn contains_session_func(
     address: *const sys::signal_protocol_address,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let addr = Address::from_ptr(address);
@@ -181,8 +181,8 @@ unsafe extern "C" fn delete_session_func(
     address: *const sys::signal_protocol_address,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let addr = Address::from_ptr(address);
@@ -198,8 +198,8 @@ unsafe extern "C" fn delete_all_sessions_func(
     name_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!name.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!name.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let name = std::slice::from_raw_parts(name as *const _, name_len);

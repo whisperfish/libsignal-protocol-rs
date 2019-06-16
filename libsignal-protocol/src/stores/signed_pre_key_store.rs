@@ -41,8 +41,9 @@ unsafe extern "C" fn load_signed_pre_key(
     pre_key_id: u32,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
-    assert!(!record.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!record.is_null());
+
     let user_data = &*(user_data as *const State);
     let mut buffer = Buffer::new();
 
@@ -61,8 +62,9 @@ unsafe extern "C" fn store_signed_pre_key(
     record_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
-    assert!(!record.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!record.is_null());
+
     let user_data = &*(user_data as *const State);
     let data = std::slice::from_raw_parts(record, record_len);
 
@@ -76,7 +78,8 @@ unsafe extern "C" fn contains_signed_pre_key(
     pre_key_id: u32,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
+
     let user_data = &*(user_data as *const State);
 
     user_data.0.contains(pre_key_id) as c_int
@@ -86,7 +89,8 @@ unsafe extern "C" fn remove_signed_pre_key(
     pre_key_id: u32,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
+
     let user_data = &*(user_data as *const State);
 
     match user_data.0.remove(pre_key_id) {

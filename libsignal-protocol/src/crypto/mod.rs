@@ -158,8 +158,8 @@ unsafe extern "C" fn random_func(
     len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!data.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
     let buffer = slice::from_raw_parts_mut(data, len);
@@ -185,8 +185,8 @@ unsafe extern "C" fn hmac_sha256_final_func(
     _user_data: *mut c_void,
 ) -> i32 {
     // just to make sure that the c ffi gave us a valid buffer to write to.
-    assert!(!output.is_null());
-    assert!(!hmac_context.is_null());
+    signal_assert!(!output.is_null());
+    signal_assert!(!hmac_context.is_null());
 
     let hmac_context = &*(hmac_context as *const HmacContext);
 
@@ -206,8 +206,8 @@ unsafe extern "C" fn hmac_sha256_init_func(
     key_len: usize,
     user_data: *mut c_void,
 ) -> i32 {
-    assert!(!key.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!key.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let key = slice::from_raw_parts(key, key_len);
@@ -231,8 +231,8 @@ unsafe extern "C" fn hmac_sha256_update_func(
     data_len: usize,
     _user_data: *mut c_void,
 ) -> i32 {
-    assert!(!data.is_null());
-    assert!(!hmac_context.is_null());
+    signal_assert!(!data.is_null());
+    signal_assert!(!hmac_context.is_null());
 
     let hmac_context = &*(hmac_context as *const HmacContext);
 
@@ -244,7 +244,7 @@ unsafe extern "C" fn sha512_digest_init_func(
     digest_context: *mut *mut c_void,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
     let hasher = match user_data.0.sha512_digest() {
@@ -267,8 +267,8 @@ unsafe extern "C" fn sha512_digest_update_func(
     data_len: usize,
     _user_data: *mut c_void,
 ) -> c_int {
-    assert!(!data.is_null());
-    assert!(!digest_context.is_null());
+    signal_assert!(!data.is_null());
+    signal_assert!(!digest_context.is_null());
 
     let hasher = &*(digest_context as *const DigestContext);
     let mut hasher = hasher.0.borrow_mut();
@@ -283,8 +283,8 @@ unsafe extern "C" fn sha512_digest_final_func(
     _user_data: *mut c_void,
 ) -> c_int {
     // just to make sure that the c ffi gave us a valid buffer to write to.
-    assert!(!output.is_null());
-    assert!(!digest_context.is_null());
+    signal_assert!(!output.is_null());
+    signal_assert!(!digest_context.is_null());
 
     let hasher = &*(digest_context as *const DigestContext);
 
@@ -375,11 +375,11 @@ unsafe extern "C" fn internal_cipher(
 ) -> c_int {
     use self::CipherMode::*;
     // just to make sure that the c ffi gave us a valid buffer to write to.
-    assert!(!output.is_null());
-    assert!(!user_data.is_null());
-    assert!(!key.is_null());
-    assert!(!iv.is_null());
-    assert!(!data.is_null());
+    signal_assert!(!output.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!key.is_null());
+    signal_assert!(!iv.is_null());
+    signal_assert!(!data.is_null());
 
     let signal_cipher_type = match SignalCipherType::try_from(cipher) {
         Ok(ty) => ty,
