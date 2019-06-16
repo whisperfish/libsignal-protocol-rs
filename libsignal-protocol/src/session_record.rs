@@ -1,9 +1,11 @@
-use crate::{raw_ptr::Raw, SessionState};
+use crate::{raw_ptr::Raw, ContextInner, SessionState};
+use std::rc::Rc;
 
 /// The serialized state of a session.
 #[derive(Debug, Clone)]
 pub struct SessionRecord {
     pub(crate) raw: Raw<sys::session_record>,
+    pub(crate) _ctx: Rc<ContextInner>,
 }
 
 impl SessionRecord {
