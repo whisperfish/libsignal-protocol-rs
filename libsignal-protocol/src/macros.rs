@@ -60,3 +60,30 @@ macro_rules! signal_assert {
         }
     };
 }
+
+macro_rules! signal_catch_unwind {
+    ($operation:expr) => {
+        match ::std::panic::catch_unwind(|| $operation) {
+            Ok(got) => got,
+            Err(panic_error) => {
+                let msg = if let Some(m) = panic_error.downcast_ref::<&str>() {
+                    m
+                } else if let Some(m) = panic_error.downcast_ref::<String>() {
+                    m.as_str()
+                } else {
+                    "Unknown panic"
+                };
+
+                ::log::error!(
+                    "The expression `{}` panicked at {}#{}: {}",
+                    stringify!($operation),
+                    file!(),
+                    line!(),
+                    msg
+                );
+
+                return $crate::InternalError::Unknown.into();
+            },
+        }
+    };
+}

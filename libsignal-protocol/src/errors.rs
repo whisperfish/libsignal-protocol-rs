@@ -132,6 +132,10 @@ impl<T> IntoInternalErrorCode for Result<T, InternalError> {
     }
 }
 
+impl From<InternalError> for i32 {
+    fn from(other: InternalError) -> i32 { other.code() }
+}
+
 impl Display for InternalError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
