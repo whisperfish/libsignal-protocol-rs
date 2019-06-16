@@ -1,7 +1,6 @@
 //! Underlying cryptographic routines.
 
 use std::{
-    cell::RefCell,
     convert::TryFrom,
     os::raw::{c_int, c_void},
     panic::RefUnwindSafe,
@@ -388,6 +387,7 @@ unsafe extern "C" fn decrypt_func(
     )
 }
 
+#[allow(clippy::cognitive_complexity)]
 unsafe extern "C" fn internal_cipher(
     mode: CipherMode,
     output: *mut *mut signal_buffer,
