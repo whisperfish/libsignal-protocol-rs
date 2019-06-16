@@ -102,6 +102,7 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
+<span id="105">105</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">context</span>::<span class="ident">ContextInner</span>,
@@ -178,6 +179,7 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident">SessionRecord</span> {
                 <span class="ident">raw</span>: <span class="ident">Raw</span>::<span class="ident">from_ptr</span>(<span class="ident">raw</span>),
+                <span class="ident">ctx</span>: <span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">ctx</span>),
             })
         }
     }

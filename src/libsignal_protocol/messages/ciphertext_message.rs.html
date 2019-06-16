@@ -82,10 +82,11 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
+<span id="85">85</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">raw_ptr</span>::<span class="ident">Raw</span>, <span class="ident">Buffer</span>, <span class="ident">Serializable</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">raw_ptr</span>::<span class="ident">Raw</span>, <span class="ident">Buffer</span>, <span class="ident">ContextInner</span>, <span class="ident">Serializable</span>};
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert</span>::<span class="ident">TryFrom</span>, <span class="ident">rc</span>::<span class="ident">Rc</span>};
 
 <span class="comment">// For rustdoc link resolution</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
@@ -113,6 +114,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CiphertextMessage</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw</span>: <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">ciphertext_message</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_ctx</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">ContextInner</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CiphertextMessage</span> {
