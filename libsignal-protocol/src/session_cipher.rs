@@ -62,6 +62,7 @@ impl SessionCipher {
 
             Ok(CiphertextMessage {
                 raw: Raw::from_ptr(raw),
+                _ctx: Rc::clone(&self._ctx),
             })
         }
     }

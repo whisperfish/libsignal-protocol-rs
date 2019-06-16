@@ -73,6 +73,7 @@ impl StoreContext {
 
             Ok(SessionRecord {
                 raw: Raw::from_ptr(raw),
+                ctx: Rc::clone(&self.0.ctx),
             })
         }
     }
