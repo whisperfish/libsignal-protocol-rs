@@ -37,3 +37,20 @@ macro_rules! impl_is_a {
         )*
     };
 }
+
+macro_rules! signal_assert {
+    ($condition:expr $(, $tok:tt)*) => {
+        if !$condition {
+            ::log::error!(
+                "Assertion failed at {}#{}: {}",
+                file!(),
+                line!(),
+                stringify!($condition),
+                $(
+                    ,$tok
+                )*
+            );
+            ::log::error!("{}", ::failure::Backtrace::new());
+        }
+    };
+}
