@@ -1,9 +1,11 @@
-use crate::raw_ptr::Raw;
+use crate::{raw_ptr::Raw, ContextInner};
+use std::rc::Rc;
 
 /// The internal state associated with a session.
 #[derive(Debug, Clone)]
 pub struct SessionState {
     pub(crate) raw: Raw<sys::session_state>,
+    pub(crate) _ctx: Rc<ContextInner>,
 }
 
 impl SessionState {
