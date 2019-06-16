@@ -5,7 +5,7 @@ use std::rc::Rc;
 #[derive(Debug, Clone)]
 pub struct SessionRecord {
     pub(crate) raw: Raw<sys::session_record>,
-    pub(crate) _ctx: Rc<ContextInner>,
+    pub(crate) ctx: Rc<ContextInner>,
 }
 
 impl SessionRecord {
@@ -16,6 +16,7 @@ impl SessionRecord {
             assert!(!raw.is_null());
             SessionState {
                 raw: Raw::copied_from(raw),
+                _ctx: Rc::clone(&self.ctx),
             }
         }
     }
