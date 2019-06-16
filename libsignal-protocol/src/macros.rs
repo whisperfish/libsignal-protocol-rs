@@ -38,19 +38,25 @@ macro_rules! impl_is_a {
     };
 }
 
+/// An an alternative to [`assert!()`] for functions called from C.
 macro_rules! signal_assert {
-    ($condition:expr $(, $tok:tt)*) => {
+    ($condition:expr) => {
         if !$condition {
             ::log::error!(
                 "Assertion failed at {}#{}: {}",
                 file!(),
                 line!(),
                 stringify!($condition),
-                $(
-                    ,$tok
-                )*
             );
             ::log::error!("{}", ::failure::Backtrace::new());
+
+            eprintln!(
+                "Aborting because the application reached an unexpected state at {}#{}: {}",
+                file!(),
+                line!(),
+                stringify!($condition)
+            );
+            ::std::process::exit(1);
         }
     };
 }
