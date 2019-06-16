@@ -4,12 +4,17 @@ use libsignal_protocol::{
     crypto::{Crypto, Sha256Hmac, Sha512Digest, SignalCipherType},
     InternalError,
 };
-use std::cell::Cell;
+use std::{panic::RefUnwindSafe, sync::Mutex};
 
 pub(crate) struct MockCrypto<C> {
     inner: C,
-    random_func:
-        Option<Box<dyn Fn(&mut [u8]) -> Result<(), InternalError> + 'static>>,
+    random_func: Option<
+        Box<
+            dyn Fn(&mut [u8]) -> Result<(), InternalError>
+                + RefUnwindSafe
+                + 'static,
+        >,
+    >,
 }
 
 impl<C: Crypto> MockCrypto<C> {
@@ -22,7 +27,7 @@ impl<C: Crypto> MockCrypto<C> {
 
     pub fn random_func<F>(mut self, func: F) -> Self
     where
-        F: Fn(&mut [u8]) -> Result<(), InternalError> + 'static,
+        F: Fn(&mut [u8]) -> Result<(), InternalError> + RefUnwindSafe + 'static,
     {
         self.random_func = Some(Box::new(func));
         self
@@ -72,12 +77,14 @@ impl<C: Crypto> Crypto for MockCrypto<C> {
 
 pub fn fake_random_generator() -> impl Fn(&mut [u8]) -> Result<(), InternalError>
 {
-    let test_next_random = Cell::new(0);
+    let test_next_random = Mutex::new(0);
 
     move |data| {
+        let mut test_next_random = test_next_random.lock().unwrap();
+
         for i in 0..data.len() {
-            data[i] = test_next_random.get();
-            test_next_random.set(test_next_random.get().wrapping_add(1));
+            data[i] = *test_next_random;
+            *test_next_random = test_next_random.wrapping_add(1);
         }
 
         Ok(())
