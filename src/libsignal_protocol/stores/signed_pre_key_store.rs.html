@@ -101,15 +101,35 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">buffer</span>::<span class="ident">Buffer</span>, <span class="ident">errors</span>::<span class="ident">InternalError</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
     <span class="ident">os</span>::<span class="ident">raw</span>::{<span class="ident">c_int</span>, <span class="ident">c_void</span>},
+    <span class="ident">panic</span>::<span class="ident">RefUnwindSafe</span>,
 };
 
 <span class="doccomment">/// Something which can store signed pre-keys without inspecting their contents.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SignedPreKeyStore</span> {
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SignedPreKeyStore</span>: <span class="ident">RefUnwindSafe</span> {
     <span class="doccomment">/// Load a signed pre-key.</span>
     <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) <span class="op">-&gt;</span> <span class="ident">io</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
     <span class="doccomment">/// Store a signed pre-key.</span>
@@ -145,13 +165,28 @@
     <span class="ident">pre_key_id</span>: <span class="ident">u32</span>,
     <span class="ident">user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
 ) <span class="op">-&gt;</span> <span class="ident">c_int</span> {
-    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
-    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">record</span>.<span class="ident">is_null</span>());
-    <span class="kw">let</span> <span class="ident">user_data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">State</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Buffer</span>::<span class="ident">new</span>();
+    <span class="macro">signal_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
+    <span class="macro">signal_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">record</span>.<span class="ident">is_null</span>());
 
-    <span class="kw">match</span> <span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">load</span>(<span class="ident">pre_key_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>) {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> {
+    <span class="kw">let</span> <span class="ident">user_data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">State</span>);
+
+    <span class="kw">let</span> <span class="ident">got</span> <span class="op">=</span> <span class="macro">signal_catch_unwind</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Buffer</span>::<span class="ident">new</span>();
+        <span class="kw">match</span> <span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">load</span>(<span class="ident">pre_key_id</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>) {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">buffer</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> {
+                <span class="ident">log</span>::<span class="macro">error</span><span class="macro">!</span>(
+                    <span class="string">&quot;An error occurred while trying to load the signed pre-key {}: {}&quot;</span>,
+                    <span class="ident">pre_key_id</span>,
+                    <span class="ident">e</span>
+                );
+                <span class="prelude-val">Err</span>(<span class="ident">InternalError</span>::<span class="ident">Unknown</span>)
+            },
+        }
+    });
+
+    <span class="kw">match</span> <span class="ident">got</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">buffer</span>) <span class="op">=&gt;</span> {
             <span class="kw-2">*</span><span class="ident">record</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">into_raw</span>();
             <span class="ident">sys</span>::<span class="ident">SG_SUCCESS</span> <span class="kw">as</span> <span class="ident">c_int</span>
         },
@@ -165,12 +200,13 @@
     <span class="ident">record_len</span>: <span class="ident">usize</span>,
     <span class="ident">user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
 ) <span class="op">-&gt;</span> <span class="ident">c_int</span> {
-    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
-    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">record</span>.<span class="ident">is_null</span>());
+    <span class="macro">signal_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
+    <span class="macro">signal_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">record</span>.<span class="ident">is_null</span>());
+
     <span class="kw">let</span> <span class="ident">user_data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">State</span>);
     <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">slice</span>::<span class="ident">from_raw_parts</span>(<span class="ident">record</span>, <span class="ident">record_len</span>);
 
-    <span class="kw">match</span> <span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">store</span>(<span class="ident">pre_key_id</span>, <span class="ident">data</span>) {
+    <span class="kw">match</span> <span class="macro">signal_catch_unwind</span><span class="macro">!</span>(<span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">store</span>(<span class="ident">pre_key_id</span>, <span class="ident">data</span>)) {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_SUCCESS</span> <span class="kw">as</span> <span class="ident">c_int</span>,
         <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="ident">e</span>.<span class="ident">code</span>(),
     }
@@ -180,20 +216,22 @@
     <span class="ident">pre_key_id</span>: <span class="ident">u32</span>,
     <span class="ident">user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
 ) <span class="op">-&gt;</span> <span class="ident">c_int</span> {
-    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
+    <span class="macro">signal_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
+
     <span class="kw">let</span> <span class="ident">user_data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">State</span>);
 
-    <span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">contains</span>(<span class="ident">pre_key_id</span>) <span class="kw">as</span> <span class="ident">c_int</span>
+    <span class="macro">signal_catch_unwind</span><span class="macro">!</span>(<span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">contains</span>(<span class="ident">pre_key_id</span>) <span class="kw">as</span> <span class="ident">c_int</span>)
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">remove_signed_pre_key</span>(
     <span class="ident">pre_key_id</span>: <span class="ident">u32</span>,
     <span class="ident">user_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
 ) <span class="op">-&gt;</span> <span class="ident">c_int</span> {
-    <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
+    <span class="macro">signal_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">user_data</span>.<span class="ident">is_null</span>());
+
     <span class="kw">let</span> <span class="ident">user_data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">user_data</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">State</span>);
 
-    <span class="kw">match</span> <span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="ident">pre_key_id</span>) {
+    <span class="kw">match</span> <span class="macro">signal_catch_unwind</span><span class="macro">!</span>(<span class="ident">user_data</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="ident">pre_key_id</span>)) {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">SG_SUCCESS</span> <span class="kw">as</span> <span class="ident">c_int</span>,
         <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="ident">e</span>.<span class="ident">code</span>(),
     }

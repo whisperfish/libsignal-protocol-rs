@@ -160,6 +160,10 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert</span>::<span class="ident">TryFrom</span>,
@@ -293,6 +297,10 @@
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=&gt;</span> <span class="ident">e</span>.<span class="ident">code</span>(),
         }
     }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InternalError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">i32</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">other</span>: <span class="ident">InternalError</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> { <span class="ident">other</span>.<span class="ident">code</span>() }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">InternalError</span> {

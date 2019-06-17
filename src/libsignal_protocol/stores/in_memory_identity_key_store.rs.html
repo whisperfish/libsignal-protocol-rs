@@ -75,19 +75,20 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
+<span id="78">78</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">keys</span>::<span class="ident">IdentityKeyPair</span>, <span class="ident">stores</span>::<span class="ident">IdentityKeyStore</span>, <span class="ident">Address</span>, <span class="ident">Buffer</span>,
     <span class="ident">InternalError</span>, <span class="ident">Serializable</span>,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cell</span>::<span class="ident">RefCell</span>, <span class="ident">collections</span>::<span class="ident">HashMap</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashMap</span>, <span class="ident">sync</span>::<span class="ident">Mutex</span>};
 
 <span class="doccomment">/// An in-memory [`IdentityKeyStore`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InMemoryIdentityKeyStore</span> {
     <span class="ident">registration_id</span>: <span class="ident">u32</span>,
     <span class="ident">identity</span>: <span class="ident">IdentityKeyPair</span>,
-    <span class="ident">trusted_identities</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Address</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">trusted_identities</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Address</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Should recipients be trusted the first time they are contacted?</span>
     <span class="kw">pub</span> <span class="ident">trust_on_first_use</span>: <span class="ident">bool</span>,
 }
@@ -132,7 +133,7 @@
         <span class="ident">address</span>: <span class="ident">Address</span>,
         <span class="ident">identity_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">trusted_identities</span>.<span class="ident">borrow</span>();
+        <span class="kw">let</span> <span class="ident">identities</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">trusted_identities</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">identity</span>) <span class="op">=</span> <span class="ident">identities</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">identity_key</span> <span class="op">==</span> <span class="ident">identity</span>.<span class="ident">as_slice</span>())
@@ -147,7 +148,8 @@
         <span class="ident">identity_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">trusted_identities</span>
-            .<span class="ident">borrow_mut</span>()
+            .<span class="ident">lock</span>()
+            .<span class="ident">unwrap</span>()
             .<span class="ident">insert</span>(<span class="ident">addr</span>, <span class="ident">identity_key</span>.<span class="ident">to_vec</span>());
 
         <span class="prelude-val">Ok</span>(())
