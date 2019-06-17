@@ -51,14 +51,11 @@ macro_rules! signal_assert {
                 line!(),
                 stringify!($condition),
             );
-            ::log::error!("{}", ::failure::Backtrace::new());
+            let bt = ::failure::Backtrace::new().to_string();
+            if !bt.is_empty() {
+                ::log::error!("{}", bt);
+            }
 
-            eprintln!(
-                "Aborting because the application reached an unexpected state at {}#{}: {}",
-                file!(),
-                line!(),
-                stringify!($condition)
-            );
             return $ret.into();
         }
     };
