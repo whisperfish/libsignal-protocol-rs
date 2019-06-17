@@ -397,8 +397,8 @@ unsafe extern "C" fn log_trampoline(
     len: usize,
     user_data: *mut c_void,
 ) {
-    signal_assert!(!msg.is_null());
-    signal_assert!(!user_data.is_null());
+    signal_assert!(!msg.is_null(), ());
+    signal_assert!(!user_data.is_null(), ());
 
     let state = &*(user_data as *const State);
     let buffer = std::slice::from_raw_parts(msg as *const u8, len);

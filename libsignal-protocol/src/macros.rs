@@ -41,6 +41,9 @@ macro_rules! impl_is_a {
 /// An an alternative to [`assert!()`] for functions called from C.
 macro_rules! signal_assert {
     ($condition:expr) => {
+        signal_assert!($condition, $crate::InternalError::InvalidArgument);
+    };
+    ($condition:expr, $ret:expr) => {
         if !$condition {
             ::log::error!(
                 "Assertion failed at {}#{}: {}",
@@ -56,7 +59,7 @@ macro_rules! signal_assert {
                 line!(),
                 stringify!($condition)
             );
-            ::std::process::exit(1);
+            return $ret.into();
         }
     };
 }
