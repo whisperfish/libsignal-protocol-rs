@@ -1,11 +1,12 @@
 //! Underlying cryptographic routines.
 
 use std::{
-    cell::RefCell,
     convert::TryFrom,
     os::raw::{c_int, c_void},
+    panic::RefUnwindSafe,
     pin::Pin,
     ptr, slice,
+    sync::Mutex,
 };
 
 use sys::{signal_buffer, signal_crypto_provider};
@@ -82,7 +83,7 @@ pub trait Sha512Digest {
 }
 
 /// Cryptography routines used in the signal protocol.
-pub trait Crypto {
+pub trait Crypto: RefUnwindSafe {
     /// Fill the provided buffer with some random bytes.
     fn fill_random(&self, buffer: &mut [u8]) -> Result<(), InternalError>;
 
@@ -149,21 +150,45 @@ impl CryptoProvider {
 
 struct State(Box<dyn Crypto>);
 
-struct HmacContext(RefCell<Box<dyn Sha256Hmac>>);
+struct HmacContext(Mutex<Box<dyn Sha256Hmac>>);
 
-struct DigestContext(RefCell<Box<dyn Sha512Digest>>);
+struct DigestContext(Mutex<Box<dyn Sha512Digest>>);
 
 unsafe extern "C" fn random_func(
     data: *mut u8,
     len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!data.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
-    let buffer = slice::from_raw_parts_mut(data, len);
-    user_data.0.fill_random(buffer).into_code()
+
+    let panic_result = std::panic::catch_unwind(|| {
+        let buffer = slice::from_raw_parts_mut(data, len);
+        user_data.0.fill_random(buffer)
+    });
+
+    match panic_result {
+        Ok(Ok(_)) => sys::SG_SUCCESS as c_int,
+        Ok(Err(e)) => {
+            log::error!("Unable to generate random data: {}", e);
+            InternalError::Unknown.code()
+        },
+        Err(e) => {
+            let msg = if let Some(m) = e.downcast_ref::<&str>() {
+                m
+            } else if let Some(m) = e.downcast_ref::<String>() {
+                m.as_str()
+            } else {
+                "Unknown panic"
+            };
+            log::error!("Panic encountered while trying to generate {} random bytes at {}#{}: {}",
+            len, file!(), line!(), msg);
+
+            InternalError::Unknown.code()
+        },
+    }
 }
 
 unsafe extern "C" fn hmac_sha256_cleanup_func(
@@ -185,12 +210,12 @@ unsafe extern "C" fn hmac_sha256_final_func(
     _user_data: *mut c_void,
 ) -> i32 {
     // just to make sure that the c ffi gave us a valid buffer to write to.
-    assert!(!output.is_null());
-    assert!(!hmac_context.is_null());
+    signal_assert!(!output.is_null());
+    signal_assert!(!hmac_context.is_null());
 
     let hmac_context = &*(hmac_context as *const HmacContext);
 
-    match hmac_context.0.borrow_mut().finalize() {
+    match signal_catch_unwind!(hmac_context.0.lock().unwrap().finalize()) {
         Ok(hmac) => {
             let buffer = Buffer::from(hmac);
             *output = buffer.into_raw();
@@ -206,13 +231,13 @@ unsafe extern "C" fn hmac_sha256_init_func(
     key_len: usize,
     user_data: *mut c_void,
 ) -> i32 {
-    assert!(!key.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!key.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let key = slice::from_raw_parts(key, key_len);
 
-    let hasher = match state.0.hmac_sha256(key) {
+    let hasher = match signal_catch_unwind!(state.0.hmac_sha256(key)) {
         Ok(h) => h,
         Err(e) => {
             *hmac_context = ptr::null_mut();
@@ -220,8 +245,8 @@ unsafe extern "C" fn hmac_sha256_init_func(
         },
     };
 
-    *hmac_context = Box::into_raw(Box::new(HmacContext(RefCell::new(hasher))))
-        as *mut c_void;
+    *hmac_context =
+        Box::into_raw(Box::new(HmacContext(Mutex::new(hasher)))) as *mut c_void;
     sys::SG_SUCCESS as c_int
 }
 
@@ -231,23 +256,25 @@ unsafe extern "C" fn hmac_sha256_update_func(
     data_len: usize,
     _user_data: *mut c_void,
 ) -> i32 {
-    assert!(!data.is_null());
-    assert!(!hmac_context.is_null());
+    signal_assert!(!data.is_null());
+    signal_assert!(!hmac_context.is_null());
 
     let hmac_context = &*(hmac_context as *const HmacContext);
 
     let data = slice::from_raw_parts(data, data_len);
-    hmac_context.0.borrow_mut().update(data).into_code()
+
+    signal_catch_unwind!(hmac_context.0.lock().unwrap().update(data))
+        .into_code()
 }
 
 unsafe extern "C" fn sha512_digest_init_func(
     digest_context: *mut *mut c_void,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
-    let hasher = match user_data.0.sha512_digest() {
+    let hasher = match signal_catch_unwind!(user_data.0.sha512_digest()) {
         Ok(h) => h,
         Err(e) => {
             *digest_context = ptr::null_mut();
@@ -255,7 +282,7 @@ unsafe extern "C" fn sha512_digest_init_func(
         },
     };
 
-    let dc = Box::new(DigestContext(RefCell::new(hasher)));
+    let dc = Box::new(DigestContext(Mutex::new(hasher)));
     *digest_context = Box::into_raw(Box::new(dc)) as *mut c_void;
 
     sys::SG_SUCCESS as c_int
@@ -267,14 +294,13 @@ unsafe extern "C" fn sha512_digest_update_func(
     data_len: usize,
     _user_data: *mut c_void,
 ) -> c_int {
-    assert!(!data.is_null());
-    assert!(!digest_context.is_null());
+    signal_assert!(!data.is_null());
+    signal_assert!(!digest_context.is_null());
 
     let hasher = &*(digest_context as *const DigestContext);
-    let mut hasher = hasher.0.borrow_mut();
 
     let buffer = slice::from_raw_parts(data, data_len);
-    hasher.update(buffer).into_code()
+    signal_catch_unwind!(hasher.0.lock().unwrap().update(buffer)).into_code()
 }
 
 unsafe extern "C" fn sha512_digest_final_func(
@@ -283,12 +309,12 @@ unsafe extern "C" fn sha512_digest_final_func(
     _user_data: *mut c_void,
 ) -> c_int {
     // just to make sure that the c ffi gave us a valid buffer to write to.
-    assert!(!output.is_null());
-    assert!(!digest_context.is_null());
+    signal_assert!(!output.is_null());
+    signal_assert!(!digest_context.is_null());
 
     let hasher = &*(digest_context as *const DigestContext);
 
-    match hasher.0.borrow_mut().finalize() {
+    match signal_catch_unwind!(hasher.0.lock().unwrap().finalize()) {
         Ok(buf) => {
             let buffer = Buffer::from(buf);
             *output = buffer.into_raw();
@@ -361,6 +387,7 @@ unsafe extern "C" fn decrypt_func(
     )
 }
 
+#[allow(clippy::cognitive_complexity)]
 unsafe extern "C" fn internal_cipher(
     mode: CipherMode,
     output: *mut *mut signal_buffer,
@@ -375,11 +402,11 @@ unsafe extern "C" fn internal_cipher(
 ) -> c_int {
     use self::CipherMode::*;
     // just to make sure that the c ffi gave us a valid buffer to write to.
-    assert!(!output.is_null());
-    assert!(!user_data.is_null());
-    assert!(!key.is_null());
-    assert!(!iv.is_null());
-    assert!(!data.is_null());
+    signal_assert!(!output.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!key.is_null());
+    signal_assert!(!iv.is_null());
+    signal_assert!(!data.is_null());
 
     let signal_cipher_type = match SignalCipherType::try_from(cipher) {
         Ok(ty) => ty,
@@ -394,8 +421,18 @@ unsafe extern "C" fn internal_cipher(
     let user_data = &*(user_data as *const State);
 
     let result = match mode {
-        Encrypt => user_data.0.encrypt(signal_cipher_type, key, iv, data),
-        Decrypt => user_data.0.decrypt(signal_cipher_type, key, iv, data),
+        Encrypt => signal_catch_unwind!(user_data.0.encrypt(
+            signal_cipher_type,
+            key,
+            iv,
+            data
+        )),
+        Decrypt => signal_catch_unwind!(user_data.0.decrypt(
+            signal_cipher_type,
+            key,
+            iv,
+            data
+        )),
     };
 
     match result {

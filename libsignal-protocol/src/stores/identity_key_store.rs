@@ -1,8 +1,11 @@
 use crate::{errors::InternalError, Address, Buffer};
-use std::os::raw::{c_int, c_void};
+use std::{
+    os::raw::{c_int, c_void},
+    panic::RefUnwindSafe,
+};
 
 /// Something used to store identity keys and track trusted identities.
-pub trait IdentityKeyStore {
+pub trait IdentityKeyStore: RefUnwindSafe {
     /// Get the local client's identity key pair as the tuple `(public,
     /// private)`.
     fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError>;
@@ -61,13 +64,13 @@ unsafe extern "C" fn get_identity_key_pair(
     private_data: *mut *mut sys::signal_buffer,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
-    assert!(!public_data.is_null());
-    assert!(!private_data.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!public_data.is_null());
+    signal_assert!(!private_data.is_null());
 
     let user_data = &*(user_data as *const State);
 
-    match user_data.0.identity_key_pair() {
+    match signal_catch_unwind!(user_data.0.identity_key_pair()) {
         Ok((public, private)) => {
             *public_data = public.into_raw();
             *private_data = private.into_raw();
@@ -81,11 +84,11 @@ unsafe extern "C" fn get_local_registration_id(
     user_data: *mut c_void,
     registration_id: *mut u32,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
 
-    match user_data.0.local_registration_id() {
+    match signal_catch_unwind!(user_data.0.local_registration_id()) {
         Ok(id) => {
             *registration_id = id;
             sys::SG_SUCCESS as c_int
@@ -100,8 +103,8 @@ unsafe extern "C" fn save_identity(
     key_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
     let address = Address::from_ptr(address);
@@ -111,7 +114,7 @@ unsafe extern "C" fn save_identity(
         std::slice::from_raw_parts(key_data, key_len)
     };
 
-    match user_data.0.save_identity(address, key) {
+    match signal_catch_unwind!(user_data.0.save_identity(address, key)) {
         Ok(_) => sys::SG_SUCCESS as _,
         Err(e) => e.code(),
     }
@@ -123,9 +126,9 @@ unsafe extern "C" fn is_trusted_identity(
     key_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!key_data.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!key_data.is_null());
+    signal_assert!(!user_data.is_null());
 
     let user_data = &*(user_data as *const State);
     let address = Address::from_raw(sys::signal_protocol_address {
@@ -135,7 +138,7 @@ unsafe extern "C" fn is_trusted_identity(
     });
     let key = std::slice::from_raw_parts(key_data, key_len);
 
-    match user_data.0.is_trusted_identity(address, key) {
+    match signal_catch_unwind!(user_data.0.is_trusted_identity(address, key)) {
         Ok(true) => 1,
         Ok(false) => 0,
         Err(e) => e.code(),

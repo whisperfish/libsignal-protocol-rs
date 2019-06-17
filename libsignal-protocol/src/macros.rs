@@ -37,3 +37,53 @@ macro_rules! impl_is_a {
         )*
     };
 }
+
+/// An an alternative to [`assert!()`] for functions called from C.
+macro_rules! signal_assert {
+    ($condition:expr) => {
+        signal_assert!($condition, $crate::InternalError::InvalidArgument);
+    };
+    ($condition:expr, $ret:expr) => {
+        if !$condition {
+            ::log::error!(
+                "Assertion failed at {}#{}: {}",
+                file!(),
+                line!(),
+                stringify!($condition),
+            );
+            let bt = ::failure::Backtrace::new().to_string();
+            if !bt.is_empty() {
+                ::log::error!("{}", bt);
+            }
+
+            return $ret.into();
+        }
+    };
+}
+
+macro_rules! signal_catch_unwind {
+    ($operation:expr) => {
+        match ::std::panic::catch_unwind(|| $operation) {
+            Ok(got) => got,
+            Err(panic_error) => {
+                let msg = if let Some(m) = panic_error.downcast_ref::<&str>() {
+                    m
+                } else if let Some(m) = panic_error.downcast_ref::<String>() {
+                    m.as_str()
+                } else {
+                    "Unknown panic"
+                };
+
+                ::log::error!(
+                    "The expression `{}` panicked at {}#{}: {}",
+                    stringify!($operation),
+                    file!(),
+                    line!(),
+                    msg
+                );
+
+                return $crate::InternalError::Unknown.into();
+            },
+        }
+    };
+}

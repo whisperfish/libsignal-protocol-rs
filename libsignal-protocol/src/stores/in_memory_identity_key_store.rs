@@ -2,14 +2,14 @@ use crate::{
     keys::IdentityKeyPair, stores::IdentityKeyStore, Address, Buffer,
     InternalError, Serializable,
 };
-use std::{cell::RefCell, collections::HashMap};
+use std::{collections::HashMap, sync::Mutex};
 
 /// An in-memory [`IdentityKeyStore`].
 #[derive(Debug)]
 pub struct InMemoryIdentityKeyStore {
     registration_id: u32,
     identity: IdentityKeyPair,
-    trusted_identities: RefCell<HashMap<Address, Vec<u8>>>,
+    trusted_identities: Mutex<HashMap<Address, Vec<u8>>>,
     /// Should recipients be trusted the first time they are contacted?
     pub trust_on_first_use: bool,
 }
@@ -54,7 +54,7 @@ impl IdentityKeyStore for InMemoryIdentityKeyStore {
         address: Address,
         identity_key: &[u8],
     ) -> Result<bool, InternalError> {
-        let identities = self.trusted_identities.borrow();
+        let identities = self.trusted_identities.lock().unwrap();
 
         if let Some(identity) = identities.get(&address) {
             Ok(identity_key == identity.as_slice())
@@ -69,7 +69,8 @@ impl IdentityKeyStore for InMemoryIdentityKeyStore {
         identity_key: &[u8],
     ) -> Result<(), InternalError> {
         self.trusted_identities
-            .borrow_mut()
+            .lock()
+            .unwrap()
             .insert(addr, identity_key.to_vec());
 
         Ok(())

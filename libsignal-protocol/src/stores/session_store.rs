@@ -1,5 +1,8 @@
 use crate::{errors::InternalError, Address, Buffer};
-use std::os::raw::{c_char, c_int, c_void};
+use std::{
+    os::raw::{c_char, c_int, c_void},
+    panic::RefUnwindSafe,
+};
 
 /// A serialized session.
 #[derive(Debug, Clone, PartialEq)]
@@ -11,7 +14,7 @@ pub struct SerializedSession {
 }
 
 /// Something which can store the sessions established with recipients.
-pub trait SessionStore {
+pub trait SessionStore: RefUnwindSafe {
     /// Get a copy of the serialized session record corresponding to the
     /// provided recipient [`Address`].
     fn load_session(
@@ -72,15 +75,15 @@ unsafe extern "C" fn load_session_func(
     address: *const sys::signal_protocol_address,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!record.is_null());
-    assert!(!user_record.is_null());
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!record.is_null());
+    signal_assert!(!user_record.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let address = Address::from_ptr(address);
 
-    match state.0.load_session(address) {
+    match signal_catch_unwind!(state.0.load_session(address)) {
         Ok(Some(SerializedSession {
             session,
             extra_data,
@@ -103,14 +106,14 @@ unsafe extern "C" fn get_sub_device_sessions_func(
     name_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!sessions.is_null());
-    assert!(!name.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!sessions.is_null());
+    signal_assert!(!name.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let name = std::slice::from_raw_parts(name as *const _, name_len);
 
-    match state.0.get_sub_device_sessions(name) {
+    match signal_catch_unwind!(state.0.get_sub_device_sessions(name)) {
         Ok(got) => {
             let list = sys::signal_int_list_alloc();
             if list.is_null() {
@@ -136,9 +139,9 @@ unsafe extern "C" fn store_session_func(
     user_record_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!record.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!record.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let addr = Address::from_ptr(address);
@@ -154,7 +157,7 @@ unsafe extern "C" fn store_session_func(
         extra_data: user_record.map(Buffer::from),
     };
 
-    match state.0.store_session(addr, session) {
+    match signal_catch_unwind!(state.0.store_session(addr, session)) {
         Ok(_) => sys::SG_SUCCESS as _,
         Err(e) => e.code(),
     }
@@ -164,13 +167,13 @@ unsafe extern "C" fn contains_session_func(
     address: *const sys::signal_protocol_address,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let addr = Address::from_ptr(address);
 
-    match state.0.contains_session(addr) {
+    match signal_catch_unwind!(state.0.contains_session(addr)) {
         Ok(true) => 1,
         Ok(false) => 0,
         Err(e) => e.code(),
@@ -181,13 +184,13 @@ unsafe extern "C" fn delete_session_func(
     address: *const sys::signal_protocol_address,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!address.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!address.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let addr = Address::from_ptr(address);
 
-    match state.0.delete_session(addr) {
+    match signal_catch_unwind!(state.0.delete_session(addr)) {
         Ok(_) => sys::SG_SUCCESS as _,
         Err(e) => e.code(),
     }
@@ -198,13 +201,13 @@ unsafe extern "C" fn delete_all_sessions_func(
     name_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!name.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!name.is_null());
+    signal_assert!(!user_data.is_null());
 
     let state = &*(user_data as *const State);
     let name = std::slice::from_raw_parts(name as *const _, name_len);
 
-    match state.0.delete_all_sessions(name) {
+    match signal_catch_unwind!(state.0.delete_all_sessions(name)) {
         Ok(_) => sys::SG_SUCCESS as _,
         Err(e) => e.code(),
     }

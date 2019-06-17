@@ -2,9 +2,11 @@ use std::{
     convert::TryFrom,
     fmt::{self, Debug, Formatter},
     os::raw::{c_char, c_int, c_void},
+    panic::RefUnwindSafe,
     pin::Pin,
     ptr,
     rc::Rc,
+    sync::Mutex,
     time::SystemTime,
 };
 
@@ -284,6 +286,15 @@ impl Context {
     pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
 
     pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
+
+    /// Se the function to use when `libsignal-protocol-c` emits a log message.
+    pub fn set_log_func<F>(&self, log_func: F)
+    where
+        F: Fn(Level, &str) + RefUnwindSafe + 'static,
+    {
+        let mut lf = self.0.state.log_func.lock().unwrap();
+        *lf = Box::new(log_func);
+    }
 }
 
 #[cfg(feature = "crypto-native")]
@@ -323,7 +334,7 @@ impl ContextInner {
             let crypto = CryptoProvider::new(crypto);
             let mut state = Pin::new(Box::new(State {
                 mux: RawMutex::INIT,
-                log_func: Box::new(default_log_func),
+                log_func: Mutex::new(Box::new(default_log_func)),
             }));
 
             let user_data =
@@ -386,15 +397,20 @@ unsafe extern "C" fn log_trampoline(
     len: usize,
     user_data: *mut c_void,
 ) {
-    assert!(!msg.is_null());
-    assert!(!user_data.is_null());
+    signal_assert!(!msg.is_null(), ());
+    signal_assert!(!user_data.is_null(), ());
 
     let state = &*(user_data as *const State);
     let buffer = std::slice::from_raw_parts(msg as *const u8, len);
     let level = translate_log_level(level);
 
     if let Ok(message) = std::str::from_utf8(buffer) {
-        (state.log_func)(level, message);
+        // we can't log the errors that occur while logging errors, so just
+        // drop them on the floor...
+        let _ = std::panic::catch_unwind(|| {
+            let log_func = state.log_func.lock().unwrap();
+            log_func(level, message);
+        });
     }
 }
 
@@ -429,7 +445,7 @@ unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
 /// appropriate synchronisation mechanisms (i.e. `RefCell` or atomics).
 struct State {
     mux: RawMutex,
-    log_func: Box<dyn Fn(Level, &str)>,
+    log_func: Mutex<Box<dyn Fn(Level, &str) + RefUnwindSafe>>,
 }
 
 #[cfg(test)]

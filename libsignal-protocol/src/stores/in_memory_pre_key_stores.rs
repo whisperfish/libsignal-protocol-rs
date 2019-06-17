@@ -3,13 +3,13 @@ use crate::{
     InternalError,
 };
 use std::{
-    cell::RefCell,
     collections::HashMap,
     io::{self, Write},
+    sync::Mutex,
 };
 
 /// An in-memory [`PreKeyStore`].
-#[derive(Debug, Default, PartialEq, Clone)]
+#[derive(Debug, Default)]
 pub struct InMemoryPreKeyStore(Inner);
 
 impl PreKeyStore for InMemoryPreKeyStore {
@@ -27,7 +27,7 @@ impl PreKeyStore for InMemoryPreKeyStore {
 }
 
 /// An in-memory [`SignedPreKeyStore`].
-#[derive(Debug, Default, PartialEq, Clone)]
+#[derive(Debug, Default)]
 pub struct InMemorySignedPreKeyStore(Inner);
 
 impl SignedPreKeyStore for InMemorySignedPreKeyStore {
@@ -44,28 +44,30 @@ impl SignedPreKeyStore for InMemorySignedPreKeyStore {
     fn remove(&self, id: u32) -> Result<(), InternalError> { self.0.remove(id) }
 }
 
-#[derive(Debug, Default, PartialEq, Clone)]
+#[derive(Debug, Default)]
 struct Inner {
-    keys: RefCell<HashMap<u32, Vec<u8>>>,
+    keys: Mutex<HashMap<u32, Vec<u8>>>,
 }
 
 impl Inner {
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()> {
-        match self.keys.borrow().get(&id) {
+        match self.keys.lock().unwrap().get(&id) {
             Some(bytes) => writer.write_all(bytes),
             None => unimplemented!(),
         }
     }
 
     fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError> {
-        self.keys.borrow_mut().insert(id, body.to_vec());
+        self.keys.lock().unwrap().insert(id, body.to_vec());
         Ok(())
     }
 
-    fn contains(&self, id: u32) -> bool { self.keys.borrow().contains_key(&id) }
+    fn contains(&self, id: u32) -> bool {
+        self.keys.lock().unwrap().contains_key(&id)
+    }
 
     fn remove(&self, id: u32) -> Result<(), InternalError> {
-        self.keys.borrow_mut().remove(&id);
+        self.keys.lock().unwrap().remove(&id);
         Ok(())
     }
 }

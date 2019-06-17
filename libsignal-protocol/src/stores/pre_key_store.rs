@@ -2,11 +2,12 @@ use crate::{buffer::Buffer, errors::InternalError};
 use std::{
     io::{self, Write},
     os::raw::{c_int, c_void},
+    panic::RefUnwindSafe,
 };
 
 /// Something which can store [`crate::keys::PreKey`]s without inspecting their
 /// contents.
-pub trait PreKeyStore {
+pub trait PreKeyStore: RefUnwindSafe {
     /// Load a pre-key.
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
     /// Store a pre-key.
@@ -39,13 +40,27 @@ unsafe extern "C" fn load_pre_key(
     pre_key_id: u32,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
-    assert!(!record.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!record.is_null());
     let user_data = &*(user_data as *const State);
-    let mut buffer = Buffer::new();
 
-    match user_data.0.load(pre_key_id, &mut buffer) {
-        Ok(_) => {
+    let got = signal_catch_unwind!({
+        let mut buffer = Buffer::new();
+        match user_data.0.load(pre_key_id, &mut buffer) {
+            Ok(_) => Ok(buffer),
+            Err(e) => {
+                log::error!(
+                    "An error occurred while trying to load pre-key {}: {}",
+                    pre_key_id,
+                    e
+                );
+                Err(InternalError::Unknown)
+            },
+        }
+    });
+
+    match got {
+        Ok(buffer) => {
             *record = buffer.into_raw();
             sys::SG_SUCCESS as c_int
         },
@@ -59,12 +74,13 @@ unsafe extern "C" fn store_pre_key(
     record_len: usize,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
-    assert!(!record.is_null());
+    signal_assert!(!user_data.is_null());
+    signal_assert!(!record.is_null());
+
     let user_data = &*(user_data as *const State);
     let data = std::slice::from_raw_parts(record, record_len);
 
-    match user_data.0.store(pre_key_id, data) {
+    match signal_catch_unwind!(user_data.0.store(pre_key_id, data)) {
         Ok(_) => sys::SG_SUCCESS as c_int,
         Err(e) => e.code(),
     }
@@ -74,20 +90,22 @@ unsafe extern "C" fn contains_pre_key(
     pre_key_id: u32,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
+
     let user_data = &*(user_data as *const State);
 
-    user_data.0.contains(pre_key_id) as c_int
+    signal_catch_unwind!(user_data.0.contains(pre_key_id)) as c_int
 }
 
 unsafe extern "C" fn remove_pre_key(
     pre_key_id: u32,
     user_data: *mut c_void,
 ) -> c_int {
-    assert!(!user_data.is_null());
+    signal_assert!(!user_data.is_null());
+
     let user_data = &*(user_data as *const State);
 
-    match user_data.0.remove(pre_key_id) {
+    match signal_catch_unwind!(user_data.0.remove(pre_key_id)) {
         Ok(_) => sys::SG_SUCCESS as c_int,
         Err(e) => e.code(),
     }
