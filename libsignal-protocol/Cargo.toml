@@ -12,7 +12,8 @@ keywords = ["signal", "libsignal", "whisper", "protocol"]
 categories = ["api-bindings", "cryptography"]
 
 [dependencies]
-libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }
+#libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }
+libsignal-protocol-sys = "0.1.0"
 failure = "0.1.5"
 failure_derive = "0.1.5"
 rand = "0.6.5"
