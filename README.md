@@ -7,7 +7,7 @@
 [![libsignal-protocol on crates.io](https://img.shields.io/crates/v/libsignal-protocol.svg)](https://crates.io/crates/libsignal-protocol)
 [![Docs for libsignal-protocol](https://docs.rs/libsignal-protocol/badge.svg)](https://docs.rs/libsignal-protocol)
 
-([API Docs])
+([API Docs for `master`](https://michael-f-bryan.github.io/libsignal-protocol-rs))
 
 A Rust interface to the [Signal Protocol][upstream].
 
@@ -93,5 +93,4 @@ version 2.0 (https://www.mozilla.org/en-US/MPL/2.0/).
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs?ref=badge_large)
 
-[API Docs]: https://michael-f-bryan.github.io/libsignal-protocol-rs
 [upstream]: https://github.com/signalapp/libsignal-protocol-c
