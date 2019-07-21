@@ -290,7 +290,7 @@ dependencies = [
  "failure 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure_derive 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "hmac 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "libsignal-protocol-sys 0.1.0",
+ "libsignal-protocol-sys 0.1.1-alpha.0",
  "lock_api 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl 0.10.23 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -302,7 +302,7 @@ dependencies = [
 
 [[package]]
 name = "libsignal-protocol-sys"
-version = "0.1.0"
+version = "0.1.1-alpha.0"
 dependencies = [
  "cmake 0.1.40 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
