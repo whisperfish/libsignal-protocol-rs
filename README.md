@@ -3,6 +3,9 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/82a990f6d0b441038ff00c11a685b876)](https://app.codacy.com/app/shekohex/libsignal-protocol-rs?utm_source=github.com&utm_medium=referral&utm_content=Michael-F-Bryan/libsignal-protocol-rs&utm_campaign=Badge_Grade_Settings)
 [![Build Status](https://travis-ci.com/Michael-F-Bryan/libsignal-protocol-rs.svg?branch=master)](https://travis-ci.com/Michael-F-Bryan/libsignal-protocol-rs)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FMichael-F-Bryan%2Flibsignal-protocol-rs?ref=badge_shield)
+[![License](https://img.shields.io/crates/l/libsignal-protocol.svg)](LICENSE.md)
+[![libsignal-protocol on crates.io](https://img.shields.io/crates/v/libsignal-protocol.svg)](https://crates.io/crates/libsignal-protocol)
+[![Docs for libsignal-protocol](https://docs.rs/libsignal-protocol/badge.svg)](https://docs.rs/libsignal-protocol)
 
 ([API Docs])
 
