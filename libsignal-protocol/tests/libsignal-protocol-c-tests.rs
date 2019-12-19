@@ -351,7 +351,6 @@ fn test_optional_one_time_pre_key() {
     let bob_local_registration_id = bob_store.registration_id().unwrap();
 
     let bob_signed_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
-    let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_signed_pre_key_public_serialized =
         bob_signed_pre_key_pair.public().serialize().unwrap();
     let bob_signed_pre_key_signature = sig::calculate_signature(
