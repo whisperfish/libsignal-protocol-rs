@@ -3,10 +3,10 @@ use crate::{
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType},
     raw_ptr::Raw,
-    Context, ContextInner,
+    Buffer, Context, ContextInner, Serializable,
 };
 use failure::Error;
-use std::{convert::TryFrom, rc::Rc};
+use std::{convert::TryFrom, ptr, rc::Rc};
 
 // For rustdoc link resolution
 #[allow(unused_imports)]
@@ -116,6 +116,35 @@ impl From<SignalMessage> for CiphertextMessage {
             raw: other.raw.upcast(),
             _ctx: other._ctx,
         }
+    }
+}
+
+impl Serializable for SignalMessage {
+    fn deserialize(ctx: Context, data: &[u8]) -> Result<Self, failure::Error> {
+        unsafe {
+            let mut raw = ptr::null_mut();
+
+            let res = sys::signal_message_deserialize(
+                &mut raw,
+                data.as_ptr(),
+                data.len(),
+                ctx.raw(),
+            );
+            if res != 0 {
+                return Err(failure::err_msg("Unable to deserialize buffer"));
+            }
+            // safety: the successful invocation of signal_message_deserialize
+            // tells us this is actually a pointer to a `signal_message`
+            let raw = Raw::copied_from(raw as *mut sys::signal_message);
+            Ok(SignalMessage {
+                raw,
+                _ctx: Rc::clone(&ctx.0),
+            })
+        }
+    }
+
+    fn serialize(&self) -> Result<Buffer, failure::Error> {
+        unimplemented!()
     }
 }
 

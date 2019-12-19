@@ -121,7 +121,7 @@ pub trait Serializable {
     fn serialize(&self) -> Result<Buffer, Error>;
 
     /// Parse the provided data in the protobuf format.
-    fn deserialize(data: &[u8]) -> Result<Self, Error>
+    fn deserialize(ctx: Context, data: &[u8]) -> Result<Self, Error>
     where
         Self: Sized;
 

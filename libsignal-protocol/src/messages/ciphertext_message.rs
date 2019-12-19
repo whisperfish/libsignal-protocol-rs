@@ -1,4 +1,4 @@
-use crate::{raw_ptr::Raw, Buffer, ContextInner, Serializable};
+use crate::{raw_ptr::Raw, Buffer, Context, ContextInner, Serializable};
 use failure::Error;
 use std::{convert::TryFrom, rc::Rc};
 
@@ -43,7 +43,7 @@ impl CiphertextMessage {
                 sys::CIPHERTEXT_SENDERKEY_TYPE => Ok(CiphertextType::SenderKey),
                 sys::CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE => {
                     Ok(CiphertextType::SenderKeyDistribution)
-                },
+                }
                 other => Err(failure::format_err!(
                     "Unknown ciphertext type: {}",
                     other
@@ -54,7 +54,7 @@ impl CiphertextMessage {
 }
 
 impl Serializable for CiphertextMessage {
-    fn deserialize(_data: &[u8]) -> Result<Self, failure::Error>
+    fn deserialize(_ctx: Context, _data: &[u8]) -> Result<Self, failure::Error>
     where
         Self: Sized,
     {
