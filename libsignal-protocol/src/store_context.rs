@@ -1,6 +1,7 @@
 use crate::{
     context::ContextInner,
     errors::{FromInternalErrorCode, InternalError},
+    keys::{SessionSignedPreKey, PreKey},
     raw_ptr::Raw,
     Address, SessionRecord,
 };
@@ -27,6 +28,38 @@ impl StoreContext {
             raw,
             ctx: Rc::clone(ctx),
         }))
+    }
+
+    /// Store pre key
+    pub fn store_pre_key(
+        &self,
+        pre_key: &PreKey,
+    ) -> Result<(), Error> {
+        unsafe {
+            sys::signal_protocol_pre_key_store_key(
+                self.raw(),
+                pre_key.raw.as_ptr(),
+            )
+            .into_result()?;
+
+            Ok(())
+        }
+    }
+
+    /// Store signed pre key
+    pub fn store_signed_pre_key(
+        &self,
+        signed_pre_key: &SessionSignedPreKey,
+    ) -> Result<(), Error> {
+        unsafe {
+            sys::signal_protocol_signed_pre_key_store_key(
+                self.raw(),
+                signed_pre_key.raw.as_ptr(),
+            )
+            .into_result()?;
+
+            Ok(())
+        }
     }
 
     /// Get the registration ID.
