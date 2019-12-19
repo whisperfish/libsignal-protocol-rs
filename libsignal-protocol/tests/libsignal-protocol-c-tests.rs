@@ -350,9 +350,18 @@ fn test_optional_one_time_pre_key() {
 
     let bob_local_registration_id = bob_store.registration_id().unwrap();
 
-    let bob_signed_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
-    let bob_signed_pre_key_public_serialized =
-        bob_signed_pre_key_pair.public().serialize().unwrap();
+    let bob_signed_pre_key_pair = sig::generate_signed_pre_key(
+        &ctx,
+        &bob_identity_key_pair,
+        22,
+        SystemTime::now(),
+    )
+    .unwrap();
+    let bob_signed_pre_key_public_serialized = bob_signed_pre_key_pair
+        .key_pair()
+        .public()
+        .serialize()
+        .unwrap();
     let bob_signed_pre_key_signature = sig::calculate_signature(
         &ctx,
         &bob_identity_key_pair.private(),
@@ -364,7 +373,10 @@ fn test_optional_one_time_pre_key() {
         .registration_id(bob_local_registration_id)
         .identity_key(&bob_identity_key_pair.public())
         .device_id(1)
-        .signed_pre_key(22, &bob_signed_pre_key_pair.public())
+        .signed_pre_key(
+            bob_signed_pre_key_pair.id(),
+            &bob_signed_pre_key_pair.key_pair().public(),
+        )
         .signature(bob_signed_pre_key_signature.as_slice())
         .build()
         .unwrap();
