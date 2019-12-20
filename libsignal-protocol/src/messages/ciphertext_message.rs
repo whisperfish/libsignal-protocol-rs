@@ -54,7 +54,7 @@ impl CiphertextMessage {
 }
 
 impl Serializable for CiphertextMessage {
-    fn deserialize(_ctx: Context, _data: &[u8]) -> Result<Self, failure::Error>
+    fn deserialize(_ctx: &Context, _data: &[u8]) -> Result<Self, failure::Error>
     where
         Self: Sized,
     {

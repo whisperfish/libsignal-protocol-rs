@@ -136,7 +136,7 @@ impl From<PreKeySignalMessage> for CiphertextMessage {
 }
 
 impl Serializable for PreKeySignalMessage {
-    fn deserialize(ctx: Context, data: &[u8]) -> Result<Self, failure::Error> {
+    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, failure::Error> {
         unsafe {
             let mut raw = ptr::null_mut();
 

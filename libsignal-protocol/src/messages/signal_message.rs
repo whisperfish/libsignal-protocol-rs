@@ -120,7 +120,7 @@ impl From<SignalMessage> for CiphertextMessage {
 }
 
 impl Serializable for SignalMessage {
-    fn deserialize(ctx: Context, data: &[u8]) -> Result<Self, failure::Error> {
+    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, failure::Error> {
         unsafe {
             let mut raw = ptr::null_mut();
 
