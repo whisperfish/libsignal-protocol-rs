@@ -17,8 +17,6 @@ libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }
 failure = "0.1.5"
 failure_derive = "0.1.5"
 rand = "0.6.5"
-parking_lot = "0.8.0"
-lock_api = "0.2.0"
 log = "0.4.6"
 
 # -- Optional Crates -- #

@@ -11,9 +11,7 @@ use std::{
 };
 
 use failure::Error;
-use lock_api::RawMutex as _;
 use log::Level;
-use parking_lot::RawMutex;
 
 #[cfg(feature = "crypto-native")]
 use crate::crypto::DefaultCrypto;
@@ -333,7 +331,6 @@ impl ContextInner {
             let mut global_context: *mut sys::signal_context = ptr::null_mut();
             let crypto = CryptoProvider::new(crypto);
             let mut state = Pin::new(Box::new(State {
-                mux: RawMutex::INIT,
                 log_func: Mutex::new(Box::new(default_log_func)),
             }));
 
@@ -425,14 +422,12 @@ fn translate_log_level(raw: c_int) -> Level {
     }
 }
 
-unsafe extern "C" fn lock_function(user_data: *mut c_void) {
-    let state = &*(user_data as *const State);
-    state.mux.lock();
+unsafe extern "C" fn lock_function(_user_data: *mut c_void) {
+    // Locking is not required as [`Context`] cannot be shared between
+    // threads as long as it does not implement [`Sync`]
 }
 
-unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
-    let state = &*(user_data as *const State);
-    state.mux.unlock();
+unsafe extern "C" fn unlock_function(_user_data: *mut c_void) {
 }
 
 /// The "user state" we pass to `libsignal-protocol-c` as part of the global
@@ -444,7 +439,6 @@ unsafe extern "C" fn unlock_function(user_data: *mut c_void) {
 /// `libsignal-protocol-c` library, so any mutation **must** be done using the
 /// appropriate synchronisation mechanisms (i.e. `RefCell` or atomics).
 struct State {
-    mux: RawMutex,
     log_func: Mutex<Box<dyn Fn(Level, &str) + RefUnwindSafe>>,
 }
 
