@@ -6,5 +6,4 @@ implementors["block_modes"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

@@ -6,5 +6,4 @@ implementors["libsignal_protocol"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()

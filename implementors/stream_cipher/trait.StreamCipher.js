@@ -6,5 +6,4 @@ implementors["stream_cipher"] = [];
             } else {
                 window.pending_implementors = implementors;
             }
-        
-})()
+        })()
