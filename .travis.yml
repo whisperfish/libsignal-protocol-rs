@@ -11,12 +11,16 @@ addons:
 env:
   - RUST_BACKTRACE=full
 
-script: 
+script:
   - cargo build --all --verbose
   - cargo test --all --verbose
   - cargo test --all --verbose --all-features
+  # Run test with feature flags in subdir as cargo does not support feature
+  # flags in virtual workspace
+  - cd libsignal-protocol
   - cargo test --all --verbose --no-default-features --features="crypto-openssl"
   - cargo test --all --verbose --no-default-features --features="crypto-native"
+  - cd ..
   - cargo doc --all --verbose
     # Check that the (non-blacklisted) examples and tests don't have memory bugs
   - python3 ./scripts/valgrind.py
