@@ -308,14 +308,6 @@ impl Default for Context {
     }
 }
 
-// Assert that Context does not implement [`Send`] and [`Sync`] to guarantee
-// that each [`Context`] instance is only used within a single thread. This allows
-// locking to be omitted (see lock_function below).
-//
-// See https://github.com/Michael-F-Bryan/libsignal-protocol-rs/issues/49
-// for details.
-static_assertions::assert_not_impl_all!(Context: Send, Sync);
-
 /// Our Rust wrapper around the [`sys::signal_context`].
 ///
 /// # Safety
@@ -430,6 +422,13 @@ fn translate_log_level(raw: c_int) -> Level {
         _ => Level::Info,
     }
 }
+
+// Assert that Context does not implement [`Send`] and [`Sync`] to guarantee
+// that each [`Context`] instance is only used within a single thread. 
+//
+// See https://github.com/Michael-F-Bryan/libsignal-protocol-rs/issues/49
+// for details.
+static_assertions::assert_not_impl_all!(Context: Send, Sync);
 
 unsafe extern "C" fn lock_function(_user_data: *mut c_void) {
     // Locking is not required as [`Context`] cannot be shared between
