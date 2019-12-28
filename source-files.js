@@ -42,6 +42,7 @@ sourcesIndex["rustc_demangle"] = {"name":"","files":["legacy.rs","lib.rs","v0.rs
 sourcesIndex["scopeguard"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["sha2"] = {"name":"","files":["consts.rs","lib.rs","sha256.rs","sha256_utils.rs","sha512.rs","sha512_utils.rs"]};
 sourcesIndex["smallvec"] = {"name":"","files":["lib.rs"]};
+sourcesIndex["static_assertions"] = {"name":"","files":["assert_cfg.rs","assert_eq_align.rs","assert_eq_size.rs","assert_fields.rs","assert_impl.rs","assert_obj_safe.rs","assert_trait.rs","assert_type.rs","const_assert.rs","lib.rs"]};
 sourcesIndex["stream_cipher"] = {"name":"","files":["errors.rs","lib.rs"]};
 sourcesIndex["subtle"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["syn"] = {"name":"","dirs":[{"name":"gen","files":["gen_helper.rs","visit.rs"]}],"files":["attr.rs","buffer.rs","custom_keyword.rs","custom_punctuation.rs","data.rs","derive.rs","error.rs","export.rs","expr.rs","ext.rs","generics.rs","group.rs","ident.rs","lib.rs","lifetime.rs","lit.rs","lookahead.rs","mac.rs","macros.rs","op.rs","parse.rs","parse_macro_input.rs","parse_quote.rs","path.rs","print.rs","punctuated.rs","sealed.rs","span.rs","spanned.rs","thread.rs","token.rs","tt.rs","ty.rs"]};

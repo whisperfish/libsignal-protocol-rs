@@ -42,6 +42,7 @@ ALIASES["rustc_demangle"] = {};
 ALIASES["scopeguard"] = {};
 ALIASES["sha2"] = {};
 ALIASES["smallvec"] = {};
+ALIASES["static_assertions"] = {};
 ALIASES["stream_cipher"] = {};
 ALIASES["subtle"] = {};
 ALIASES["syn"] = {};
