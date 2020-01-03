@@ -1,10 +1,11 @@
 use crate::{
+    errors::FromInternalErrorCode,
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType, SignalMessage},
     raw_ptr::Raw,
     Buffer, Context, ContextInner, Serializable,
 };
-use failure::Error;
+use failure::{Error, ResultExt};
 use std::{convert::TryFrom, ptr, rc::Rc};
 
 /// A message containing everything necessary to establish a session.
@@ -140,20 +141,17 @@ impl Serializable for PreKeySignalMessage {
         unsafe {
             let mut raw = ptr::null_mut();
 
-            let res = sys::pre_key_signal_message_deserialize(
+            sys::pre_key_signal_message_deserialize(
                 &mut raw,
                 data.as_ptr(),
                 data.len(),
                 ctx.raw(),
-            );
-            if res != 0 {
-                return Err(failure::err_msg("Unable to deserialize buffer"));
-            }
-            // safety: the successful invocation of pre_key_signal_message_deserialize
-            // tells us this is actually a pointer to a `pre_key_signal_message`
-            let raw = Raw::copied_from(raw as *mut sys::pre_key_signal_message);
+            )
+            .into_result()
+            .context("Unable to deserialize buffer")?;
+
             Ok(PreKeySignalMessage {
-                raw,
+                raw: Raw::from_ptr(raw),
                 _ctx: Rc::clone(&ctx.0),
             })
         }
