@@ -133,11 +133,8 @@ impl Serializable for SignalMessage {
             if res != 0 {
                 return Err(failure::err_msg("Unable to deserialize buffer"));
             }
-            // safety: the successful invocation of signal_message_deserialize
-            // tells us this is actually a pointer to a `signal_message`
-            let raw = Raw::copied_from(raw as *mut sys::signal_message);
             Ok(SignalMessage {
-                raw,
+                raw: Raw::from_ptr(raw),
                 _ctx: Rc::clone(&ctx.0),
             })
         }
