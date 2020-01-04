@@ -413,7 +413,7 @@ fn test_optional_one_time_pre_key() {
 }
 
 #[test]
-fn test_decrypt() {
+fn test_basic_pre_key_v3() {
     let bob_address = Address::new("+14152222222", 1);
     let alice_address = Address::new("+14157777777", 1);
     let ctx = mock_ctx();
@@ -435,14 +435,18 @@ fn test_decrypt() {
         sig::session_builder(&ctx, &alice_store, &bob_address);
 
     // Create Bob's data store and pre key bundle
-    let bob_local_registration_id = sig::generate_registration_id(&ctx, 0).unwrap();
+    let bob_local_registration_id =
+        sig::generate_registration_id(&ctx, 0).unwrap();
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_store = sig::store_context(
         &ctx,
         InMemoryPreKeyStore::default(),
         InMemorySignedPreKeyStore::default(),
         InMemorySessionStore::default(),
-        InMemoryIdentityKeyStore::new(bob_local_registration_id, &bob_identity_key_pair),
+        InMemoryIdentityKeyStore::new(
+            bob_local_registration_id,
+            &bob_identity_key_pair,
+        ),
     )
     .unwrap();
 
@@ -468,7 +472,7 @@ fn test_decrypt() {
         .store_signed_pre_key(&bob_signed_pre_key_pair)
         .unwrap();
 
-    // Generate pre key for bob
+    // Generate pre key for Bob
     let mut bob_pre_keys = sig::generate_pre_keys(&ctx, 2, 4).unwrap();
     let bob_pre_key = bob_pre_keys.next().unwrap();
     bob_store.store_pre_key(&bob_pre_key).unwrap();
@@ -491,43 +495,47 @@ fn test_decrypt() {
         .process_pre_key_bundle(&bob_pre_key_bundle)
         .unwrap();
 
-    // create alice's session cipher
+    // Encrypt an outgoing message to send to Bob
+    let msg = "L'homme est condamn� � �tre libre";
     let alice_session_cipher =
         sig::SessionCipher::new(&ctx, &alice_store, &bob_address).unwrap();
-
-    // Let Alice send a message to bob
-    let msg = "Hello bob!";
-    let outgoing_message =
+    let alice_outgoing_message =
         alice_session_cipher.encrypt(msg.as_bytes()).unwrap();
 
-    // Convert to an incoming message (this is technically a downcast from
-    // CiphertextMessage to PreKeySignalMessage)
-    let incoming_message =
-        PreKeySignalMessage::try_from(outgoing_message).unwrap();
+    // Convert to an incoming message for Bob
+    let alice_outgoing_message_serialized =
+        alice_outgoing_message.serialize().unwrap();
+    let bob_incoming_message_deserialized = PreKeySignalMessage::deserialize(
+        &ctx,
+        alice_outgoing_message_serialized.as_slice(),
+    )
+    .unwrap();
 
-    let has_pre_key_id = incoming_message.has_pre_key_id();
-    assert!(has_pre_key_id);
-
-    // Create bob's session cipher
+    // Create Bob's session cipher and decrypt the message from Alice
     let bob_session_cipher =
         sig::SessionCipher::new(&ctx, &bob_store, &alice_address).unwrap();
-
-    // Decrypt message to bob
     let decrypted_msg = bob_session_cipher
-        .decrypt_pre_key_message(&incoming_message)
+        .decrypt_pre_key_message(&bob_incoming_message_deserialized)
         .unwrap();
     assert_eq!(msg, std::str::from_utf8(decrypted_msg.as_slice()).unwrap());
 
-    // Let bob send a message to Alice
+    // Have Bob send a reply to Alice
     let msg = "Hi Alice!";
-    let outgoing_message = bob_session_cipher.encrypt(msg.as_bytes()).unwrap();
+    let bob_outgoing_message =
+        bob_session_cipher.encrypt(msg.as_bytes()).unwrap();
 
-    // Convert to an incoming message (this is technically a downcast from
-    // CiphertextMessage to SignalMessage)
-    let incoming_message = SignalMessage::try_from(outgoing_message).unwrap();
+    // Convert to an incomming message for Alice
+    let bob_outgoing_message_serialized =
+        bob_outgoing_message.serialize().unwrap();
+    let alice_incomming_message_deserialized = SignalMessage::deserialize(
+        &ctx,
+        bob_outgoing_message_serialized.as_slice(),
+    )
+    .unwrap();
 
+    // Verify that Alice can decrypt it
     let decrypted_msg = alice_session_cipher
-        .decrypt_message(&incoming_message)
+        .decrypt_message(&alice_incomming_message_deserialized)
         .unwrap();
     assert_eq!(msg, std::str::from_utf8(decrypted_msg.as_slice()).unwrap());
 }
