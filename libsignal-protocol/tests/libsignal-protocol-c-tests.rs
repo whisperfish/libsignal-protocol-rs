@@ -435,18 +435,17 @@ fn test_decrypt() {
         sig::session_builder(&ctx, &alice_store, &bob_address);
 
     // Create Bob's data store and pre key bundle
-    let registration_id = sig::generate_registration_id(&ctx, 0).unwrap();
+    let bob_local_registration_id = sig::generate_registration_id(&ctx, 0).unwrap();
     let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
     let bob_store = sig::store_context(
         &ctx,
         InMemoryPreKeyStore::default(),
         InMemorySignedPreKeyStore::default(),
         InMemorySessionStore::default(),
-        InMemoryIdentityKeyStore::new(registration_id, &bob_identity_key_pair),
+        InMemoryIdentityKeyStore::new(bob_local_registration_id, &bob_identity_key_pair),
     )
     .unwrap();
 
-    let bob_local_registration_id = bob_store.registration_id().unwrap();
     let bob_signed_pre_key_pair = sig::generate_signed_pre_key(
         &ctx,
         &bob_identity_key_pair,
