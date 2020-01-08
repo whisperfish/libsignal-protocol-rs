@@ -62,14 +62,14 @@ impl OpenSSLCrypto {
             },
             SignalCipherType::AesCbcPkcs5 => vec![0u8; data.len() + block_size],
         };
-        let mut count = crypter
+        let count = crypter
             .update(data, &mut result)
             .map_err(|_e| InternalError::Unknown)?;
 
-        count += crypter
-            .finalize(&mut result)
+        let rest = crypter
+            .finalize(&mut result[count..])
             .map_err(|_e| InternalError::Unknown)?;
-        result.truncate(count);
+        result.truncate(count + rest);
         Ok(result)
     }
 }
