@@ -120,11 +120,6 @@ pub trait Serializable {
     /// Serialize the object to a buffer.
     fn serialize(&self) -> Result<Buffer, Error>;
 
-    /// Parse the provided data in the protobuf format.
-    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, Error>
-    where
-        Self: Sized;
-
     /// Helper for serializing to anything which implements [`Write`].
     fn serialize_to<W: Write>(&self, mut writer: W) -> Result<(), Error> {
         let buffer = self.serialize()?;
@@ -132,4 +127,12 @@ pub trait Serializable {
 
         Ok(())
     }
+}
+
+/// A helper trait for something which can be deserialized from protobufs.
+pub trait Deserializable {
+    /// Parse the provided data in the protobuf format.
+    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, Error>
+    where
+        Self: Sized;
 }

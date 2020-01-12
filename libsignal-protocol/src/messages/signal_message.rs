@@ -3,7 +3,7 @@ use crate::{
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType},
     raw_ptr::Raw,
-    Buffer, Context, ContextInner, Serializable,
+    Context, ContextInner, Deserializable,
 };
 use failure::{Error, ResultExt};
 use std::{convert::TryFrom, ptr, rc::Rc};
@@ -119,7 +119,7 @@ impl From<SignalMessage> for CiphertextMessage {
     }
 }
 
-impl Serializable for SignalMessage {
+impl Deserializable for SignalMessage {
     fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, failure::Error> {
         unsafe {
             let mut raw = ptr::null_mut();
@@ -138,10 +138,6 @@ impl Serializable for SignalMessage {
                 _ctx: Rc::clone(&ctx.0),
             })
         }
-    }
-
-    fn serialize(&self) -> Result<Buffer, failure::Error> {
-        unimplemented!()
     }
 }
 

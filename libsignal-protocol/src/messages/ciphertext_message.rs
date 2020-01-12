@@ -1,4 +1,4 @@
-use crate::{raw_ptr::Raw, Buffer, Context, ContextInner, Serializable};
+use crate::{raw_ptr::Raw, Buffer, ContextInner, Serializable};
 use failure::Error;
 use std::{convert::TryFrom, rc::Rc};
 
@@ -54,13 +54,6 @@ impl CiphertextMessage {
 }
 
 impl Serializable for CiphertextMessage {
-    fn deserialize(_ctx: &Context, _data: &[u8]) -> Result<Self, failure::Error>
-    where
-        Self: Sized,
-    {
-        unimplemented!()
-    }
-
     fn serialize(&self) -> Result<Buffer, failure::Error> {
         unsafe {
             // get a reference to the *cached* serialized message

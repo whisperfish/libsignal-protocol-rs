@@ -12,7 +12,7 @@ use sig::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
-    Address, Context, InternalError, PreKeyBundle, Serializable,
+    Address, Context, InternalError, PreKeyBundle, Serializable, Deserializable,
 };
 
 use crate::helpers::{fake_random_generator, MockCrypto};
