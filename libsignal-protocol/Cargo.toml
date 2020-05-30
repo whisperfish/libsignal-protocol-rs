@@ -16,7 +16,7 @@ libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }
 #libsignal-protocol-sys = "0.1.0"
 failure = "0.1.5"
 failure_derive = "0.1.5"
-rand = "0.6.5"
+rand = "0.7.3"
 log = "0.4.6"
 static_assertions = "1.1.0"
 
@@ -37,4 +37,4 @@ crypto-openssl = ["openssl", "rental"]
 
 [dev-dependencies]
 cfg-if = "0.1.9"
-env_logger = "0.6.1"
+env_logger = "0.7.1"
