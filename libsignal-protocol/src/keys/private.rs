@@ -82,4 +82,4 @@ impl PartialOrd for PrivateKey {
     }
 }
 
-impl_serializable!(PrivateKey, ec_private_key_serialize, asd);
+impl_serializable!(PrivateKey, ec_private_key_serialize);

@@ -135,4 +135,6 @@ impl From<PreKeySignalMessage> for CiphertextMessage {
     }
 }
 
+impl_deserializable!(PreKeySignalMessage, pre_key_signal_message_deserialize);
+
 impl_is_a!(sys::pre_key_signal_message => sys::ciphertext_message);

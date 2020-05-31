@@ -7,12 +7,12 @@ use std::{
 
 use sig::{
     keys::{PrivateKey, PublicKey},
-    messages::PreKeySignalMessage,
+    messages::{PreKeySignalMessage, SignalMessage},
     stores::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
-    Address, Context, InternalError, PreKeyBundle, Serializable,
+    Address, Context, InternalError, PreKeyBundle, Serializable, Deserializable,
 };
 
 use crate::helpers::{fake_random_generator, MockCrypto};
@@ -350,10 +350,18 @@ fn test_optional_one_time_pre_key() {
 
     let bob_local_registration_id = bob_store.registration_id().unwrap();
 
-    let bob_signed_pre_key_pair = sig::generate_key_pair(&ctx).unwrap();
-    let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
-    let bob_signed_pre_key_public_serialized =
-        bob_signed_pre_key_pair.public().serialize().unwrap();
+    let bob_signed_pre_key_pair = sig::generate_signed_pre_key(
+        &ctx,
+        &bob_identity_key_pair,
+        22,
+        SystemTime::now(),
+    )
+    .unwrap();
+    let bob_signed_pre_key_public_serialized = bob_signed_pre_key_pair
+        .key_pair()
+        .public()
+        .serialize()
+        .unwrap();
     let bob_signed_pre_key_signature = sig::calculate_signature(
         &ctx,
         &bob_identity_key_pair.private(),
@@ -365,7 +373,10 @@ fn test_optional_one_time_pre_key() {
         .registration_id(bob_local_registration_id)
         .identity_key(&bob_identity_key_pair.public())
         .device_id(1)
-        .signed_pre_key(22, &bob_signed_pre_key_pair.public())
+        .signed_pre_key(
+            bob_signed_pre_key_pair.id(),
+            &bob_signed_pre_key_pair.key_pair().public(),
+        )
         .signature(bob_signed_pre_key_signature.as_slice())
         .build()
         .unwrap();
@@ -399,4 +410,132 @@ fn test_optional_one_time_pre_key() {
 
     let has_pre_key_id = incoming_message.has_pre_key_id();
     assert!(!has_pre_key_id);
+}
+
+#[test]
+fn test_basic_pre_key_v3() {
+    let bob_address = Address::new("+14152222222", 1);
+    let alice_address = Address::new("+14157777777", 1);
+    let ctx = mock_ctx();
+
+    // Create Alice's data store and session builder
+    let alice_identity = sig::generate_identity_key_pair(&ctx).unwrap();
+    let alice_store = sig::store_context(
+        &ctx,
+        InMemoryPreKeyStore::default(),
+        InMemorySignedPreKeyStore::default(),
+        InMemorySessionStore::default(),
+        InMemoryIdentityKeyStore::new(
+            sig::generate_registration_id(&ctx, 0).unwrap(),
+            &alice_identity,
+        ),
+    )
+    .unwrap();
+    let alice_session_builder =
+        sig::session_builder(&ctx, &alice_store, &bob_address);
+
+    // Create Bob's data store and pre key bundle
+    let bob_local_registration_id =
+        sig::generate_registration_id(&ctx, 0).unwrap();
+    let bob_identity_key_pair = sig::generate_identity_key_pair(&ctx).unwrap();
+    let bob_store = sig::store_context(
+        &ctx,
+        InMemoryPreKeyStore::default(),
+        InMemorySignedPreKeyStore::default(),
+        InMemorySessionStore::default(),
+        InMemoryIdentityKeyStore::new(
+            bob_local_registration_id,
+            &bob_identity_key_pair,
+        ),
+    )
+    .unwrap();
+
+    let bob_signed_pre_key_pair = sig::generate_signed_pre_key(
+        &ctx,
+        &bob_identity_key_pair,
+        22,
+        SystemTime::now(),
+    )
+    .unwrap();
+    let bob_signed_pre_key_public_serialized = bob_signed_pre_key_pair
+        .key_pair()
+        .public()
+        .serialize()
+        .unwrap();
+    let bob_signed_pre_key_signature = sig::calculate_signature(
+        &ctx,
+        &bob_identity_key_pair.private(),
+        bob_signed_pre_key_public_serialized.as_slice(),
+    )
+    .unwrap();
+    bob_store
+        .store_signed_pre_key(&bob_signed_pre_key_pair)
+        .unwrap();
+
+    // Generate pre key for Bob
+    let mut bob_pre_keys = sig::generate_pre_keys(&ctx, 2, 4).unwrap();
+    let bob_pre_key = bob_pre_keys.next().unwrap();
+    bob_store.store_pre_key(&bob_pre_key).unwrap();
+
+    let bob_pre_key_bundle = PreKeyBundle::builder()
+        .registration_id(bob_local_registration_id)
+        .identity_key(&bob_identity_key_pair.public())
+        .device_id(1)
+        .pre_key(bob_pre_key.id(), &bob_pre_key.key_pair().public())
+        .signed_pre_key(
+            bob_signed_pre_key_pair.id(),
+            &bob_signed_pre_key_pair.key_pair().public(),
+        )
+        .signature(bob_signed_pre_key_signature.as_slice())
+        .build()
+        .unwrap();
+
+    // Have Alice process Bob's pre key bundle
+    alice_session_builder
+        .process_pre_key_bundle(&bob_pre_key_bundle)
+        .unwrap();
+
+    // Encrypt an outgoing message to send to Bob
+    let msg = "L'homme est condamn� � �tre libre";
+    let alice_session_cipher =
+        sig::SessionCipher::new(&ctx, &alice_store, &bob_address).unwrap();
+    let alice_outgoing_message =
+        alice_session_cipher.encrypt(msg.as_bytes()).unwrap();
+
+    // Convert to an incoming message for Bob
+    let alice_outgoing_message_serialized =
+        alice_outgoing_message.serialize().unwrap();
+    let bob_incoming_message_deserialized = PreKeySignalMessage::deserialize(
+        &ctx,
+        alice_outgoing_message_serialized.as_slice(),
+    )
+    .unwrap();
+
+    // Create Bob's session cipher and decrypt the message from Alice
+    let bob_session_cipher =
+        sig::SessionCipher::new(&ctx, &bob_store, &alice_address).unwrap();
+    let decrypted_msg = bob_session_cipher
+        .decrypt_pre_key_message(&bob_incoming_message_deserialized)
+        .unwrap();
+    assert_eq!(msg, std::str::from_utf8(decrypted_msg.as_slice()).unwrap());
+
+    // Have Bob send a reply to Alice
+    let msg = "Hi Alice!";
+    let bob_outgoing_message =
+        bob_session_cipher.encrypt(msg.as_bytes()).unwrap();
+
+    // Convert to an incomming message for Alice
+    let bob_outgoing_message_serialized =
+        bob_outgoing_message.serialize().unwrap();
+    let alice_incomming_message_deserialized = SignalMessage::deserialize(
+        &ctx,
+        bob_outgoing_message_serialized.as_slice(),
+    )
+    .unwrap();
+
+    // Verify that Alice can decrypt it
+    let decrypted_msg = alice_session_cipher
+        .decrypt_message(&alice_incomming_message_deserialized)
+        .unwrap();
+    assert_eq!(msg, std::str::from_utf8(decrypted_msg.as_slice()).unwrap());
 }

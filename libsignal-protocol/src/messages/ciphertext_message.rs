@@ -43,7 +43,7 @@ impl CiphertextMessage {
                 sys::CIPHERTEXT_SENDERKEY_TYPE => Ok(CiphertextType::SenderKey),
                 sys::CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE => {
                     Ok(CiphertextType::SenderKeyDistribution)
-                },
+                }
                 other => Err(failure::format_err!(
                     "Unknown ciphertext type: {}",
                     other
@@ -54,13 +54,6 @@ impl CiphertextMessage {
 }
 
 impl Serializable for CiphertextMessage {
-    fn deserialize(_data: &[u8]) -> Result<Self, failure::Error>
-    where
-        Self: Sized,
-    {
-        unimplemented!()
-    }
-
     fn serialize(&self) -> Result<Buffer, failure::Error> {
         unsafe {
             // get a reference to the *cached* serialized message

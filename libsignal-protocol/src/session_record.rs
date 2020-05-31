@@ -22,8 +22,10 @@ impl SessionRecord {
     }
 }
 
-impl_serializable!(
-    SessionRecord,
-    session_record_serialize,
-    session_record_deserialize
-);
+impl_serializable!(SessionRecord, session_record_serialize);
+impl_deserializable!(SessionRecord, session_record_deserialize, |raw, ctx| {
+    SessionRecord {
+        raw,
+        ctx: Rc::clone(&ctx.0),
+    }
+});

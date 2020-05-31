@@ -1,10 +1,10 @@
 use crate::{
     context::{Context, ContextInner},
     errors::FromInternalErrorCode,
-    messages::CiphertextMessage,
+    messages::{CiphertextMessage, PreKeySignalMessage, SignalMessage},
     raw_ptr::Raw,
     store_context::{StoreContext, StoreContextInner},
-    Address,
+    Address, Buffer,
 };
 
 use failure::Error;
@@ -64,6 +64,44 @@ impl SessionCipher {
                 raw: Raw::from_ptr(raw),
                 _ctx: Rc::clone(&self._ctx),
             })
+        }
+    }
+
+    /// Decrypt a pre key message
+    pub fn decrypt_pre_key_message(
+        &self,
+        message: &PreKeySignalMessage,
+    ) -> Result<Buffer, Error> {
+        unsafe {
+            let mut buffer = ptr::null_mut();
+            sys::session_cipher_decrypt_pre_key_signal_message(
+                self.raw,
+                message.raw.as_ptr(),
+                ptr::null_mut(),
+                &mut buffer,
+            )
+            .into_result()?;
+            
+            Ok(Buffer::from_raw(buffer))
+        }
+    }
+
+    /// Decrypt a message
+    pub fn decrypt_message(
+        &self,
+        message: &SignalMessage,
+    ) -> Result<Buffer, Error> {
+        unsafe {
+            let mut buffer = ptr::null_mut();
+            sys::session_cipher_decrypt_signal_message(
+                self.raw,
+                message.raw.as_ptr(),
+                ptr::null_mut(),
+                &mut buffer,
+            )
+            .into_result()?;
+            
+            Ok(Buffer::from_raw(buffer))
         }
     }
 }

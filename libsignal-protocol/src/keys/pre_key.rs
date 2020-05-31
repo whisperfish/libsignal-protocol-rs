@@ -43,7 +43,7 @@ impl PreKey {
     }
 }
 
-impl_serializable!(PreKey, session_pre_key_serialize, foo);
+impl_serializable!(PreKey, session_pre_key_serialize);
 
 impl Debug for PreKey {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
