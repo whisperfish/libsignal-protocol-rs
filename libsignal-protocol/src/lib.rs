@@ -130,9 +130,7 @@ pub trait Serializable {
 }
 
 /// A helper trait for something which can be deserialized from protobufs.
-pub trait Deserializable {
+pub trait Deserializable: Sized {
     /// Parse the provided data in the protobuf format.
-    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, Error>
-    where
-        Self: Sized;
+    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, Error>;
 }
