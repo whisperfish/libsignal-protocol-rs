@@ -1,12 +1,11 @@
 use crate::{
-    errors::FromInternalErrorCode,
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType, SignalMessage},
     raw_ptr::Raw,
-    Context, ContextInner, Deserializable,
+    ContextInner,
 };
-use failure::{Error, ResultExt};
-use std::{convert::TryFrom, ptr, rc::Rc};
+use failure::Error;
+use std::{convert::TryFrom, rc::Rc};
 
 /// A message containing everything necessary to establish a session.
 #[derive(Debug, Clone)]
@@ -136,26 +135,6 @@ impl From<PreKeySignalMessage> for CiphertextMessage {
     }
 }
 
-impl Deserializable for PreKeySignalMessage {
-    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, failure::Error> {
-        unsafe {
-            let mut raw = ptr::null_mut();
-
-            sys::pre_key_signal_message_deserialize(
-                &mut raw,
-                data.as_ptr(),
-                data.len(),
-                ctx.raw(),
-            )
-            .into_result()
-            .context("Unable to deserialize buffer")?;
-
-            Ok(PreKeySignalMessage {
-                raw: Raw::from_ptr(raw),
-                _ctx: Rc::clone(&ctx.0),
-            })
-        }
-    }
-}
+impl_deserializable!(PreKeySignalMessage, pre_key_signal_message_deserialize);
 
 impl_is_a!(sys::pre_key_signal_message => sys::ciphertext_message);

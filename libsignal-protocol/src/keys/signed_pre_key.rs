@@ -84,7 +84,7 @@ impl SessionSignedPreKey {
     }
 }
 
-impl_serializable!(SessionSignedPreKey, session_signed_pre_key_serialize, foo);
+impl_serializable!(SessionSignedPreKey, session_signed_pre_key_serialize);
 
 impl Debug for SessionSignedPreKey {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {

@@ -1,12 +1,12 @@
 use crate::{
-    errors::{FromInternalErrorCode, InternalError},
+    errors::InternalError,
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType},
     raw_ptr::Raw,
-    Context, ContextInner, Deserializable,
+    Context, ContextInner,
 };
-use failure::{Error, ResultExt};
-use std::{convert::TryFrom, ptr, rc::Rc};
+use failure::Error;
+use std::{convert::TryFrom, rc::Rc};
 
 // For rustdoc link resolution
 #[allow(unused_imports)]
@@ -119,26 +119,6 @@ impl From<SignalMessage> for CiphertextMessage {
     }
 }
 
-impl Deserializable for SignalMessage {
-    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, failure::Error> {
-        unsafe {
-            let mut raw = ptr::null_mut();
-
-            sys::signal_message_deserialize(
-                &mut raw,
-                data.as_ptr(),
-                data.len(),
-                ctx.raw(),
-            )
-            .into_result()
-            .context("Unable to deserialize buffer")?;
-
-            Ok(SignalMessage {
-                raw: Raw::from_ptr(raw),
-                _ctx: Rc::clone(&ctx.0),
-            })
-        }
-    }
-}
+impl_deserializable!(SignalMessage, signal_message_deserialize);
 
 impl_is_a!(sys::signal_message => sys::ciphertext_message);

@@ -1,5 +1,5 @@
 macro_rules! impl_serializable {
-    ($name:ty, $serialize:ident, $deserialize:ident) => {
+    ($name:ty, $serialize:ident) => {
         impl $crate::Serializable for $name {
             fn serialize(&self) -> Result<$crate::Buffer, failure::Error> {
                 #[allow(unused_imports)]
@@ -10,6 +10,46 @@ macro_rules! impl_serializable {
                     sys::$serialize(&mut buffer, self.raw.as_const_ptr())
                         .into_result()?;
                     Ok($crate::Buffer::from_raw(buffer))
+                }
+            }
+        }
+    };
+}
+
+macro_rules! impl_deserializable {
+    ($name:ty, $deserialize:ident) => {
+        impl_deserializable!($name, $deserialize, |raw, ctx| Self {
+            raw,
+            _ctx: std::rc::Rc::clone(&ctx.0),
+        });
+    };
+    ($name:ty, $deserialize:ident, |$raw:ident, $ctx:ident| $constructed:expr) => {
+        #[allow(unused_imports)]
+        impl $crate::Deserializable for $name {
+            fn deserialize(
+                ctx: &$crate::Context,
+                data: &[u8],
+            ) -> Result<Self, failure::Error> {
+                use failure::ResultExt;
+                use $crate::errors::FromInternalErrorCode;
+
+                let mut raw = std::mem::MaybeUninit::uninit();
+
+                unsafe {
+                    sys::$deserialize(
+                        raw.as_mut_ptr(),
+                        data.as_ptr(),
+                        data.len() as _,
+                        ctx.raw(),
+                    )
+                    .into_result()
+                    .context("Unable to deserialize buffer")?;
+
+                    let $raw =
+                        $crate::raw_ptr::Raw::from_ptr(raw.assume_init());
+                    let $ctx = ctx;
+
+                    Ok($constructed)
                 }
             }
         }

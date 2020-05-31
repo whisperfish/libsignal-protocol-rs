@@ -97,7 +97,7 @@ impl PartialOrd for PublicKey {
     }
 }
 
-impl_serializable!(PublicKey, ec_public_key_serialize, asd);
+impl_serializable!(PublicKey, ec_public_key_serialize);
 
 #[cfg(test)]
 mod tests {

@@ -72,4 +72,4 @@ impl Debug for IdentityKeyPair {
     }
 }
 
-impl_serializable!(IdentityKeyPair, ratchet_identity_key_pair_serialize, foo);
+impl_serializable!(IdentityKeyPair, ratchet_identity_key_pair_serialize);
