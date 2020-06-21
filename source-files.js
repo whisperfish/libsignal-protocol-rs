@@ -1,9 +1,10 @@
 var N = null;var sourcesIndex = {};
 sourcesIndex["addr2line"] = {"name":"","files":["lazy.rs","lib.rs"]};
+sourcesIndex["adler32"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["aes"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["aes_ctr"] = {"name":"","files":["dummy.rs","lib.rs"]};
 sourcesIndex["aes_soft"] = {"name":"","files":["bitslice.rs","consts.rs","expand.rs","impls.rs","lib.rs","simd.rs"]};
-sourcesIndex["backtrace"] = {"name":"","dirs":[{"name":"backtrace","files":["libunwind.rs","mod.rs"]},{"name":"symbolize","dirs":[{"name":"gimli","files":["elf.rs","mmap_unix.rs"]}],"files":["gimli.rs","mod.rs"]}],"files":["capture.rs","lib.rs","print.rs","types.rs"]};
+sourcesIndex["backtrace"] = {"name":"","dirs":[{"name":"backtrace","files":["libunwind.rs","mod.rs"]},{"name":"symbolize","dirs":[{"name":"gimli","files":["elf.rs","mmap_unix.rs","stash.rs"]}],"files":["gimli.rs","mod.rs"]}],"files":["capture.rs","lib.rs","print.rs","types.rs"]};
 sourcesIndex["backtrace_sys"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["block_buffer"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["block_cipher_trait"] = {"name":"","files":["errors.rs","lib.rs"]};
@@ -26,6 +27,7 @@ sourcesIndex["libc"] = {"name":"","dirs":[{"name":"unix","dirs":[{"name":"linux_
 sourcesIndex["libsignal_protocol"] = {"name":"","dirs":[{"name":"crypto","files":["mod.rs","native.rs"]},{"name":"keys","files":["identity_key_pair.rs","key_pair.rs","mod.rs","pre_key.rs","pre_key_list.rs","private.rs","public.rs","signed_pre_key.rs"]},{"name":"messages","files":["ciphertext_message.rs","mod.rs","pre_key_signal_message.rs","signal_message.rs"]},{"name":"stores","files":["identity_key_store.rs","in_memory_identity_key_store.rs","in_memory_pre_key_stores.rs","in_memory_session_store.rs","mod.rs","pre_key_store.rs","session_store.rs","signed_pre_key_store.rs"]}],"files":["address.rs","buffer.rs","context.rs","errors.rs","hkdf.rs","lib.rs","macros.rs","pre_key_bundle.rs","raw_ptr.rs","session_builder.rs","session_cipher.rs","session_record.rs","session_state.rs","store_context.rs"]};
 sourcesIndex["libsignal_protocol_sys"] = {"name":"","files":["bindings.rs","lib.rs"]};
 sourcesIndex["log"] = {"name":"","files":["lib.rs","macros.rs"]};
+sourcesIndex["miniz_oxide"] = {"name":"","dirs":[{"name":"deflate","files":["buffer.rs","core.rs","mod.rs","stream.rs"]},{"name":"inflate","files":["core.rs","mod.rs","output_buffer.rs","stream.rs"]}],"files":["lib.rs","shared.rs"]};
 sourcesIndex["object"] = {"name":"","dirs":[{"name":"read","dirs":[{"name":"coff","files":["file.rs","mod.rs","relocation.rs","section.rs","symbol.rs"]},{"name":"elf","files":["compression.rs","file.rs","mod.rs","note.rs","relocation.rs","section.rs","segment.rs","symbol.rs"]},{"name":"macho","files":["file.rs","load_command.rs","mod.rs","relocation.rs","section.rs","segment.rs","symbol.rs"]},{"name":"pe","files":["file.rs","mod.rs","section.rs"]}],"files":["any.rs","mod.rs","traits.rs","util.rs"]}],"files":["common.rs","elf.rs","endian.rs","lib.rs","macho.rs","pe.rs","pod.rs"]};
 sourcesIndex["opaque_debug"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["ppv_lite86"] = {"name":"","dirs":[{"name":"x86_64","files":["mod.rs","sse2.rs"]}],"files":["lib.rs","soft.rs","types.rs"]};
