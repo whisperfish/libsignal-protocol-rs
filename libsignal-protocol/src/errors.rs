@@ -24,6 +24,8 @@ pub enum InternalError {
     FPVersionMismatch,
     FPIdentMismatch,
     Other(i32),
+    UnknownCiphertextType(u32),
+    SerializationError,
 }
 
 impl InternalError {
@@ -88,6 +90,10 @@ impl InternalError {
             InternalError::FPVersionMismatch => sys::SG_ERR_FP_VERSION_MISMATCH,
             InternalError::FPIdentMismatch => sys::SG_ERR_FP_IDENT_MISMATCH,
             InternalError::Other(c) => c,
+            InternalError::UnknownCiphertextType(_) => {
+                sys::SG_ERR_INVALID_PROTO_BUF
+            },
+            InternalError::SerializationError => sys::SG_ERR_INVALID_PROTO_BUF,
         }
     }
 }
@@ -161,6 +167,10 @@ impl Display for InternalError {
             },
             InternalError::FPIdentMismatch => write!(f, "FP ident mismatched"),
             InternalError::Other(code) => write!(f, "Unknown error {}", code),
+            InternalError::UnknownCiphertextType(t) => {
+                write!(f, "Unknown ciphertext type {}", t)
+            },
+            InternalError::SerializationError => write!(f, "Cannot serialize"),
         }
     }
 }

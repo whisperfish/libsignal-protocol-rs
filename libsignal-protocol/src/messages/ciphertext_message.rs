@@ -1,5 +1,6 @@
-use crate::{raw_ptr::Raw, Buffer, ContextInner, Serializable};
-use failure::Error;
+use crate::{
+    errors::InternalError, raw_ptr::Raw, Buffer, ContextInner, Serializable,
+};
 use std::{convert::TryFrom, rc::Rc};
 
 // For rustdoc link resolution
@@ -33,7 +34,7 @@ pub struct CiphertextMessage {
 
 impl CiphertextMessage {
     /// Which type of message is this?
-    pub fn get_type(&self) -> Result<CiphertextType, Error> {
+    pub fn get_type(&self) -> Result<CiphertextType, InternalError> {
         unsafe {
             let ty = sys::ciphertext_message_get_type(self.raw.as_ptr());
 
@@ -43,27 +44,22 @@ impl CiphertextMessage {
                 sys::CIPHERTEXT_SENDERKEY_TYPE => Ok(CiphertextType::SenderKey),
                 sys::CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE => {
                     Ok(CiphertextType::SenderKeyDistribution)
-                }
-                other => Err(failure::format_err!(
-                    "Unknown ciphertext type: {}",
-                    other
-                )),
+                },
+                other => Err(InternalError::UnknownCiphertextType(other)),
             }
         }
     }
 }
 
 impl Serializable for CiphertextMessage {
-    fn serialize(&self) -> Result<Buffer, failure::Error> {
+    fn serialize(&self) -> Result<Buffer, InternalError> {
         unsafe {
             // get a reference to the *cached* serialized message
             let buffer =
                 sys::ciphertext_message_get_serialized(self.raw.as_const_ptr());
 
             if buffer.is_null() {
-                return Err(failure::err_msg(
-                    "Unable to serialize the message",
-                ));
+                return Err(InternalError::SerializationError);
             }
 
             let temporary_not_owned_buffer = Buffer::from_raw(buffer);
