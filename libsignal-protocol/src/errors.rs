@@ -1,30 +1,47 @@
-use std::{
-    convert::TryFrom,
-    fmt::{self, Display, Formatter},
-};
+use std::convert::TryFrom;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, failure_derive::Fail)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, thiserror::Error)]
 #[allow(missing_docs)]
 pub enum InternalError {
+    #[error("No Memory")]
     NoMemory,
+    #[error("Invalid argument")]
     InvalidArgument,
+    #[error("Unknown error")]
     Unknown,
+    #[error("Duplicate message")]
     DuplicateMessage,
+    #[error("Invalid key")]
     InvalidKey,
+    #[error("Invalid key ID")]
     InvalidKeyId,
+    #[error("Invalid MAC")]
     InvalidMAC,
+    #[error("Invalid message")]
     InvalidMessage,
+    #[error("Invalid version")]
     InvalidVersion,
+    #[error("Legacy message")]
     LegacyMessage,
+    #[error("No session")]
     NoSession,
+    #[error("Stale key exchange")]
     StaleKeyExchange,
+    #[error("Untrusted identity")]
     UntrustedIdentity,
+    #[error("Varifying signature failed")]
     VerifySignatureVerificationFailed,
+    #[error("Invalid protobuf")]
     InvalidProtoBuf,
+    #[error("FP version mismatched")]
     FPVersionMismatch,
+    #[error("FP ident mismatched")]
     FPIdentMismatch,
+    #[error("Unknown error {0}")]
     Other(i32),
+    #[error("Unknown ciphertext type {0}")]
     UnknownCiphertextType(u32),
+    #[error("Cannot serialize")]
     SerializationError,
 }
 
@@ -140,37 +157,4 @@ impl<T> IntoInternalErrorCode for Result<T, InternalError> {
 
 impl From<InternalError> for i32 {
     fn from(other: InternalError) -> i32 { other.code() }
-}
-
-impl Display for InternalError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        match self {
-            InternalError::NoMemory => write!(f, "No Memory"),
-            InternalError::InvalidArgument => write!(f, "Invalid argument"),
-            InternalError::Unknown => write!(f, "Unknown error"),
-            InternalError::DuplicateMessage => write!(f, "Duplicate message"),
-            InternalError::InvalidKey => write!(f, "Invalid key"),
-            InternalError::InvalidKeyId => write!(f, "Invalid key ID"),
-            InternalError::InvalidMAC => write!(f, "Invalid MAC"),
-            InternalError::InvalidMessage => write!(f, "Invalid message"),
-            InternalError::InvalidVersion => write!(f, "Invalid version"),
-            InternalError::LegacyMessage => write!(f, "Legacy message"),
-            InternalError::NoSession => write!(f, "No session"),
-            InternalError::StaleKeyExchange => write!(f, "Stale key exchange"),
-            InternalError::UntrustedIdentity => write!(f, "Untrusted identity"),
-            InternalError::VerifySignatureVerificationFailed => {
-                write!(f, "Verifying signature failed")
-            },
-            InternalError::InvalidProtoBuf => write!(f, "Invalid protobuf"),
-            InternalError::FPVersionMismatch => {
-                write!(f, "FP version mismatched")
-            },
-            InternalError::FPIdentMismatch => write!(f, "FP ident mismatched"),
-            InternalError::Other(code) => write!(f, "Unknown error {}", code),
-            InternalError::UnknownCiphertextType(t) => {
-                write!(f, "Unknown ciphertext type {}", t)
-            },
-            InternalError::SerializationError => write!(f, "Cannot serialize"),
-        }
-    }
 }
