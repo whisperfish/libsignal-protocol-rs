@@ -4,7 +4,7 @@ use aes_ctr::{
     Aes128Ctr, Aes192Ctr, Aes256Ctr,
 };
 use block_modes::{block_padding::Pkcs7, BlockMode, Cbc};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, Mac, NewMac};
 use sha2::{Digest, Sha256, Sha512};
 
 use crate::{
@@ -151,12 +151,12 @@ impl Default for DefaultCrypto {
 #[cfg(feature = "crypto-native")]
 impl Sha512Digest for Sha512 {
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError> {
-        self.input(data);
+        Digest::update(self, data);
         Ok(())
     }
 
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError> {
-        let result = self.result_reset();
+        let result = self.finalize_reset();
         Ok(result.to_vec())
     }
 }
@@ -164,12 +164,12 @@ impl Sha512Digest for Sha512 {
 #[cfg(feature = "crypto-native")]
 impl Sha256Hmac for HmacSha256 {
     fn update(&mut self, data: &[u8]) -> Result<(), InternalError> {
-        self.input(data);
+        Mac::update(self, data);
         Ok(())
     }
 
     fn finalize(&mut self) -> Result<Vec<u8>, InternalError> {
-        let result = self.result_reset().code();
+        let result = self.finalize_reset().into_bytes();
         Ok(result.to_vec())
     }
 }
