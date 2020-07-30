@@ -1,7 +1,9 @@
 macro_rules! impl_serializable {
     ($name:ty, $serialize:ident) => {
         impl $crate::Serializable for $name {
-            fn serialize(&self) -> Result<$crate::Buffer, failure::Error> {
+            fn serialize(
+                &self,
+            ) -> Result<$crate::Buffer, $crate::errors::InternalError> {
                 #[allow(unused_imports)]
                 use $crate::errors::FromInternalErrorCode;
 
@@ -29,7 +31,7 @@ macro_rules! impl_deserializable {
             fn deserialize(
                 ctx: &$crate::Context,
                 data: &[u8],
-            ) -> Result<Self, failure::Error> {
+            ) -> Result<Self, $crate::errors::InternalError> {
                 use failure::ResultExt;
                 use $crate::errors::FromInternalErrorCode;
 
@@ -42,8 +44,7 @@ macro_rules! impl_deserializable {
                         data.len() as _,
                         ctx.raw(),
                     )
-                    .into_result()
-                    .context("Unable to deserialize buffer")?;
+                    .into_result()?;
 
                     let $raw =
                         $crate::raw_ptr::Raw::from_ptr(raw.assume_init());

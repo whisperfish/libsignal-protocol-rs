@@ -1,13 +1,12 @@
 use crate::{
     context::{Context, ContextInner},
-    errors::FromInternalErrorCode,
+    errors::{FromInternalErrorCode, InternalError},
     messages::{CiphertextMessage, PreKeySignalMessage, SignalMessage},
     raw_ptr::Raw,
     store_context::{StoreContext, StoreContextInner},
     Address, Buffer,
 };
 
-use failure::Error;
 use std::{
     fmt::{self, Debug, Formatter},
     ptr,
@@ -28,7 +27,7 @@ impl SessionCipher {
         ctx: &Context,
         store_ctx: &StoreContext,
         address: &Address,
-    ) -> Result<SessionCipher, Error> {
+    ) -> Result<SessionCipher, InternalError> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::session_cipher_create(
@@ -49,7 +48,10 @@ impl SessionCipher {
     }
 
     /// Encrypt a message.
-    pub fn encrypt(&self, message: &[u8]) -> Result<CiphertextMessage, Error> {
+    pub fn encrypt(
+        &self,
+        message: &[u8],
+    ) -> Result<CiphertextMessage, InternalError> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::session_cipher_encrypt(
@@ -71,7 +73,7 @@ impl SessionCipher {
     pub fn decrypt_pre_key_message(
         &self,
         message: &PreKeySignalMessage,
-    ) -> Result<Buffer, Error> {
+    ) -> Result<Buffer, InternalError> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::session_cipher_decrypt_pre_key_signal_message(
@@ -81,7 +83,7 @@ impl SessionCipher {
                 &mut buffer,
             )
             .into_result()?;
-            
+
             Ok(Buffer::from_raw(buffer))
         }
     }
@@ -90,7 +92,7 @@ impl SessionCipher {
     pub fn decrypt_message(
         &self,
         message: &SignalMessage,
-    ) -> Result<Buffer, Error> {
+    ) -> Result<Buffer, InternalError> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::session_cipher_decrypt_signal_message(
@@ -100,7 +102,7 @@ impl SessionCipher {
                 &mut buffer,
             )
             .into_result()?;
-            
+
             Ok(Buffer::from_raw(buffer))
         }
     }
