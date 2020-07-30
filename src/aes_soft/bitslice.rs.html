@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/aes-soft-0.3.3/src/bitslice.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bitslice.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../aes_soft/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/aes-soft-0.3.3/src/bitslice.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bitslice.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../aes_soft/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -880,16 +880,16 @@
 <span class="comment">// This trait defines all of the operations needed for a type to be processed as part of an AES</span>
 <span class="comment">// encryption or decryption operation.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AesOps</span> {
-    <span class="kw">fn</span> <span class="ident">sub_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">inv_sub_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">shift_rows</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">inv_shift_rows</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">mix_columns</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">inv_mix_columns</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">add_round_key</span>(<span class="self">self</span>, <span class="ident">rk</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">sub_bytes</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">inv_sub_bytes</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">shift_rows</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">inv_shift_rows</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">mix_columns</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">inv_mix_columns</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">add_round_key</span>(<span class="self">self</span>, <span class="ident">rk</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_core</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AesOps</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">sk</span>: <span class="kw-2">&amp;</span>[<span class="ident">S</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_core</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AesOps</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">sk</span>: <span class="kw-2">&amp;</span>[<span class="ident">S</span>]) <span class="op">-&gt;</span> <span class="ident">S</span> {
     <span class="comment">// Round 0 - add round key</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">add_round_key</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>[<span class="number">0</span>]);
 
@@ -909,7 +909,7 @@
     <span class="ident">tmp</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_core</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AesOps</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">sk</span>: <span class="kw-2">&amp;</span>[<span class="ident">S</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_core</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AesOps</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>, <span class="ident">sk</span>: <span class="kw-2">&amp;</span>[<span class="ident">S</span>]) <span class="op">-&gt;</span> <span class="ident">S</span> {
     <span class="comment">// Round 0 - add round key</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">add_round_key</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>[<span class="ident">sk</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>]);
 
@@ -933,14 +933,14 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>, <span class="kw">pub</span> <span class="ident">T</span>, <span class="kw">pub</span> <span class="ident">T</span>, <span class="kw">pub</span> <span class="ident">T</span>, <span class="kw">pub</span> <span class="ident">T</span>, <span class="kw">pub</span> <span class="ident">T</span>, <span class="kw">pub</span> <span class="ident">T</span>, <span class="kw">pub</span> <span class="ident">T</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>) <span class="op">=</span> <span class="self">self</span>;
         (<span class="ident">Bs4State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>), <span class="ident">Bs4State</span>(<span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitXor</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">xor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">xor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>, <span class="ident">a4</span>, <span class="ident">a5</span>, <span class="ident">a6</span>, <span class="ident">a7</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">b0</span>, <span class="ident">b1</span>, <span class="ident">b2</span>, <span class="ident">b3</span>, <span class="ident">b4</span>, <span class="ident">b5</span>, <span class="ident">b6</span>, <span class="ident">b7</span>) <span class="op">=</span> <span class="ident">rhs</span>;
         <span class="ident">Bs8State</span>(
@@ -1027,7 +1027,7 @@
     <span class="comment">// greedily looked for terms to combine to create the implementations below.</span>
     <span class="comment">// It is likely that this could be optimized more.</span>
 
-    <span class="kw">fn</span> <span class="ident">change_basis_a2x</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">change_basis_a2x</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t06</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">6</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">0</span>;
         <span class="kw">let</span> <span class="ident">t056</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">5</span> <span class="op">^</span> <span class="ident">t06</span>;
         <span class="kw">let</span> <span class="ident">t0156</span> <span class="op">=</span> <span class="ident">t056</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">1</span>;
@@ -1045,7 +1045,7 @@
         <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">change_basis_x2s</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">change_basis_x2s</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t46</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">4</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">6</span>;
         <span class="kw">let</span> <span class="ident">t35</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">3</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">5</span>;
         <span class="kw">let</span> <span class="ident">t06</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">6</span>;
@@ -1063,7 +1063,7 @@
         <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">change_basis_x2a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">change_basis_x2a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t15</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">1</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">5</span>;
         <span class="kw">let</span> <span class="ident">t36</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">3</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">6</span>;
         <span class="kw">let</span> <span class="ident">t1356</span> <span class="op">=</span> <span class="ident">t15</span> <span class="op">^</span> <span class="ident">t36</span>;
@@ -1081,7 +1081,7 @@
         <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">change_basis_s2x</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">change_basis_s2x</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t46</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">4</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">6</span>;
         <span class="kw">let</span> <span class="ident">t01</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span> <span class="op">^</span> <span class="self">self</span>.<span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">t0146</span> <span class="op">=</span> <span class="ident">t01</span> <span class="op">^</span> <span class="ident">t46</span>;
@@ -1106,7 +1106,7 @@
     <span class="comment">// we do with the &quot;x63&quot; value is to XOR a Bs8State with it. We optimize that XOR</span>
     <span class="comment">// below into just inverting 4 of the elements and leaving the other 4 elements</span>
     <span class="comment">// untouched.</span>
-    <span class="kw">fn</span> <span class="ident">xor_x63</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">xor_x63</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Bs8State</span>(
             <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>,
             <span class="op">!</span><span class="self">self</span>.<span class="number">1</span>,
@@ -1124,12 +1124,12 @@
 <span class="kw">struct</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>, <span class="ident">T</span>, <span class="ident">T</span>, <span class="ident">T</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">Bs4State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>) <span class="op">=</span> <span class="self">self</span>;
         (<span class="ident">Bs2State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>), <span class="ident">Bs2State</span>(<span class="ident">x2</span>, <span class="ident">x3</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">join</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">join</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs4State</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="ident">Bs4State</span>(<span class="ident">b0</span>, <span class="ident">b1</span>, <span class="ident">b2</span>, <span class="ident">b3</span>) <span class="op">=</span> <span class="ident">rhs</span>;
         <span class="ident">Bs8State</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>, <span class="ident">b0</span>, <span class="ident">b1</span>, <span class="ident">b2</span>, <span class="ident">b3</span>)
@@ -1137,7 +1137,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitXor</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">xor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">xor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs4State</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="ident">Bs4State</span>(<span class="ident">b0</span>, <span class="ident">b1</span>, <span class="ident">b2</span>, <span class="ident">b3</span>) <span class="op">=</span> <span class="ident">rhs</span>;
         <span class="ident">Bs4State</span>(<span class="ident">a0</span> <span class="op">^</span> <span class="ident">b0</span>, <span class="ident">a1</span> <span class="op">^</span> <span class="ident">b1</span>, <span class="ident">a2</span> <span class="op">^</span> <span class="ident">b2</span>, <span class="ident">a3</span> <span class="op">^</span> <span class="ident">b3</span>)
@@ -1148,12 +1148,12 @@
 <span class="kw">struct</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>, <span class="ident">T</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">T</span>, <span class="ident">T</span>) {
+    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">T</span>, <span class="ident">T</span>) {
         <span class="kw">let</span> <span class="ident">Bs2State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>) <span class="op">=</span> <span class="self">self</span>;
         (<span class="ident">x0</span>, <span class="ident">x1</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">join</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">join</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs2State</span>(<span class="ident">a0</span>, <span class="ident">a1</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="ident">Bs2State</span>(<span class="ident">b0</span>, <span class="ident">b1</span>) <span class="op">=</span> <span class="ident">rhs</span>;
         <span class="ident">Bs4State</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">b0</span>, <span class="ident">b1</span>)
@@ -1161,7 +1161,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitXor</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">xor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">xor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs2State</span>(<span class="ident">a0</span>, <span class="ident">a1</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="ident">Bs2State</span>(<span class="ident">b0</span>, <span class="ident">b1</span>) <span class="op">=</span> <span class="ident">rhs</span>;
         <span class="ident">Bs2State</span>(<span class="ident">a0</span> <span class="op">^</span> <span class="ident">b0</span>, <span class="ident">a1</span> <span class="op">^</span> <span class="ident">b1</span>)
@@ -1170,12 +1170,12 @@
 
 <span class="comment">// Bit Slice data in the form of 4 u32s in column-major order</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_4x4_with_u16</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">d</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">pb</span>(<span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">bit</span>: <span class="ident">u32</span>, <span class="ident">shift</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
-        (((<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">bit</span>) <span class="op">&amp;</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shift</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_4x4_with_u16</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">d</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">pb</span>(<span class="ident">x</span>: <span class="ident">u32</span>, <span class="ident">bit</span>: <span class="ident">u32</span>, <span class="ident">shift</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
+        (((<span class="ident">x</span> <span class="op">&gt;&gt;</span> <span class="ident">bit</span>) <span class="op">&amp;</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="ident">shift</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">construct</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">d</span>: <span class="ident">u32</span>, <span class="ident">bit</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">construct</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">d</span>: <span class="ident">u32</span>, <span class="ident">bit</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
         <span class="ident">pb</span>(<span class="ident">a</span>, <span class="ident">bit</span>, <span class="number">0</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">b</span>, <span class="ident">bit</span>, <span class="number">1</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">c</span>, <span class="ident">bit</span>, <span class="number">2</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">d</span>, <span class="ident">bit</span>, <span class="number">3</span>)
             <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">a</span>, <span class="ident">bit</span> <span class="op">+</span> <span class="number">8</span>, <span class="number">4</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">b</span>, <span class="ident">bit</span> <span class="op">+</span> <span class="number">8</span>, <span class="number">5</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">c</span>, <span class="ident">bit</span> <span class="op">+</span> <span class="number">8</span>, <span class="number">6</span>)
             <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">d</span>, <span class="ident">bit</span> <span class="op">+</span> <span class="number">8</span>, <span class="number">7</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">a</span>, <span class="ident">bit</span> <span class="op">+</span> <span class="number">16</span>, <span class="number">8</span>)
@@ -1199,12 +1199,12 @@
 
 <span class="comment">// Bit slice a single u32 value - this is used to calculate the SubBytes step when creating the</span>
 <span class="comment">// round keys.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_4x1_with_u16</span>(<span class="ident">a</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_4x1_with_u16</span>(<span class="ident">a</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
     <span class="ident">bit_slice_4x4_with_u16</span>(<span class="ident">a</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
 }
 
 <span class="comment">// Bit slice a 16 byte array in column major order</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_1x16_with_u16</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_1x16_with_u16</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> [<span class="number">0u32</span>; <span class="number">4</span>];
     <span class="ident">LE</span>::<span class="ident">read_u32_into</span>(<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>);
 
@@ -1217,12 +1217,12 @@
 }
 
 <span class="comment">// Un Bit Slice into a set of 4 u32s</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">un_bit_slice_4x4_with_u16</span>(<span class="ident">bs</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>) {
-    <span class="kw">fn</span> <span class="ident">pb</span>(<span class="ident">x</span>: <span class="ident">u16</span>, <span class="ident">bit</span>: <span class="ident">u32</span>, <span class="ident">shift</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
-        <span class="ident">u32</span>::<span class="ident">from</span>((<span class="ident">x</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">bit</span>) <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shift</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">un_bit_slice_4x4_with_u16</span>(<span class="ident">bs</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> (<span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>, <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">pb</span>(<span class="ident">x</span>: <span class="ident">u16</span>, <span class="ident">bit</span>: <span class="ident">u32</span>, <span class="ident">shift</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+        <span class="ident">u32</span>::<span class="ident">from</span>((<span class="ident">x</span> <span class="op">&gt;&gt;</span> <span class="ident">bit</span>) <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">&lt;&lt;</span> <span class="ident">shift</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">deconstruct</span>(<span class="ident">bs</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">bit</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">deconstruct</span>(<span class="ident">bs</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>, <span class="ident">bit</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">bs</span>;
 
         <span class="ident">pb</span>(<span class="ident">x0</span>, <span class="ident">bit</span>, <span class="number">0</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">x1</span>, <span class="ident">bit</span>, <span class="number">1</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">x2</span>, <span class="ident">bit</span>, <span class="number">2</span>) <span class="op">|</span> <span class="ident">pb</span>(<span class="ident">x3</span>, <span class="ident">bit</span>, <span class="number">3</span>)
@@ -1250,7 +1250,7 @@
 }
 
 <span class="comment">// Un Bit Slice into a single u32. This is used when creating the round keys.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">un_bit_slice_4x1_with_u16</span>(<span class="ident">bs</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">un_bit_slice_4x1_with_u16</span>(<span class="ident">bs</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
     <span class="kw">let</span> (<span class="ident">a</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">un_bit_slice_4x4_with_u16</span>(<span class="ident">bs</span>);
     <span class="ident">a</span>
 }
@@ -1266,7 +1266,7 @@
 }
 
 <span class="comment">// Bit Slice a 128 byte array of eight 16 byte blocks. Each block is in column major order.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_1x128_with_u32x4</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u32x4</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_1x128_with_u32x4</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u32x4</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">bit0</span> <span class="op">=</span> <span class="ident">u32x4</span>(<span class="number">0x01010101</span>, <span class="number">0x01010101</span>, <span class="number">0x01010101</span>, <span class="number">0x01010101</span>);
     <span class="kw">let</span> <span class="ident">bit1</span> <span class="op">=</span> <span class="ident">u32x4</span>(<span class="number">0x02020202</span>, <span class="number">0x02020202</span>, <span class="number">0x02020202</span>, <span class="number">0x02020202</span>);
     <span class="kw">let</span> <span class="ident">bit2</span> <span class="op">=</span> <span class="ident">u32x4</span>(<span class="number">0x04040404</span>, <span class="number">0x04040404</span>, <span class="number">0x04040404</span>, <span class="number">0x04040404</span>);
@@ -1276,20 +1276,20 @@
     <span class="kw">let</span> <span class="ident">bit6</span> <span class="op">=</span> <span class="ident">u32x4</span>(<span class="number">0x40404040</span>, <span class="number">0x40404040</span>, <span class="number">0x40404040</span>, <span class="number">0x40404040</span>);
     <span class="kw">let</span> <span class="ident">bit7</span> <span class="op">=</span> <span class="ident">u32x4</span>(<span class="number">0x80808080</span>, <span class="number">0x80808080</span>, <span class="number">0x80808080</span>, <span class="number">0x80808080</span>);
 
-    <span class="kw">fn</span> <span class="ident">read_row_major</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">read_row_major</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="ident">u32x4</span>(
-            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">0</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">4</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">8</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">12</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>),
-            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">1</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">5</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">9</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">13</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>),
-            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">2</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">6</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">10</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">14</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>),
-            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">3</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">7</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">11</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>)
-                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">15</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>),
+            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">0</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">4</span>]) <span class="op">&lt;&lt;</span> <span class="number">8</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">8</span>]) <span class="op">&lt;&lt;</span> <span class="number">16</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">12</span>]) <span class="op">&lt;&lt;</span> <span class="number">24</span>),
+            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">1</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">5</span>]) <span class="op">&lt;&lt;</span> <span class="number">8</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">9</span>]) <span class="op">&lt;&lt;</span> <span class="number">16</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">13</span>]) <span class="op">&lt;&lt;</span> <span class="number">24</span>),
+            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">2</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">6</span>]) <span class="op">&lt;&lt;</span> <span class="number">8</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">10</span>]) <span class="op">&lt;&lt;</span> <span class="number">16</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">14</span>]) <span class="op">&lt;&lt;</span> <span class="number">24</span>),
+            <span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">3</span>]) <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">7</span>]) <span class="op">&lt;&lt;</span> <span class="number">8</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">11</span>]) <span class="op">&lt;&lt;</span> <span class="number">16</span>)
+                <span class="op">|</span> (<span class="ident">u32</span>::<span class="ident">from</span>(<span class="ident">data</span>[<span class="number">15</span>]) <span class="op">&lt;&lt;</span> <span class="number">24</span>),
         )
     }
 
@@ -1337,7 +1337,7 @@
 <span class="comment">// is used as part of bit slicing the round keys.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bit_slice_fill_4x4_with_u32x4</span>(
     <span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>, <span class="ident">c</span>: <span class="ident">u32</span>, <span class="ident">d</span>: <span class="ident">u32</span>
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u32x4</span><span class="op">&gt;</span> {
+) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">u32x4</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">128</span>];
     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">8</span> {
         <span class="ident">LE</span>::<span class="ident">write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>[<span class="ident">i</span> <span class="op">*</span> <span class="number">16</span>..<span class="ident">i</span> <span class="op">*</span> <span class="number">16</span> <span class="op">+</span> <span class="number">4</span>], <span class="ident">a</span>);
@@ -1397,18 +1397,18 @@
         <span class="ident">output</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">a1</span> <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="ident">output</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">a2</span> <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="ident">output</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">a3</span> <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">4</span>] <span class="op">=</span> (<span class="ident">a0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">5</span>] <span class="op">=</span> (<span class="ident">a1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">6</span>] <span class="op">=</span> (<span class="ident">a2</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">7</span>] <span class="op">=</span> (<span class="ident">a3</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">8</span>] <span class="op">=</span> (<span class="ident">a0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">9</span>] <span class="op">=</span> (<span class="ident">a1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">10</span>] <span class="op">=</span> (<span class="ident">a2</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">11</span>] <span class="op">=</span> (<span class="ident">a3</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">12</span>] <span class="op">=</span> (<span class="ident">a0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">13</span>] <span class="op">=</span> (<span class="ident">a1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">14</span>] <span class="op">=</span> (<span class="ident">a2</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="ident">output</span>[<span class="number">15</span>] <span class="op">=</span> (<span class="ident">a3</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">4</span>] <span class="op">=</span> (<span class="ident">a0</span> <span class="op">&gt;&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">5</span>] <span class="op">=</span> (<span class="ident">a1</span> <span class="op">&gt;&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">6</span>] <span class="op">=</span> (<span class="ident">a2</span> <span class="op">&gt;&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">7</span>] <span class="op">=</span> (<span class="ident">a3</span> <span class="op">&gt;&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">8</span>] <span class="op">=</span> (<span class="ident">a0</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">9</span>] <span class="op">=</span> (<span class="ident">a1</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">10</span>] <span class="op">=</span> (<span class="ident">a2</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">11</span>] <span class="op">=</span> (<span class="ident">a3</span> <span class="op">&gt;&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">12</span>] <span class="op">=</span> (<span class="ident">a0</span> <span class="op">&gt;&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">13</span>] <span class="op">=</span> (<span class="ident">a1</span> <span class="op">&gt;&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">14</span>] <span class="op">=</span> (<span class="ident">a2</span> <span class="op">&gt;&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="ident">output</span>[<span class="number">15</span>] <span class="op">=</span> (<span class="ident">a3</span> <span class="op">&gt;&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
     }
 
     <span class="ident">write_row_major</span>(<span class="ident">x0</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>[<span class="number">0</span>..<span class="number">16</span>]);
@@ -1429,23 +1429,23 @@
 <span class="comment">// Operations in GF(2^2) using normal basis (Omega^2,Omega)</span>
 <span class="kw">trait</span> <span class="ident">Gf2Ops</span> {
     <span class="comment">// multiply</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="self">Self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="comment">// scale by N = Omega^2</span>
-    <span class="kw">fn</span> <span class="ident">scl_n</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">scl_n</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="comment">// scale by N^2 = Omega</span>
-    <span class="kw">fn</span> <span class="ident">scl_n2</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">scl_n2</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="comment">// square</span>
-    <span class="kw">fn</span> <span class="ident">sq</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">sq</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="comment">// Same as sqaure</span>
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitXor</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">BitAnd</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Gf2Ops</span> <span class="kw">for</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="kw">let</span> (<span class="ident">d</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="ident">y</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> (<span class="ident">a</span> <span class="op">^</span> <span class="ident">b</span>) <span class="op">&amp;</span> (<span class="ident">c</span> <span class="op">^</span> <span class="ident">d</span>);
@@ -1454,42 +1454,42 @@
         <span class="ident">Bs2State</span>(<span class="ident">q</span>, <span class="ident">p</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">scl_n</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">scl_n</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">^</span> <span class="ident">b</span>;
         <span class="ident">Bs2State</span>(<span class="ident">q</span>, <span class="ident">b</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">scl_n2</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">scl_n2</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">^</span> <span class="ident">b</span>;
         <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">a</span>;
         <span class="ident">Bs2State</span>(<span class="ident">q</span>, <span class="ident">p</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">sq</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sq</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="ident">Bs2State</span>(<span class="ident">a</span>, <span class="ident">b</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">sq</span>() }
+    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs2State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">sq</span>() }
 }
 
 <span class="comment">// Operations in GF(2^4) using normal basis (alpha^8,alpha^2)</span>
 <span class="kw">trait</span> <span class="ident">Gf4Ops</span> {
     <span class="comment">// multiply</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="self">Self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="comment">// square &amp; scale by nu</span>
     <span class="comment">// nu = beta^8 = N^2*alpha^2, N = w^2</span>
-    <span class="kw">fn</span> <span class="ident">sq_scl</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">sq_scl</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 
     <span class="comment">// inverse</span>
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitXor</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">BitAnd</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">Gf4Ops</span> <span class="kw">for</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="kw">let</span> (<span class="ident">d</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="ident">y</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">xor</span>(<span class="ident">d</span>);
@@ -1499,14 +1499,14 @@
         <span class="ident">q</span>.<span class="ident">join</span>(<span class="ident">p</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">sq_scl</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sq_scl</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">xor</span>(<span class="ident">b</span>).<span class="ident">sq</span>();
         <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">sq</span>().<span class="ident">scl_n2</span>();
         <span class="ident">q</span>.<span class="ident">join</span>(<span class="ident">p</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs4State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">xor</span>(<span class="ident">b</span>).<span class="ident">sq</span>().<span class="ident">scl_n</span>();
         <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">mul</span>(<span class="ident">b</span>);
@@ -1520,13 +1520,13 @@
 <span class="comment">// Operations in GF(2^8) using normal basis (d^16,d)</span>
 <span class="kw">trait</span> <span class="ident">Gf8Ops</span> {
     <span class="comment">// inverse</span>
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BitXor</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">BitAnd</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Default</span><span class="op">&gt;</span> <span class="ident">Gf8Ops</span>
     <span class="kw">for</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">b</span>, <span class="ident">a</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split</span>();
         <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">xor</span>(<span class="ident">b</span>).<span class="ident">sq_scl</span>();
         <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">mul</span>(<span class="ident">b</span>);
@@ -1538,21 +1538,21 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AesBitValueOps</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">AesOps</span> <span class="kw">for</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">sub_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sub_bytes</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">nb</span>: <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">change_basis_a2x</span>();
         <span class="kw">let</span> <span class="ident">inv</span> <span class="op">=</span> <span class="ident">nb</span>.<span class="ident">inv</span>();
         <span class="kw">let</span> <span class="ident">nb2</span>: <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">inv</span>.<span class="ident">change_basis_x2s</span>();
         <span class="ident">nb2</span>.<span class="ident">xor_x63</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">inv_sub_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">inv_sub_bytes</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">xor_x63</span>();
         <span class="kw">let</span> <span class="ident">nb</span>: <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">change_basis_s2x</span>();
         <span class="kw">let</span> <span class="ident">inv</span> <span class="op">=</span> <span class="ident">nb</span>.<span class="ident">inv</span>();
         <span class="ident">inv</span>.<span class="ident">change_basis_x2a</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">shift_rows</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">shift_rows</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">Bs8State</span>(
             <span class="ident">x0</span>.<span class="ident">shift_row</span>(),
@@ -1566,7 +1566,7 @@
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">inv_shift_rows</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">inv_shift_rows</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">Bs8State</span>(
             <span class="ident">x0</span>.<span class="ident">inv_shift_row</span>(),
@@ -1581,7 +1581,7 @@
     }
 
     <span class="comment">// Formula from [5]</span>
-    <span class="kw">fn</span> <span class="ident">mix_columns</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">mix_columns</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>) <span class="op">=</span> <span class="self">self</span>;
 
         <span class="kw">let</span> <span class="ident">x0out</span> <span class="op">=</span> <span class="ident">x7</span> <span class="op">^</span> <span class="ident">x7</span>.<span class="ident">ror1</span>() <span class="op">^</span> <span class="ident">x0</span>.<span class="ident">ror1</span>() <span class="op">^</span> (<span class="ident">x0</span> <span class="op">^</span> <span class="ident">x0</span>.<span class="ident">ror1</span>()).<span class="ident">ror2</span>();
@@ -1600,7 +1600,7 @@
     }
 
     <span class="comment">// Formula from [6]</span>
-    <span class="kw">fn</span> <span class="ident">inv_mix_columns</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">inv_mix_columns</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">Bs8State</span>(<span class="ident">x0</span>, <span class="ident">x1</span>, <span class="ident">x2</span>, <span class="ident">x3</span>, <span class="ident">x4</span>, <span class="ident">x5</span>, <span class="ident">x6</span>, <span class="ident">x7</span>) <span class="op">=</span> <span class="self">self</span>;
 
         <span class="kw">let</span> <span class="ident">x0out</span> <span class="op">=</span> <span class="ident">x5</span> <span class="op">^</span> <span class="ident">x6</span> <span class="op">^</span> <span class="ident">x7</span> <span class="op">^</span> (<span class="ident">x5</span> <span class="op">^</span> <span class="ident">x7</span> <span class="op">^</span> <span class="ident">x0</span>).<span class="ident">ror1</span>() <span class="op">^</span> (<span class="ident">x0</span> <span class="op">^</span> <span class="ident">x5</span> <span class="op">^</span> <span class="ident">x6</span>).<span class="ident">ror2</span>()
@@ -1627,7 +1627,7 @@
         <span class="ident">Bs8State</span>(<span class="ident">x0out</span>, <span class="ident">x1out</span>, <span class="ident">x2out</span>, <span class="ident">x3out</span>, <span class="ident">x4out</span>, <span class="ident">x5out</span>, <span class="ident">x6out</span>, <span class="ident">x7out</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">add_round_key</span>(<span class="self">self</span>, <span class="ident">rk</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">xor</span>(<span class="kw-2">*</span><span class="ident">rk</span>) }
+    <span class="kw">fn</span> <span class="ident">add_round_key</span>(<span class="self">self</span>, <span class="ident">rk</span>: <span class="kw-2">&amp;</span><span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">Bs8State</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> { <span class="self">self</span>.<span class="ident">xor</span>(<span class="kw-2">*</span><span class="ident">rk</span>) }
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AesBitValueOps</span>
@@ -1636,61 +1636,61 @@
     <span class="op">+</span> <span class="ident">Not</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span>
     <span class="op">+</span> <span class="ident">Default</span>
     <span class="op">+</span> <span class="ident">Sized</span> {
-    <span class="kw">fn</span> <span class="ident">shift_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">inv_shift_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">ror1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">ror2</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">ror3</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">shift_row</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">inv_shift_row</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">ror1</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">ror2</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">ror3</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">AesBitValueOps</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">shift_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">shift_row</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
         <span class="comment">// first 4 bits represent first row - don&#39;t shift</span>
         (<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x000f</span>) <span class="op">|</span>
         <span class="comment">// next 4 bits represent 2nd row - left rotate 1 bit</span>
-        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x00e0</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0010</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>) <span class="op">|</span>
+        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x00e0</span>) <span class="op">&gt;&gt;</span> <span class="number">1</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0010</span>) <span class="op">&lt;&lt;</span> <span class="number">3</span>) <span class="op">|</span>
         <span class="comment">// next 4 bits represent 3rd row - left rotate 2 bits</span>
-        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0c00</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0300</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>) <span class="op">|</span>
+        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0c00</span>) <span class="op">&gt;&gt;</span> <span class="number">2</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0300</span>) <span class="op">&lt;&lt;</span> <span class="number">2</span>) <span class="op">|</span>
         <span class="comment">// next 4 bits represent 4th row - left rotate 3 bits</span>
-        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x8000</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x7000</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>)
+        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x8000</span>) <span class="op">&gt;&gt;</span> <span class="number">3</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x7000</span>) <span class="op">&lt;&lt;</span> <span class="number">1</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">inv_shift_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">inv_shift_row</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
         <span class="comment">// first 4 bits represent first row - don&#39;t shift</span>
         (<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x000f</span>) <span class="op">|</span>
         <span class="comment">// next 4 bits represent 2nd row - right rotate 1 bit</span>
-        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0080</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0070</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">|</span>
+        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0080</span>) <span class="op">&gt;&gt;</span> <span class="number">3</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0070</span>) <span class="op">&lt;&lt;</span> <span class="number">1</span>) <span class="op">|</span>
         <span class="comment">// next 4 bits represent 3rd row - right rotate 2 bits</span>
-        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0c00</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0300</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>) <span class="op">|</span>
+        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0c00</span>) <span class="op">&gt;&gt;</span> <span class="number">2</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x0300</span>) <span class="op">&lt;&lt;</span> <span class="number">2</span>) <span class="op">|</span>
         <span class="comment">// next 4 bits represent 4th row - right rotate 3 bits</span>
-        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0xe000</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x1000</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>)
+        ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0xe000</span>) <span class="op">&gt;&gt;</span> <span class="number">1</span>) <span class="op">|</span> ((<span class="self">self</span> <span class="op">&amp;</span> <span class="number">0x1000</span>) <span class="op">&lt;&lt;</span> <span class="number">3</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">ror1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> { <span class="self">self</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span> <span class="op">|</span> <span class="self">self</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span> }
+    <span class="kw">fn</span> <span class="ident">ror1</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> { <span class="self">self</span> <span class="op">&gt;&gt;</span> <span class="number">4</span> <span class="op">|</span> <span class="self">self</span> <span class="op">&lt;&lt;</span> <span class="number">12</span> }
 
-    <span class="kw">fn</span> <span class="ident">ror2</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> { <span class="self">self</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span> <span class="op">|</span> <span class="self">self</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span> }
+    <span class="kw">fn</span> <span class="ident">ror2</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> { <span class="self">self</span> <span class="op">&gt;&gt;</span> <span class="number">8</span> <span class="op">|</span> <span class="self">self</span> <span class="op">&lt;&lt;</span> <span class="number">8</span> }
 
-    <span class="kw">fn</span> <span class="ident">ror3</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u16</span> { <span class="self">self</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span> <span class="op">|</span> <span class="self">self</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span> }
+    <span class="kw">fn</span> <span class="ident">ror3</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> { <span class="self">self</span> <span class="op">&gt;&gt;</span> <span class="number">12</span> <span class="op">|</span> <span class="self">self</span> <span class="op">&lt;&lt;</span> <span class="number">4</span> }
 }
 
 <span class="kw">impl</span> <span class="ident">u32x4</span> {
-    <span class="kw">fn</span> <span class="ident">lsh</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">lsh</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="kw">let</span> <span class="ident">u32x4</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">u32x4</span>(
-            <span class="ident">a0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">s</span>,
-            (<span class="ident">a1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a0</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
-            (<span class="ident">a2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a1</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
-            (<span class="ident">a3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a2</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
+            <span class="ident">a0</span> <span class="op">&lt;&lt;</span> <span class="ident">s</span>,
+            (<span class="ident">a1</span> <span class="op">&lt;&lt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a0</span> <span class="op">&gt;&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
+            (<span class="ident">a2</span> <span class="op">&lt;&lt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a1</span> <span class="op">&gt;&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
+            (<span class="ident">a3</span> <span class="op">&lt;&lt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a2</span> <span class="op">&gt;&gt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">rsh</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">rsh</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="kw">let</span> <span class="ident">u32x4</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">u32x4</span>(
-            (<span class="ident">a0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
-            (<span class="ident">a1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a2</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
-            (<span class="ident">a2</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a3</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
-            <span class="ident">a3</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">s</span>,
+            (<span class="ident">a0</span> <span class="op">&gt;&gt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a1</span> <span class="op">&lt;&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
+            (<span class="ident">a1</span> <span class="op">&gt;&gt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a2</span> <span class="op">&lt;&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
+            (<span class="ident">a2</span> <span class="op">&gt;&gt;</span> <span class="ident">s</span>) <span class="op">|</span> (<span class="ident">a3</span> <span class="op">&lt;&lt;</span> (<span class="number">32</span> <span class="op">-</span> <span class="ident">s</span>)),
+            <span class="ident">a3</span> <span class="op">&gt;&gt;</span> <span class="ident">s</span>,
         )
     }
 }
@@ -1698,45 +1698,45 @@
 <span class="kw">impl</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="ident">u32x4</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">u32x4</span>;
 
-    <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> { <span class="self">self</span> <span class="op">^</span> <span class="ident">U32X4_1</span> }
+    <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> { <span class="self">self</span> <span class="op">^</span> <span class="ident">U32X4_1</span> }
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">u32x4</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> { <span class="ident">u32x4</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) }
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="ident">u32x4</span> { <span class="ident">u32x4</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>) }
 }
 
 <span class="kw">impl</span> <span class="ident">AesBitValueOps</span> <span class="kw">for</span> <span class="ident">u32x4</span> {
-    <span class="kw">fn</span> <span class="ident">shift_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">shift_row</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="kw">let</span> <span class="ident">u32x4</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">u32x4</span>(
             <span class="ident">a0</span>,
-            <span class="ident">a1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span> <span class="op">|</span> <span class="ident">a1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>,
-            <span class="ident">a2</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span> <span class="op">|</span> <span class="ident">a2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>,
-            <span class="ident">a3</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span> <span class="op">|</span> <span class="ident">a3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>,
+            <span class="ident">a1</span> <span class="op">&gt;&gt;</span> <span class="number">8</span> <span class="op">|</span> <span class="ident">a1</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>,
+            <span class="ident">a2</span> <span class="op">&gt;&gt;</span> <span class="number">16</span> <span class="op">|</span> <span class="ident">a2</span> <span class="op">&lt;&lt;</span> <span class="number">16</span>,
+            <span class="ident">a3</span> <span class="op">&gt;&gt;</span> <span class="number">24</span> <span class="op">|</span> <span class="ident">a3</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>,
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">inv_shift_row</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">inv_shift_row</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="kw">let</span> <span class="ident">u32x4</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">u32x4</span>(
             <span class="ident">a0</span>,
-            <span class="ident">a1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span> <span class="op">|</span> <span class="ident">a1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>,
-            <span class="ident">a2</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span> <span class="op">|</span> <span class="ident">a2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>,
-            <span class="ident">a3</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span> <span class="op">|</span> <span class="ident">a3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>,
+            <span class="ident">a1</span> <span class="op">&gt;&gt;</span> <span class="number">24</span> <span class="op">|</span> <span class="ident">a1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>,
+            <span class="ident">a2</span> <span class="op">&gt;&gt;</span> <span class="number">16</span> <span class="op">|</span> <span class="ident">a2</span> <span class="op">&lt;&lt;</span> <span class="number">16</span>,
+            <span class="ident">a3</span> <span class="op">&gt;&gt;</span> <span class="number">8</span> <span class="op">|</span> <span class="ident">a3</span> <span class="op">&lt;&lt;</span> <span class="number">24</span>,
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">ror1</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">ror1</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="kw">let</span> <span class="ident">u32x4</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">u32x4</span>(<span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>, <span class="ident">a0</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">ror2</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">ror2</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="kw">let</span> <span class="ident">u32x4</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">u32x4</span>(<span class="ident">a2</span>, <span class="ident">a3</span>, <span class="ident">a0</span>, <span class="ident">a1</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">ror3</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32x4</span> {
+    <span class="kw">fn</span> <span class="ident">ror3</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32x4</span> {
         <span class="kw">let</span> <span class="ident">u32x4</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>, <span class="ident">a3</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">u32x4</span>(<span class="ident">a3</span>, <span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">a2</span>)
     }

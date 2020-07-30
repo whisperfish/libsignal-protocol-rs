@@ -1,5 +1,6 @@
 var N = null;var sourcesIndex = {};
 sourcesIndex["addr2line"] = {"name":"","files":["lazy.rs","lib.rs"]};
+sourcesIndex["adler"] = {"name":"","files":["algo.rs","lib.rs"]};
 sourcesIndex["adler32"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["aes"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["aes_ctr"] = {"name":"","files":["dummy.rs","lib.rs"]};
@@ -49,6 +50,8 @@ sourcesIndex["stream_cipher"] = {"name":"","files":["errors.rs","lib.rs"]};
 sourcesIndex["subtle"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["syn"] = {"name":"","dirs":[{"name":"gen","files":["gen_helper.rs","visit.rs"]}],"files":["attr.rs","bigint.rs","buffer.rs","custom_keyword.rs","custom_punctuation.rs","data.rs","derive.rs","discouraged.rs","error.rs","export.rs","expr.rs","ext.rs","generics.rs","group.rs","ident.rs","lib.rs","lifetime.rs","lit.rs","lookahead.rs","mac.rs","macros.rs","op.rs","parse.rs","parse_macro_input.rs","parse_quote.rs","path.rs","print.rs","punctuated.rs","sealed.rs","span.rs","spanned.rs","thread.rs","token.rs","tt.rs","ty.rs","verbatim.rs"]};
 sourcesIndex["synstructure"] = {"name":"","files":["lib.rs","macros.rs"]};
+sourcesIndex["thiserror"] = {"name":"","files":["aserror.rs","display.rs","lib.rs"]};
+sourcesIndex["thiserror_impl"] = {"name":"","files":["ast.rs","attr.rs","expand.rs","fmt.rs","lib.rs","prop.rs","valid.rs"]};
 sourcesIndex["typenum"] = {"name":"","files":["array.rs","bit.rs","int.rs","lib.rs","marker_traits.rs","operator_aliases.rs","private.rs","type_operators.rs","uint.rs"]};
 sourcesIndex["unicode_xid"] = {"name":"","files":["lib.rs","tables.rs"]};
 createSourceSidebar();
