@@ -1,5 +1,6 @@
 use std::{
     cmp::{Ord, Ordering},
+    fmt::{self, Display},
     ptr,
 };
 
@@ -8,7 +9,7 @@ use failure::Error;
 use crate::{
     errors::{FromInternalErrorCode, InternalError},
     raw_ptr::Raw,
-    Context,
+    Buffer, Context,
 };
 
 /// The public part of an elliptic curve key pair.
@@ -94,6 +95,18 @@ impl Eq for PublicKey {}
 impl PartialOrd for PublicKey {
     fn partial_cmp(&self, other: &PublicKey) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl Display for PublicKey {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        unsafe {
+            let mut raw = ptr::null_mut();
+            sys::ec_public_key_serialize(&mut raw, self.raw.as_const_ptr())
+                .into_result()
+                .map_err(|_| fmt::Error)?;
+            f.write_str(&base64::encode(Buffer::from_raw(raw).as_slice()))
+        }
     }
 }
 
