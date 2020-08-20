@@ -67,7 +67,7 @@ impl PublicKey {
     /// Uses this public key to check the ECDH agreement with a private key
     pub fn calculate_agreement(
         &self,
-        private_key: PrivateKey,
+        private_key: &PrivateKey,
     ) -> Result<Vec<u8>, Error> {
         unsafe {
             let mut shared_data = std::ptr::null_mut();
