@@ -77,13 +77,15 @@ impl PublicKey {
                 private_key.raw.as_const_ptr(),
             ) as usize;
             if length > 0 {
-                // FIXME: this only works because by default on Linux, Rust uses the
-                // same allocator as libsignal-protocol-c: the same problem exists in hkdf.rs:65
-                // the real fix would be to wrap the pointer in some struct and call libc::free
-                // on Drop
-                let secret =
-                    std::slice::from_raw_parts_mut(shared_data, length);
-                Ok(Vec::from(Box::from_raw(secret)))
+                let mut secret = Vec::with_capacity(length);
+                std::ptr::copy_nonoverlapping(
+                    shared_data,
+                    secret.as_mut_ptr(),
+                    length,
+                );
+                secret.set_len(length);
+                libc::free(shared_data as *mut libc::c_void);
+                Ok(secret)
             } else {
                 Err(failure::err_msg("Error while calculating shared secret"))
             }
