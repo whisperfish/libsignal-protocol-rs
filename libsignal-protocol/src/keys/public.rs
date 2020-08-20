@@ -63,6 +63,16 @@ impl PublicKey {
             }
         }
     }
+
+    /// returns this public key as a base64 encoded string
+    pub fn as_base64(&self) -> Result<String, InternalError> {
+        unsafe {
+            let mut raw = ptr::null_mut();
+            sys::ec_public_key_serialize(&mut raw, self.raw.as_const_ptr())
+                .into_result()?;
+            Ok(base64::encode(Buffer::from_raw(raw).as_slice()))
+        }
+    }
 }
 
 impl Ord for PublicKey {
@@ -100,13 +110,7 @@ impl PartialOrd for PublicKey {
 
 impl Display for PublicKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        unsafe {
-            let mut raw = ptr::null_mut();
-            sys::ec_public_key_serialize(&mut raw, self.raw.as_const_ptr())
-                .into_result()
-                .map_err(|_| fmt::Error)?;
-            f.write_str(&base64::encode(Buffer::from_raw(raw).as_slice()))
-        }
+        f.write_str(&self.as_base64().map_err(|_| fmt::Error)?)
     }
 }
 
