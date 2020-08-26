@@ -41,10 +41,10 @@ impl HMACBasedKeyDerivationFunction {
         info: &[u8],
     ) -> Result<Vec<u8>, Error> {
         unsafe {
-            let mut secret = ptr::null_mut();
+            let mut secret_buf = ptr::null_mut();
             let prk_len = sys::hkdf_derive_secrets(
                 self.raw.as_ptr(),
-                &mut secret,
+                &mut secret_buf,
                 input_key_material.as_ptr(),
                 input_key_material.len(),
                 salt.as_ptr(),
@@ -60,11 +60,17 @@ impl HMACBasedKeyDerivationFunction {
                     .into());
             }
 
-            // Note: I'm not 100% sure this is sound. `secret` was allocated
-            // using malloc, but the allocator used to free our Vec is
-            // unspecified...
-            let secret = std::slice::from_raw_parts_mut(secret, secret_length);
-            Ok(Vec::from(Box::from_raw(secret)))
+            let prk_len = prk_len as usize;
+
+            let mut secret = Vec::with_capacity(prk_len);
+            std::ptr::copy_nonoverlapping(
+                secret_buf,
+                secret.as_mut_ptr(),
+                prk_len,
+            );
+            secret.set_len(prk_len);
+            libc::free(secret_buf as *mut libc::c_void);
+            Ok(secret)
         }
     }
 }

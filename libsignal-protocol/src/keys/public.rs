@@ -8,6 +8,7 @@ use failure::Error;
 
 use crate::{
     errors::{FromInternalErrorCode, InternalError},
+    keys::PrivateKey,
     raw_ptr::Raw,
     Buffer, Context,
 };
@@ -63,6 +64,35 @@ impl PublicKey {
             }
         }
     }
+
+    /// Uses this public key to check the ECDH agreement with a private key
+    pub fn calculate_agreement(
+        &self,
+        private_key: &PrivateKey,
+    ) -> Result<Vec<u8>, Error> {
+        unsafe {
+            let mut shared_data = std::ptr::null_mut();
+            let length = sys::curve_calculate_agreement(
+                &mut shared_data,
+                self.raw.as_const_ptr(),
+                private_key.raw.as_const_ptr(),
+            ) as usize;
+            if length > 0 {
+                let mut secret = Vec::with_capacity(length);
+                std::ptr::copy_nonoverlapping(
+                    shared_data,
+                    secret.as_mut_ptr(),
+                    length,
+                );
+                secret.set_len(length);
+                libc::free(shared_data as *mut libc::c_void);
+                Ok(secret)
+            } else {
+                Err(failure::err_msg("Error while calculating shared secret"))
+            }
+        }
+    }
+
 
     /// returns this public key as a base64 encoded string
     pub fn as_base64(&self) -> Result<String, InternalError> {
