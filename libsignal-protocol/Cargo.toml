@@ -26,11 +26,11 @@ base64 = "0.12"
 openssl = { version = "0.10", optional = true }
 rental = { version = "0.5.3", optional = true }
 
-sha2 = { version = "0.8.0", optional = true }
-hmac = { version = "0.7.0", optional = true }
-aes = { version = "0.3.2", optional = true }
-block-modes = { version = "0.3.3", optional = true }
-aes-ctr = { version = "0.3.0", optional = true }
+sha2 = { version = "0.9.0", optional = true }
+hmac = { version = "0.8.0", optional = true }
+aes = { version = "0.4.0", optional = true }
+block-modes = { version = "0.5.0", optional = true }
+aes-ctr = { version = "0.4.0", optional = true }
 
 [features]
 default = ["crypto-native"]
