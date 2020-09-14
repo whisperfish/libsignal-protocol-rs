@@ -1,6 +1,7 @@
 (function() {var implementors = {};
 implementors["backtrace"] = [{"text":"impl&lt;'a&gt; Display for SymbolName&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Display for BytesOrWideString&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["base64"] = [{"text":"impl&lt;'a&gt; Display for Base64Display&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl Display for DecodeError","synthetic":false,"types":[]}];
+implementors["block_cipher"] = [{"text":"impl Display for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["block_cipher_trait"] = [{"text":"impl Display for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["block_modes"] = [{"text":"impl Display for BlockModeError","synthetic":false,"types":[]},{"text":"impl Display for InvalidKeyIvLength","synthetic":false,"types":[]}];
 implementors["crypto_mac"] = [{"text":"impl Display for MacError","synthetic":false,"types":[]},{"text":"impl Display for InvalidKeyLength","synthetic":false,"types":[]}];

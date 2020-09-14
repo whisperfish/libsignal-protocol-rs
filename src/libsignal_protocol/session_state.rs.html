@@ -28,7 +28,7 @@
 
 <span class="kw">impl</span> <span class="ident">SessionState</span> {
     <span class="doccomment">/// Get the session version.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
         <span class="kw">unsafe</span> { <span class="ident">sys</span>::<span class="ident">session_state_get_session_version</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>()) }
     }
 }

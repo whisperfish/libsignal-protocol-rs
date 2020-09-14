@@ -1,9 +1,10 @@
 (function() {var implementors = {};
 implementors["backtrace"] = [{"text":"impl PartialEq&lt;PrintFmt&gt; for PrintFmt","synthetic":false,"types":[]}];
 implementors["base64"] = [{"text":"impl PartialEq&lt;DecodeError&gt; for DecodeError","synthetic":false,"types":[]}];
+implementors["block_cipher"] = [{"text":"impl PartialEq&lt;InvalidKeyLength&gt; for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["block_cipher_trait"] = [{"text":"impl PartialEq&lt;InvalidKeyLength&gt; for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["byteorder"] = [{"text":"impl PartialEq&lt;BigEndian&gt; for BigEndian","synthetic":false,"types":[]},{"text":"impl PartialEq&lt;LittleEndian&gt; for LittleEndian","synthetic":false,"types":[]}];
-implementors["crypto_mac"] = [{"text":"impl PartialEq&lt;MacError&gt; for MacError","synthetic":false,"types":[]},{"text":"impl PartialEq&lt;InvalidKeyLength&gt; for InvalidKeyLength","synthetic":false,"types":[]},{"text":"impl&lt;N&gt; PartialEq&lt;MacResult&lt;N&gt;&gt; for MacResult&lt;N&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;N: ArrayLength&lt;u8&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["crypto_mac"] = [{"text":"impl PartialEq&lt;MacError&gt; for MacError","synthetic":false,"types":[]},{"text":"impl PartialEq&lt;InvalidKeyLength&gt; for InvalidKeyLength","synthetic":false,"types":[]},{"text":"impl&lt;M:&nbsp;Mac&gt; PartialEq&lt;Output&lt;M&gt;&gt; for Output&lt;M&gt;","synthetic":false,"types":[]}];
 implementors["failure"] = [{"text":"impl&lt;E:&nbsp;PartialEq&gt; PartialEq&lt;Compat&lt;E&gt;&gt; for Compat&lt;E&gt;","synthetic":false,"types":[]}];
 implementors["fake_simd"] = [{"text":"impl PartialEq&lt;u32x4&gt; for u32x4","synthetic":false,"types":[]}];
 implementors["generic_array"] = [{"text":"impl&lt;T:&nbsp;PartialEq, N&gt; PartialEq&lt;GenericArray&lt;T, N&gt;&gt; for GenericArray&lt;T, N&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;N: ArrayLength&lt;T&gt;,&nbsp;</span>","synthetic":false,"types":[]}];

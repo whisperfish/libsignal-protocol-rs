@@ -22,7 +22,7 @@ the addition happens.</p>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Add</span>;
 <span class="kw">use</span> <span class="ident">typenum</span>::{<span class="ident">Integer</span>, <span class="ident">P3</span>, <span class="ident">P4</span>};
 
-<span class="kw">type</span> <span class="ident">X</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">P3</span> <span class="kw">as</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">P4</span><span class="op">&gt;&gt;</span>::<span class="ident">Output</span>;
+<span class="kw">type</span> <span class="ident">X</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">P3</span> <span class="kw">as</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">P4</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">Output</span>;
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="op">&lt;</span><span class="ident">X</span> <span class="kw">as</span> <span class="ident">Integer</span><span class="op">&gt;</span>::<span class="ident">to_i32</span>(), <span class="number">7</span>);</pre></div>
 <p>In addition, helper aliases are defined for type operators. For example, the above snippet
 could be replaced with</p>
@@ -48,7 +48,7 @@ here. For even more ergonomics, consider using the <code>op!</code> macro instea
 </td></tr></table><h2 id='macros' class='section-header'><a href="#macros">Macros</a></h2>
 <table><tr class='module-item'><td><a class="macro" href="macro.assert_type.html" title='typenum::assert_type macro'>assert_type</a></td><td class='docblock-short'><p>Asserts that a type is <code>True</code>, aka <code>B1</code>.</p>
 </td></tr><tr class='module-item'><td><a class="macro" href="macro.assert_type_eq.html" title='typenum::assert_type_eq macro'>assert_type_eq</a></td><td class='docblock-short'><p>Asserts that two types are the same.</p>
-</td></tr><tr class='module-item'><td><a class="macro" href="macro.cmp.html" title='typenum::cmp macro'>cmp</a></td><td class='docblock-short'><span class="stab deprecated">Deprecated</span><p>A convenience macro for comparing type numbers. Use <code>op!</code> instead.</p>
+</td></tr><tr class='module-item'><td><a class="macro" href="macro.cmp.html" title='typenum::cmp macro'>cmp</a></td><td class='docblock-short'><span class="stab deprecated" title="">Deprecated</span><p>A convenience macro for comparing type numbers. Use <code>op!</code> instead.</p>
 </td></tr><tr class='module-item'><td><a class="macro" href="macro.op.html" title='typenum::op macro'>op</a></td><td class='docblock-short'><p>Convenient type operations.</p>
 </td></tr><tr class='module-item'><td><a class="macro" href="macro.tarr.html" title='typenum::tarr macro'>tarr</a></td><td class='docblock-short'><p>Create a new type-level arrray. Only usable on Rust 1.13.0 or newer.</p>
 </td></tr></table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>

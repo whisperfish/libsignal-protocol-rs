@@ -1,9 +1,10 @@
 (function() {var implementors = {};
 implementors["backtrace"] = [{"text":"impl Eq for PrintFmt","synthetic":false,"types":[]}];
 implementors["base64"] = [{"text":"impl Eq for DecodeError","synthetic":false,"types":[]}];
+implementors["block_cipher"] = [{"text":"impl Eq for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["block_cipher_trait"] = [{"text":"impl Eq for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["byteorder"] = [{"text":"impl Eq for BigEndian","synthetic":false,"types":[]},{"text":"impl Eq for LittleEndian","synthetic":false,"types":[]}];
-implementors["crypto_mac"] = [{"text":"impl Eq for MacError","synthetic":false,"types":[]},{"text":"impl Eq for InvalidKeyLength","synthetic":false,"types":[]},{"text":"impl&lt;N&gt; Eq for MacResult&lt;N&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;N: ArrayLength&lt;u8&gt;,&nbsp;</span>","synthetic":false,"types":[]}];
+implementors["crypto_mac"] = [{"text":"impl Eq for MacError","synthetic":false,"types":[]},{"text":"impl Eq for InvalidKeyLength","synthetic":false,"types":[]},{"text":"impl&lt;M:&nbsp;Mac&gt; Eq for Output&lt;M&gt;","synthetic":false,"types":[]}];
 implementors["failure"] = [{"text":"impl&lt;E:&nbsp;Eq&gt; Eq for Compat&lt;E&gt;","synthetic":false,"types":[]}];
 implementors["fake_simd"] = [{"text":"impl Eq for u32x4","synthetic":false,"types":[]}];
 implementors["generic_array"] = [{"text":"impl&lt;T:&nbsp;Eq, N&gt; Eq for GenericArray&lt;T, N&gt; <span class=\"where fmt-newline\">where<br>&nbsp;&nbsp;&nbsp;&nbsp;N: ArrayLength&lt;T&gt;,&nbsp;</span>","synthetic":false,"types":[]}];

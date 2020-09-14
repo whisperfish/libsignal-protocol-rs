@@ -101,16 +101,16 @@
 
 <span class="doccomment">/// A wrapper around `libsignal-protocol`&#39;s native reference counted pointers.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;&gt;</span>(<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Create a new [`Raw`] from an owned pointer (doesn&#39;t affect reference</span>
     <span class="doccomment">/// count).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This assumes `raw` points to a valid, non-null instance of `T`.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_ptr</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">raw</span>.<span class="ident">is_null</span>());
         <span class="ident">Raw</span>(<span class="ident">NonNull</span>::<span class="ident">new_unchecked</span>(<span class="ident">raw</span>))
     }
@@ -120,7 +120,7 @@
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This assumes `raw` points to a valid, non-null instance of `T`.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">copied_from</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">copied_from</span>(<span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">sys</span>::<span class="ident">signal_type_ref</span>(<span class="ident">T</span>::<span class="ident">upcast</span>(<span class="ident">raw</span>));
         <span class="ident">Raw</span>::<span class="ident">from_ptr</span>(<span class="ident">raw</span>)
     }
@@ -130,7 +130,7 @@
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This call relies on the [`IsA`] implementation being sound.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upcast</span><span class="op">&lt;</span><span class="ident">Parent</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">Parent</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upcast</span><span class="op">&lt;</span><span class="ident">Parent</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">Parent</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">Parent</span><span class="op">&gt;</span>,
         <span class="ident">Parent</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;</span>,
@@ -140,24 +140,24 @@
         <span class="kw">unsafe</span> { <span class="ident">Raw</span>::<span class="ident">from_ptr</span>(<span class="ident">T</span>::<span class="ident">upcast</span>(<span class="self">self</span>.<span class="ident">into_inner</span>())) }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> { <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> { <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>() }
 
     <span class="doccomment">/// Consume this [`Raw`] and extract the underlying pointer **without**</span>
     <span class="doccomment">/// decrementing its reference count.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>();
         <span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">forget</span>(<span class="self">self</span>);
         <span class="ident">ptr</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_const_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> { <span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_const_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> { <span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> { <span class="kw">unsafe</span> { <span class="ident">Raw</span>::<span class="ident">copied_from</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } }
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> { <span class="kw">unsafe</span> { <span class="ident">Raw</span>::<span class="ident">copied_from</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) } }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">sys</span>::<span class="ident">signal_type_base</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Raw</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">unsafe</span> {
             <span class="ident">sys</span>::<span class="ident">signal_type_unref</span>(<span class="ident">T</span>::<span class="ident">upcast</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>()));
@@ -176,23 +176,23 @@
 <span class="doccomment">/// is usually implemented by placing a `Parent` as the first field inside a</span>
 <span class="doccomment">/// `#[repr(C)]` struct.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">IsA</span><span class="op">&lt;</span><span class="ident">Parent</span><span class="op">&gt;</span> {
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">upcast</span>(<span class="ident">this</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="self">Self</span>) <span class="op">-&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Parent</span>;
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">upcast</span>(<span class="ident">this</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Parent</span>;
 }
 
 <span class="macro">impl_is_a</span><span class="macro">!</span> {
-    <span class="ident">sys</span>::<span class="ident">ciphertext_message</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">ec_key_pair</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">ec_private_key</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">ec_public_key</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">hkdf_context</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">pre_key_signal_message</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">ratchet_identity_key_pair</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">session_pre_key</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">session_record</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">session_signed_pre_key</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">session_state</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
-    <span class="ident">sys</span>::<span class="ident">signal_message</span> <span class="op">=&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">ciphertext_message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">ec_key_pair</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">ec_private_key</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">ec_public_key</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">hkdf_context</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">pre_key_signal_message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">ratchet_identity_key_pair</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">session_pre_key</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">session_record</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">session_signed_pre_key</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">session_state</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
+    <span class="ident">sys</span>::<span class="ident">signal_message</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sys</span>::<span class="ident">signal_type_base</span>,
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "libsignal_protocol";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

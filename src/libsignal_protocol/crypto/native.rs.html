@@ -181,7 +181,7 @@
     <span class="ident">Aes128Ctr</span>, <span class="ident">Aes192Ctr</span>, <span class="ident">Aes256Ctr</span>,
 };
 <span class="kw">use</span> <span class="ident">block_modes</span>::{<span class="ident">block_padding</span>::<span class="ident">Pkcs7</span>, <span class="ident">BlockMode</span>, <span class="ident">Cbc</span>};
-<span class="kw">use</span> <span class="ident">hmac</span>::{<span class="ident">Hmac</span>, <span class="ident">Mac</span>};
+<span class="kw">use</span> <span class="ident">hmac</span>::{<span class="ident">Hmac</span>, <span class="ident">Mac</span>, <span class="ident">NewMac</span>};
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>, <span class="ident">Sha512</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -215,60 +215,60 @@
         <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">iv</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">cipher</span>, <span class="ident">key</span>.<span class="ident">len</span>()) {
-            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCtrNoPadding</span>, <span class="number">16</span>) <span class="op">=&gt;</span> {
+            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCtrNoPadding</span>, <span class="number">16</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">to_vec</span>();
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes128Ctr</span>::<span class="ident">new_var</span>(<span class="ident">key</span>, <span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
                 <span class="ident">c</span>.<span class="ident">apply_keystream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
                 <span class="ident">buf</span>
             },
-            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCtrNoPadding</span>, <span class="number">24</span>) <span class="op">=&gt;</span> {
+            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCtrNoPadding</span>, <span class="number">24</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">to_vec</span>();
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes192Ctr</span>::<span class="ident">new_var</span>(<span class="ident">key</span>, <span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
                 <span class="ident">c</span>.<span class="ident">apply_keystream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
                 <span class="ident">buf</span>
             },
-            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCtrNoPadding</span>, <span class="number">32</span>) <span class="op">=&gt;</span> {
+            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCtrNoPadding</span>, <span class="number">32</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">to_vec</span>();
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes256Ctr</span>::<span class="ident">new_var</span>(<span class="ident">key</span>, <span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
                 <span class="ident">c</span>.<span class="ident">apply_keystream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
                 <span class="ident">buf</span>
             },
-            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">16</span>) <span class="op">=&gt;</span> {
+            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">16</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes128Cbc</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
                 <span class="kw">match</span> <span class="ident">mode</span> {
-                    <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
-                    <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>
+                    <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
+                    <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>
                         .<span class="ident">decrypt_vec</span>(<span class="ident">data</span>)
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>,
                 }
             },
-            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">24</span>) <span class="op">=&gt;</span> {
+            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">24</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes192Cbc</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
                 <span class="kw">match</span> <span class="ident">mode</span> {
-                    <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
-                    <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>
+                    <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
+                    <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>
                         .<span class="ident">decrypt_vec</span>(<span class="ident">data</span>)
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>,
                 }
             },
-            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">32</span>) <span class="op">=&gt;</span> {
+            (<span class="ident">SignalCipherType</span>::<span class="ident">AesCbcPkcs5</span>, <span class="number">32</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">Aes256Cbc</span>::<span class="ident">new_var</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">iv</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
                 <span class="kw">match</span> <span class="ident">mode</span> {
-                    <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
-                    <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=&gt;</span> <span class="ident">c</span>
+                    <span class="ident">Mode</span>::<span class="ident">Encrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>.<span class="ident">encrypt_vec</span>(<span class="ident">data</span>),
+                    <span class="ident">Mode</span>::<span class="ident">Decrypt</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">c</span>
                         .<span class="ident">decrypt_vec</span>(<span class="ident">data</span>)
                         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>,
                 }
             },
-            (<span class="ident">cipher</span>, <span class="ident">size</span>) <span class="op">=&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(
+            (<span class="ident">cipher</span>, <span class="ident">size</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(
                 <span class="string">&quot;A combination of {:?} and {} doesn&#39;t make sense&quot;</span>,
                 <span class="ident">cipher</span>, <span class="ident">size</span>
             ),
@@ -279,7 +279,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;crypto-native&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Crypto</span> <span class="kw">for</span> <span class="ident">DefaultCrypto</span> {
-    <span class="kw">fn</span> <span class="ident">fill_random</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fill_random</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">rand</span>::<span class="ident">RngCore</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand</span>::<span class="ident">thread_rng</span>();
         <span class="ident">rng</span>.<span class="ident">fill_bytes</span>(<span class="ident">buffer</span>);
@@ -289,13 +289,13 @@
     <span class="kw">fn</span> <span class="ident">hmac_sha256</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Sha256Hmac</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Sha256Hmac</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">mac</span> <span class="op">=</span>
             <span class="ident">HmacSha256</span>::<span class="ident">new_varkey</span>(<span class="ident">key</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InternalError</span>::<span class="ident">Unknown</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">mac</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">sha512_digest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Sha512Digest</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">sha512_digest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Sha512Digest</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">Sha512</span>::<span class="ident">new</span>()))
     }
 
@@ -305,7 +305,7 @@
         <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">iv</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">crypter</span>(<span class="ident">Mode</span>::<span class="ident">Encrypt</span>, <span class="ident">cipher</span>, <span class="ident">key</span>, <span class="ident">iv</span>, <span class="ident">data</span>)
     }
 
@@ -315,38 +315,38 @@
         <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">iv</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">crypter</span>(<span class="ident">Mode</span>::<span class="ident">Decrypt</span>, <span class="ident">cipher</span>, <span class="ident">key</span>, <span class="ident">iv</span>, <span class="ident">data</span>)
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;crypto-native&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DefaultCrypto</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-&gt;</span> <span class="self">Self</span> { <span class="self">Self</span> }
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="self">Self</span> }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;crypto-native&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Sha512Digest</span> <span class="kw">for</span> <span class="ident">Sha512</span> {
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">input</span>(<span class="ident">data</span>);
+    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
+        <span class="ident">Digest</span>::<span class="ident">update</span>(<span class="self">self</span>, <span class="ident">data</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">result_reset</span>();
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finalize_reset</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>.<span class="ident">to_vec</span>())
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;crypto-native&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Sha256Hmac</span> <span class="kw">for</span> <span class="ident">HmacSha256</span> {
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">input</span>(<span class="ident">data</span>);
+    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InternalError</span><span class="op">&gt;</span> {
+        <span class="ident">Mac</span>::<span class="ident">update</span>(<span class="self">self</span>, <span class="ident">data</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">result_reset</span>().<span class="ident">code</span>();
+    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finalize_reset</span>().<span class="ident">into_bytes</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>.<span class="ident">to_vec</span>())
     }
 }

@@ -252,10 +252,10 @@
 
 <span class="kw">impl</span> <span class="ident">PreKeyBundle</span> {
     <span class="doccomment">/// Get a builder struct for the [`PreKeyBundle`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-&gt;</span> <span class="ident">PreKeyBundleBuilder</span> { <span class="ident">PreKeyBundleBuilder</span>::<span class="ident">default</span>() }
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PreKeyBundleBuilder</span> { <span class="ident">PreKeyBundleBuilder</span>::<span class="ident">default</span>() }
 
     <span class="doccomment">/// Get the registration ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registration_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registration_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_get_registration_id</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>(),
@@ -264,21 +264,21 @@
     }
 
     <span class="doccomment">/// Get the device ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">i32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">i32</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_get_device_id</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>())
         }
     }
 
     <span class="doccomment">/// Get the pre-key ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_key_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_key_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_get_pre_key_id</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>())
         }
     }
 
     <span class="doccomment">/// Get the pre-key itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_get_pre_key</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>(),
@@ -294,7 +294,7 @@
     }
 
     <span class="doccomment">/// Get the signed pre-key id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signed_pre_key_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signed_pre_key_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
         <span class="kw">unsafe</span> {
             <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_get_signed_pre_key_id</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>(),
@@ -303,7 +303,7 @@
     }
 
     <span class="doccomment">/// Get the signed pre-key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signed_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signed_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_get_signed_pre_key</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>(),
@@ -319,7 +319,7 @@
     }
 
     <span class="doccomment">/// Get the identity key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PublicKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">session_pre_key_bundle_get_identity_key</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>(),
@@ -336,7 +336,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">PreKeyBundle</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;PreKeyBundle&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -350,13 +350,13 @@
     <span class="ident">pre_key_public</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span>,
     <span class="ident">signed_pre_key_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
     <span class="ident">signed_pre_key_public</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span>,
-    <span class="ident">signature</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;&gt;</span>,
+    <span class="ident">signature</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">identity_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PreKeyBundleBuilder</span> {
     <span class="doccomment">/// Set the recipient&#39;s public pre-key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_key</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pre_key</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">pre_key_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
         <span class="self">self</span>.<span class="ident">pre_key_public</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">public_key</span>.<span class="ident">clone</span>());
 
@@ -368,7 +368,7 @@
         <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">id</span>: <span class="ident">u32</span>,
         <span class="ident">signed_public_key</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>,
-    ) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">signed_pre_key_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
         <span class="self">self</span>.<span class="ident">signed_pre_key_public</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">signed_public_key</span>.<span class="ident">clone</span>());
 
@@ -376,47 +376,47 @@
     }
 
     <span class="doccomment">/// Set the signed pre-key&#39;s signature.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signature</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sig</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signature</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sig</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">signature</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">sig</span>.<span class="ident">to_vec</span>());
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the registration ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registration_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registration_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">registration_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the device ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">i32</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">device_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">i32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">device_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Set the user&#39;s identity key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_key</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>) <span class="op">-&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_key</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">identity_key</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">identity_key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">identity_key</span>.<span class="ident">clone</span>());
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">get_registration_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_registration_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">registration_id</span>
-            .<span class="ident">ok_or_else</span>(<span class="op">||</span> <span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;a registration ID is required&quot;</span>))
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;a registration ID is required&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">get_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_device_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">device_id</span>
-            .<span class="ident">ok_or_else</span>(<span class="op">||</span> <span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;a device ID is required&quot;</span>))
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;a device ID is required&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">get_identity_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_identity_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">identity_key</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">key</span>) <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">key</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>()),
-            <span class="prelude-val">None</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;Identity key is required&quot;</span>)),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">key</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">key</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>()),
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">failure</span>::<span class="ident">err_msg</span>(<span class="string">&quot;Identity key is required&quot;</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">u32</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>) {
+    <span class="kw">fn</span> <span class="ident">get_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u32</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PreKeyBundleBuilder</span> {
             <span class="ident">pre_key_id</span>: <span class="prelude-val">Some</span>(<span class="ident">id</span>),
             <span class="ident">pre_key_public</span>: <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">public</span>),
@@ -429,7 +429,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_signed_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> (<span class="ident">u32</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>) {
+    <span class="kw">fn</span> <span class="ident">get_signed_pre_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u32</span>, <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">ec_public_key</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PreKeyBundleBuilder</span> {
             <span class="ident">signed_pre_key_id</span>: <span class="prelude-val">Some</span>(<span class="ident">id</span>),
             <span class="ident">signed_pre_key_public</span>: <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">public</span>),
@@ -443,7 +443,7 @@
     }
 
     <span class="doccomment">/// Actually build the [`PreKeyBundle`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PreKeyBundle</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PreKeyBundle</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">registration_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_registration_id</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">device_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_device_id</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> (<span class="ident">pre_key_id</span>, <span class="ident">pre_key_public</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_pre_key</span>();

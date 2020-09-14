@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/aes-ctr-0.3.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../aes_ctr/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/travis/.cargo/registry/src/github.com-1ecc6299db9ec823/aes-ctr-0.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../aes_ctr/index.html'><div class='logo-container'><img src='https://raw.githubusercontent.com/RustCrypto/meta/master/logo_small.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
@@ -81,8 +81,8 @@
 <span class="doccomment">//! it either by using `RUSTFLAGS=&quot;-C target-feature=+aes,+ssse3&quot;` or by editing</span>
 <span class="doccomment">//! your `.cargo/config`. (`sse2` target feature is usually enabled by default)</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! # Warning</span>
-<span class="doccomment">//! This crate does not provide any authentification! Thus ciphertext integrity</span>
+<span class="doccomment">//! # Security Warning</span>
+<span class="doccomment">//! This crate does not ensure ciphertexts are authentic! Thus ciphertext integrity</span>
 <span class="doccomment">//! is not verified, which can lead to serious vulnerabilities!</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Usage example</span>
@@ -108,37 +108,37 @@
 <span class="doccomment">//! cipher.apply_keystream(&amp;mut data);</span>
 <span class="doccomment">//! assert_eq!(data, [1, 2, 3, 4, 5, 6, 7]);</span>
 <span class="doccomment">//! ```</span>
+
 <span class="attribute">#![<span class="ident">no_std</span>]</span>
-<span class="kw">pub</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">stream_cipher</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(
-    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
-    <span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>),
-)))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">ctr</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(
-    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
-    <span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>),
-)))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">aes_soft</span>;
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/RustCrypto/meta/master/logo_small.png&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>, <span class="ident">rust_2018_idioms</span>)]</span>
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">stream_cipher</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(
-    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
     <span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>),
 )))]</span>
-<span class="kw">mod</span> <span class="ident">dummy</span>;
+<span class="kw">mod</span> <span class="ident">soft</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
+    <span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>),
+)))]</span>
+<span class="kw">use</span> <span class="ident">soft</span> <span class="kw">as</span> <span class="ident">aes</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>,
+    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
     <span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>),
 ))]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">aesni</span>;
+<span class="kw">use</span> <span class="ident">aesni</span> <span class="kw">as</span> <span class="ident">aes</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;aes&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>, <span class="ident">target_feature</span> <span class="op">=</span> <span class="string">&quot;ssse3&quot;</span>,
-    <span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>),
-))]</span>
-<span class="kw">use</span> <span class="ident">aesni</span> <span class="kw">as</span> <span class="ident">dummy</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dummy</span>::{<span class="ident">Aes128Ctr</span>, <span class="ident">Aes192Ctr</span>, <span class="ident">Aes256Ctr</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">aes</span>::{<span class="ident">Aes128Ctr</span>, <span class="ident">Aes192Ctr</span>, <span class="ident">Aes256Ctr</span>};
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "aes_ctr";</script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

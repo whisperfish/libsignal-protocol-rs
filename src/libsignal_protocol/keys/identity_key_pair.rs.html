@@ -97,7 +97,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">public_key</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>,
         <span class="ident">private_key</span>: <span class="kw-2">&amp;</span><span class="ident">PrivateKey</span>,
-    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IdentityKeyPair</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IdentityKeyPair</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
             <span class="ident">sys</span>::<span class="ident">ratchet_identity_key_pair_create</span>(
@@ -114,7 +114,7 @@
     }
 
     <span class="doccomment">/// Get the public part of this key pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">PublicKey</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">public</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PublicKey</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">ratchet_identity_key_pair_get_public</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>(),
@@ -127,7 +127,7 @@
     }
 
     <span class="doccomment">/// Get the public part of this key pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">PrivateKey</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">private</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PrivateKey</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">ratchet_identity_key_pair_get_private</span>(
                 <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>(),
@@ -141,7 +141,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">IdentityKeyPair</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;IdentityKeyPair&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;public&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public</span>())
             .<span class="ident">field</span>(<span class="string">&quot;private&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">private</span>())

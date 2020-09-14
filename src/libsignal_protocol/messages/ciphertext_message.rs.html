@@ -110,25 +110,25 @@
 
 <span class="kw">impl</span> <span class="ident">CiphertextMessage</span> {
     <span class="doccomment">/// Which type of message is this?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CiphertextType</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CiphertextType</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">ciphertext_message_get_type</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>());
 
             <span class="kw">match</span> <span class="ident">u32</span>::<span class="ident">try_from</span>(<span class="ident">ty</span>).<span class="ident">unwrap</span>() {
-                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_PREKEY_TYPE</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">PreKey</span>),
-                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SIGNAL_TYPE</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">Signal</span>),
-                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SENDERKEY_TYPE</span> <span class="op">=&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">SenderKey</span>),
-                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE</span> <span class="op">=&gt;</span> {
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_PREKEY_TYPE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">PreKey</span>),
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SIGNAL_TYPE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">Signal</span>),
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SENDERKEY_TYPE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">SenderKey</span>),
+                <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">SenderKeyDistribution</span>)
                 },
-                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">InternalError</span>::<span class="ident">UnknownCiphertextType</span>(<span class="ident">other</span>)),
+                <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">InternalError</span>::<span class="ident">UnknownCiphertextType</span>(<span class="ident">other</span>)),
             }
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Serializable</span> <span class="kw">for</span> <span class="ident">CiphertextMessage</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Buffer</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Buffer</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="comment">// get a reference to the *cached* serialized message</span>
             <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span>

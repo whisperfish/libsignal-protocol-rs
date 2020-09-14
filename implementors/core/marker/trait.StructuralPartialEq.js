@@ -1,6 +1,7 @@
 (function() {var implementors = {};
 implementors["backtrace"] = [{"text":"impl StructuralPartialEq for PrintFmt","synthetic":false,"types":[]}];
 implementors["base64"] = [{"text":"impl StructuralPartialEq for DecodeError","synthetic":false,"types":[]}];
+implementors["block_cipher"] = [{"text":"impl StructuralPartialEq for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["block_cipher_trait"] = [{"text":"impl StructuralPartialEq for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["byteorder"] = [{"text":"impl StructuralPartialEq for BigEndian","synthetic":false,"types":[]},{"text":"impl StructuralPartialEq for LittleEndian","synthetic":false,"types":[]}];
 implementors["crypto_mac"] = [{"text":"impl StructuralPartialEq for MacError","synthetic":false,"types":[]},{"text":"impl StructuralPartialEq for InvalidKeyLength","synthetic":false,"types":[]}];
