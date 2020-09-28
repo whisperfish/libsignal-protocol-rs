@@ -1,5 +1,6 @@
 use crate::{
-    errors::FromInternalErrorCode, keys::PublicKey, raw_ptr::Raw, Context,
+    errors::FromInternalErrorCode, keys::PublicKey, raw_ptr::Raw, Buffer,
+    Context,
 };
 use failure::Error;
 use std::{
@@ -45,6 +46,16 @@ impl PrivateKey {
             Ok(PublicKey {
                 raw: Raw::from_ptr(raw),
             })
+        }
+    }
+
+    /// returns this private key as a base64 encoded string
+    pub fn as_base64(&self) -> Result<String, Error> {
+        unsafe {
+            let mut raw = ptr::null_mut();
+            sys::ec_private_key_serialize(&mut raw, self.raw.as_const_ptr())
+                .into_result()?;
+            Ok(base64::encode(Buffer::from_raw(raw).as_slice()))
         }
     }
 }
