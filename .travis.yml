@@ -39,7 +39,8 @@ matrix:
   include:
     - rust: stable
     # ptr_cast requires rustc 1.38.0
-    - rust: 1.38.0
+    # there's a failure when documenting the subtle crate with 1.38.0
+    - rust: 1.42.0
     - rust: nightly
 
     - rust: nightly
