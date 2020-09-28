@@ -1,6 +1,5 @@
 (function() {var implementors = {};
 implementors["adler"] = [{"text":"impl Default for Adler32","synthetic":false,"types":[]}];
-implementors["adler32"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"adler32/struct.RollingAdler32.html\" title=\"struct adler32::RollingAdler32\">RollingAdler32</a>","synthetic":false,"types":["adler32::RollingAdler32"]}];
 implementors["backtrace"] = [{"text":"impl Default for Backtrace","synthetic":false,"types":[]}];
 implementors["block_buffer"] = [{"text":"impl&lt;BlockSize:&nbsp;Default + ArrayLength&lt;u8&gt;&gt; Default for BlockBuffer&lt;BlockSize&gt;","synthetic":false,"types":[]}];
 implementors["byteorder"] = [{"text":"impl Default for BigEndian","synthetic":false,"types":[]},{"text":"impl Default for LittleEndian","synthetic":false,"types":[]}];

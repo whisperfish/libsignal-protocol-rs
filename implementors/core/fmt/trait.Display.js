@@ -2,7 +2,6 @@
 implementors["backtrace"] = [{"text":"impl&lt;'a&gt; Display for SymbolName&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Display for BytesOrWideString&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["base64"] = [{"text":"impl&lt;'a&gt; Display for Base64Display&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl Display for DecodeError","synthetic":false,"types":[]}];
 implementors["block_cipher"] = [{"text":"impl Display for InvalidKeyLength","synthetic":false,"types":[]}];
-implementors["block_cipher_trait"] = [{"text":"impl Display for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["block_modes"] = [{"text":"impl Display for BlockModeError","synthetic":false,"types":[]},{"text":"impl Display for InvalidKeyIvLength","synthetic":false,"types":[]}];
 implementors["crypto_mac"] = [{"text":"impl Display for MacError","synthetic":false,"types":[]},{"text":"impl Display for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["digest"] = [{"text":"impl Display for InvalidOutputSize","synthetic":false,"types":[]}];
@@ -15,7 +14,6 @@ implementors["object"] = [{"text":"impl Display for Error","synthetic":false,"ty
 implementors["proc_macro2"] = [{"text":"impl Display for TokenStream","synthetic":false,"types":[]},{"text":"impl Display for TokenTree","synthetic":false,"types":[]},{"text":"impl Display for Group","synthetic":false,"types":[]},{"text":"impl Display for Punct","synthetic":false,"types":[]},{"text":"impl Display for Ident","synthetic":false,"types":[]},{"text":"impl Display for Literal","synthetic":false,"types":[]}];
 implementors["rand"] = [{"text":"impl Display for BernoulliError","synthetic":false,"types":[]},{"text":"impl Display for WeightedError","synthetic":false,"types":[]},{"text":"impl Display for ReadError","synthetic":false,"types":[]}];
 implementors["rand_core"] = [{"text":"impl Display for Error","synthetic":false,"types":[]}];
-implementors["rand_jitter"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html\" title=\"trait core::fmt::Display\">Display</a> for <a class=\"enum\" href=\"rand_jitter/enum.TimerError.html\" title=\"enum rand_jitter::TimerError\">TimerError</a>","synthetic":false,"types":["rand_jitter::error::TimerError"]}];
 implementors["rustc_demangle"] = [{"text":"impl&lt;'a&gt; Display for Demangle&lt;'a&gt;","synthetic":false,"types":[]}];
 implementors["stream_cipher"] = [{"text":"impl Display for LoopError","synthetic":false,"types":[]},{"text":"impl Display for InvalidKeyNonceLength","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Display for Lifetime","synthetic":false,"types":[]},{"text":"impl Display for LitInt","synthetic":false,"types":[]},{"text":"impl Display for LitFloat","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Display for ParseBuffer&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl Display for Error","synthetic":false,"types":[]}];
