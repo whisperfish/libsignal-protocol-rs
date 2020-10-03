@@ -6,6 +6,7 @@ implementors["failure"] = [{"text":"impl&lt;E:&nbsp;Display + Debug&gt; Error fo
 implementors["getrandom"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
 implementors["libsignal_protocol"] = [{"text":"impl Error for InternalError","synthetic":false,"types":[]}];
 implementors["log"] = [{"text":"impl Error for SetLoggerError","synthetic":false,"types":[]},{"text":"impl Error for ParseLevelError","synthetic":false,"types":[]}];
+implementors["proc_macro2"] = [{"text":"impl Error for LexError","synthetic":false,"types":[]}];
 implementors["rand"] = [{"text":"impl Error for BernoulliError","synthetic":false,"types":[]},{"text":"impl Error for WeightedError","synthetic":false,"types":[]},{"text":"impl Error for ReadError","synthetic":false,"types":[]}];
 implementors["rand_core"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
 implementors["syn"] = [{"text":"impl Error for Error","synthetic":false,"types":[]}];
