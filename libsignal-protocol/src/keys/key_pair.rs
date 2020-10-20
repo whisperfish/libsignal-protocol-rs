@@ -1,9 +1,8 @@
 use crate::{
-    errors::FromInternalErrorCode,
+    errors::{Error, FromInternalErrorCode},
     keys::{PrivateKey, PublicKey},
     raw_ptr::Raw,
 };
-use failure::Error;
 use std::{
     fmt::{self, Debug, Formatter},
     ptr,

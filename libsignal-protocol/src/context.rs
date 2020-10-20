@@ -1,6 +1,7 @@
 use std::{
     convert::TryFrom,
     fmt::{self, Debug, Formatter},
+    marker::{Send, Sync},
     os::raw::{c_char, c_int, c_void},
     panic::RefUnwindSafe,
     pin::Pin,
@@ -8,17 +9,15 @@ use std::{
     rc::Rc,
     sync::Mutex,
     time::SystemTime,
-    marker::{Send, Sync},
 };
 
-use failure::Error;
 use log::Level;
 
 #[cfg(feature = "crypto-native")]
-use crate::crypto::DefaultCrypto;
+use crate::{crypto::DefaultCrypto, errors::Error};
 use crate::{
     crypto::{Crypto, CryptoProvider},
-    errors::{FromInternalErrorCode, InternalError},
+    errors::{FromInternalErrorCode},
     hkdf::HMACBasedKeyDerivationFunction,
     keys::{
         IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
@@ -188,7 +187,7 @@ pub fn generate_signed_pre_key(
         .into_result()?;
 
         if raw.is_null() {
-            Err(failure::err_msg("Unable to generate a signed pre key"))
+            Err(Error::SignedPreKeyGenerationError)
         } else {
             Ok(SessionSignedPreKey {
                 raw: Raw::from_ptr(raw),
@@ -327,7 +326,7 @@ pub(crate) struct ContextInner {
 impl ContextInner {
     pub(crate) fn new<C: Crypto + 'static>(
         crypto: C,
-    ) -> Result<ContextInner, InternalError> {
+    ) -> Result<ContextInner, Error> {
         unsafe {
             let mut global_context: *mut sys::signal_context = ptr::null_mut();
             let crypto = CryptoProvider::new(crypto);
@@ -385,7 +384,7 @@ fn default_log_func(level: Level, message: &str) {
     log::log!(level, "{}", message);
 
     if level == Level::Error && std::env::var("RUST_BACKTRACE").is_ok() {
-        log::error!("{}", failure::Backtrace::new());
+        log::error!("{:?}", backtrace::Backtrace::new());
     }
 }
 
@@ -424,7 +423,7 @@ fn translate_log_level(raw: c_int) -> Level {
 }
 
 // Assert that Context does not implement [`Send`] and [`Sync`] to guarantee
-// that each [`Context`] instance is only used within a single thread. 
+// that each [`Context`] instance is only used within a single thread.
 //
 // See https://github.com/Michael-F-Bryan/libsignal-protocol-rs/issues/49
 // for details.
@@ -435,8 +434,7 @@ unsafe extern "C" fn lock_function(_user_data: *mut c_void) {
     // threads as long as it does not implement [`Sync`] and [`Send`].
 }
 
-unsafe extern "C" fn unlock_function(_user_data: *mut c_void) {
-}
+unsafe extern "C" fn unlock_function(_user_data: *mut c_void) {}
 
 /// The "user state" we pass to `libsignal-protocol-c` as part of the global
 /// context.

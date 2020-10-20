@@ -1,10 +1,4 @@
-use crate::{
-    context::ContextInner,
-    errors::{FromInternalErrorCode, InternalError},
-    keys::{PreKey, SessionSignedPreKey},
-    raw_ptr::Raw,
-    Address, SessionRecord,
-};
+use crate::{Address, Error, SessionRecord, context::ContextInner, InternalError, errors::{FromInternalErrorCode}, keys::{PreKey, SessionSignedPreKey}, raw_ptr::Raw};
 use std::{
     fmt::{self, Debug, Formatter},
     ptr,
@@ -30,7 +24,7 @@ impl StoreContext {
     }
 
     /// Store pre key
-    pub fn store_pre_key(&self, pre_key: &PreKey) -> Result<(), InternalError> {
+    pub fn store_pre_key(&self, pre_key: &PreKey) -> Result<(), Error> {
         unsafe {
             sys::signal_protocol_pre_key_store_key(
                 self.raw(),
@@ -46,7 +40,7 @@ impl StoreContext {
     pub fn store_signed_pre_key(
         &self,
         signed_pre_key: &SessionSignedPreKey,
-    ) -> Result<(), InternalError> {
+    ) -> Result<(), Error> {
         unsafe {
             sys::signal_protocol_signed_pre_key_store_key(
                 self.raw(),
@@ -59,7 +53,7 @@ impl StoreContext {
     }
 
     /// Get the registration ID.
-    pub fn registration_id(&self) -> Result<u32, InternalError> {
+    pub fn registration_id(&self) -> Result<u32, Error> {
         unsafe {
             let mut id = 0;
             sys::signal_protocol_identity_get_local_registration_id(
@@ -76,7 +70,7 @@ impl StoreContext {
     pub fn contains_session(
         &self,
         addr: &Address,
-    ) -> Result<bool, InternalError> {
+    ) -> Result<bool, Error> {
         unsafe {
             match sys::signal_protocol_session_contains_session(
                 self.raw(),
@@ -85,7 +79,7 @@ impl StoreContext {
                 0 => Ok(false),
                 1 => Ok(true),
                 code => Err(InternalError::from_error_code(code)
-                    .unwrap_or(InternalError::Unknown)),
+                    .unwrap_or(InternalError::Unknown).into()),
             }
         }
     }
@@ -94,7 +88,7 @@ impl StoreContext {
     pub fn load_session(
         &self,
         addr: &Address,
-    ) -> Result<SessionRecord, InternalError> {
+    ) -> Result<SessionRecord, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::signal_protocol_session_load_session(

@@ -75,7 +75,9 @@ pub use crate::{
     address::Address,
     buffer::Buffer,
     context::*,
-    errors::{FromInternalErrorCode, InternalError, IntoInternalErrorCode},
+    errors::{
+        Error, FromInternalErrorCode, InternalError, IntoInternalErrorCode,
+    },
     hkdf::HMACBasedKeyDerivationFunction,
     pre_key_bundle::{PreKeyBundle, PreKeyBundleBuilder},
     session_builder::SessionBuilder,
@@ -116,13 +118,13 @@ pub mod stores;
 /// A helper trait for something which can be serialized to protobufs.
 pub trait Serializable {
     /// Serialize the object to a buffer.
-    fn serialize(&self) -> Result<Buffer, InternalError>;
+    fn serialize(&self) -> Result<Buffer, Error>;
 
     /// Helper for serializing to anything which implements [`Write`].
     fn serialize_to<W: Write>(
         &self,
         mut writer: W,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), errors::Error> {
         let buffer = self.serialize()?;
         writer.write_all(buffer.as_slice())?;
 
@@ -133,5 +135,5 @@ pub trait Serializable {
 /// A helper trait for something which can be deserialized from protobufs.
 pub trait Deserializable: Sized {
     /// Parse the provided data in the protobuf format.
-    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, InternalError>;
+    fn deserialize(ctx: &Context, data: &[u8]) -> Result<Self, Error>;
 }

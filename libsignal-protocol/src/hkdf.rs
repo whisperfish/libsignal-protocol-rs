@@ -1,10 +1,9 @@
 use crate::{
     context::ContextInner,
-    errors::{FromInternalErrorCode, InternalError},
+    errors::{Error, FromInternalErrorCode, InternalError},
     raw_ptr::Raw,
     Context,
 };
-use failure::Error;
 use std::{ptr, rc::Rc};
 
 /// Context for a HMAC-based Key Derivation Function.

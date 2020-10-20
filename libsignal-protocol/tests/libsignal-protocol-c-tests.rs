@@ -12,7 +12,7 @@ use sig::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
-    Address, Context, Deserializable, InternalError, PreKeyBundle,
+    Address, Context, Deserializable, PreKeyBundle,
     Serializable,
 };
 
@@ -313,7 +313,7 @@ fn test_basic_pre_key_v2() {
     // Have Alice process Bob's pre key bundle, which should fail due to a
     // missing unsigned pre key.
     let got = alice_session_builder.process_pre_key_bundle(&bob_pre_key_bundle);
-    assert_eq!(got, Err(InternalError::InvalidKey));
+    assert!(got.is_err());
 }
 
 #[test]

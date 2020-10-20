@@ -1,11 +1,4 @@
-use crate::{
-    context::{Context, ContextInner},
-    errors::{FromInternalErrorCode, InternalError},
-    messages::{CiphertextMessage, PreKeySignalMessage, SignalMessage},
-    raw_ptr::Raw,
-    store_context::{StoreContext, StoreContextInner},
-    Address, Buffer,
-};
+use crate::{Address, Buffer, Error, context::{Context, ContextInner}, errors::{FromInternalErrorCode}, messages::{CiphertextMessage, PreKeySignalMessage, SignalMessage}, raw_ptr::Raw, store_context::{StoreContext, StoreContextInner}};
 
 use std::{
     fmt::{self, Debug, Formatter},
@@ -27,7 +20,7 @@ impl SessionCipher {
         ctx: &Context,
         store_ctx: &StoreContext,
         address: &Address,
-    ) -> Result<SessionCipher, InternalError> {
+    ) -> Result<SessionCipher, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::session_cipher_create(
@@ -51,7 +44,7 @@ impl SessionCipher {
     pub fn encrypt(
         &self,
         message: &[u8],
-    ) -> Result<CiphertextMessage, InternalError> {
+    ) -> Result<CiphertextMessage, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::session_cipher_encrypt(
@@ -73,7 +66,7 @@ impl SessionCipher {
     pub fn decrypt_pre_key_message(
         &self,
         message: &PreKeySignalMessage,
-    ) -> Result<Buffer, InternalError> {
+    ) -> Result<Buffer, Error> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::session_cipher_decrypt_pre_key_signal_message(
@@ -92,7 +85,7 @@ impl SessionCipher {
     pub fn decrypt_message(
         &self,
         message: &SignalMessage,
-    ) -> Result<Buffer, InternalError> {
+    ) -> Result<Buffer, Error> {
         unsafe {
             let mut buffer = ptr::null_mut();
             sys::session_cipher_decrypt_signal_message(

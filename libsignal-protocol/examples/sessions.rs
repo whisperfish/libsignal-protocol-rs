@@ -47,15 +47,15 @@ extern crate libsignal_protocol as sig;
 
 use std::time::SystemTime;
 
-use failure::{Error, ResultExt};
+use anyhow::{Context, Error};
 
 use sig::{
     stores::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
-    Address, Context, PreKeyBundle, Serializable, SessionBuilder,
-    SessionCipher,
+    Address, Context as SignalContext, PreKeyBundle, Serializable,
+    SessionBuilder, SessionCipher,
 };
 
 #[path = "../tests/helpers/mod.rs"]
@@ -72,7 +72,7 @@ cfg_if::cfg_if! {
 }
 fn main() -> Result<(), Error> {
     env_logger::init();
-    let ctx = Context::new(Crypto::default()).unwrap();
+    let ctx = SignalContext::new(Crypto::default()).unwrap();
 
     // first we'll need a copy of bob's public key and some of his pre-keys
     let bob_address = Address::new("+14159998888", 1);

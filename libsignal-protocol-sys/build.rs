@@ -116,7 +116,7 @@ fn get_cmake_config() -> cmake::Config {
             }
 
             libsignal_cmake
-        }
+        },
 
         "ios" => {
             for (ios_arch, params) in CMAKE_PARAMS_IOS {
@@ -133,7 +133,7 @@ fn get_cmake_config() -> cmake::Config {
             libsignal_cmake.cflag("-fembed-bitcode");
 
             libsignal_cmake
-        }
+        },
 
         _ => libsignal_cmake,
     };
