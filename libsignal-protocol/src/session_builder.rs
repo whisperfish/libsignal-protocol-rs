@@ -1,4 +1,11 @@
-use crate::{address::Address, Error, context::{Context, ContextInner}, errors::{FromInternalErrorCode}, pre_key_bundle::PreKeyBundle, store_context::{StoreContext, StoreContextInner}};
+use crate::{
+    address::Address,
+    context::{Context, ContextInner},
+    errors::FromInternalErrorCode,
+    pre_key_bundle::PreKeyBundle,
+    store_context::{StoreContext, StoreContextInner},
+    Error,
+};
 use std::{
     fmt::{self, Debug, Formatter},
     ptr,

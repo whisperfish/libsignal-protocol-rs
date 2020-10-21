@@ -1,4 +1,10 @@
-use crate::{Address, Error, SessionRecord, context::ContextInner, InternalError, errors::{FromInternalErrorCode}, keys::{PreKey, SessionSignedPreKey}, raw_ptr::Raw};
+use crate::{
+    context::ContextInner,
+    errors::FromInternalErrorCode,
+    keys::{PreKey, SessionSignedPreKey},
+    raw_ptr::Raw,
+    Address, Error, InternalError, SessionRecord,
+};
 use std::{
     fmt::{self, Debug, Formatter},
     ptr,
@@ -67,10 +73,7 @@ impl StoreContext {
     }
 
     /// Does this store already contain a session with the provided recipient?
-    pub fn contains_session(
-        &self,
-        addr: &Address,
-    ) -> Result<bool, Error> {
+    pub fn contains_session(&self, addr: &Address) -> Result<bool, Error> {
         unsafe {
             match sys::signal_protocol_session_contains_session(
                 self.raw(),
@@ -79,16 +82,14 @@ impl StoreContext {
                 0 => Ok(false),
                 1 => Ok(true),
                 code => Err(InternalError::from_error_code(code)
-                    .unwrap_or(InternalError::Unknown).into()),
+                    .unwrap_or(InternalError::Unknown)
+                    .into()),
             }
         }
     }
 
     /// Load the session corresponding to the provided recipient.
-    pub fn load_session(
-        &self,
-        addr: &Address,
-    ) -> Result<SessionRecord, Error> {
+    pub fn load_session(&self, addr: &Address) -> Result<SessionRecord, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::signal_protocol_session_load_session(

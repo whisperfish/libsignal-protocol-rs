@@ -27,6 +27,10 @@ pub enum Error {
     IdentityKeyGetError,
     #[error("a missing field is required: {0}")]
     MissingRequiredField(RequiredField),
+    #[error("unknown error: {reason}")]
+    Unknown {
+        reason: String
+    }
 }
 
 #[derive(Debug, Copy, Clone, thiserror::Error)]
@@ -37,6 +41,17 @@ pub enum RequiredField {
     DeviceId,
     #[error("identity key is missing")]
     IdentityKey,
+}
+
+impl Error {
+    /// Get the error code for libsignal-protocol-c.
+    /// For anything else than InternalError, returns SG_ERR_UNKNOWN.
+    pub(crate) fn code(self) -> i32 {
+        match self {
+            Error::InternalError(e) => e.code(),
+            _ => sys::SG_ERR_UNKNOWN,
+        }
+    }
 }
 
 /// Mapping of internal errors that can happen inside of libsignal-protocol-c

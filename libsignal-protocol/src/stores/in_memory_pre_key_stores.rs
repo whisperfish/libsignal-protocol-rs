@@ -1,6 +1,6 @@
 use crate::{
     stores::{PreKeyStore, SignedPreKeyStore},
-    InternalError,
+    Error, InternalError,
 };
 use std::{
     collections::HashMap,
@@ -17,13 +17,13 @@ impl PreKeyStore for InMemoryPreKeyStore {
         self.0.load(id, writer)
     }
 
-    fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError> {
+    fn store(&self, id: u32, body: &[u8]) -> Result<(), Error> {
         self.0.store(id, body)
     }
 
     fn contains(&self, id: u32) -> bool { self.0.contains(id) }
 
-    fn remove(&self, id: u32) -> Result<(), InternalError> { self.0.remove(id) }
+    fn remove(&self, id: u32) -> Result<(), Error> { self.0.remove(id) }
 }
 
 /// An in-memory [`SignedPreKeyStore`].
@@ -35,13 +35,13 @@ impl SignedPreKeyStore for InMemorySignedPreKeyStore {
         self.0.load(id, writer)
     }
 
-    fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError> {
+    fn store(&self, id: u32, body: &[u8]) -> Result<(), Error> {
         self.0.store(id, body)
     }
 
     fn contains(&self, id: u32) -> bool { self.0.contains(id) }
 
-    fn remove(&self, id: u32) -> Result<(), InternalError> { self.0.remove(id) }
+    fn remove(&self, id: u32) -> Result<(), Error> { self.0.remove(id) }
 }
 
 #[derive(Debug, Default)]
@@ -57,7 +57,7 @@ impl Inner {
         }
     }
 
-    fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError> {
+    fn store(&self, id: u32, body: &[u8]) -> Result<(), Error> {
         self.keys.lock().unwrap().insert(id, body.to_vec());
         Ok(())
     }
@@ -66,7 +66,7 @@ impl Inner {
         self.keys.lock().unwrap().contains_key(&id)
     }
 
-    fn remove(&self, id: u32) -> Result<(), InternalError> {
+    fn remove(&self, id: u32) -> Result<(), Error> {
         self.keys.lock().unwrap().remove(&id);
         Ok(())
     }

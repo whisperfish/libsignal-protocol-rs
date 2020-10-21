@@ -1,7 +1,4 @@
-use crate::{
-    keys::IdentityKeyPair, stores::IdentityKeyStore, Address, Buffer,
-    InternalError, Serializable,
-};
+use crate::{Address, Buffer, Error, InternalError, Serializable, keys::IdentityKeyPair, stores::IdentityKeyStore};
 use std::{collections::HashMap, sync::Mutex};
 
 /// An in-memory [`IdentityKeyStore`].
@@ -30,21 +27,19 @@ impl InMemoryIdentityKeyStore {
 }
 
 impl IdentityKeyStore for InMemoryIdentityKeyStore {
-    fn local_registration_id(&self) -> Result<u32, InternalError> {
+    fn local_registration_id(&self) -> Result<u32, Error> {
         Ok(self.registration_id)
     }
 
-    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError> {
+    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), Error> {
         let public = self
             .identity
             .public()
-            .serialize()
-            .map_err(|_| InternalError::Unknown)?;
+            .serialize()?;
         let private = self
             .identity
             .private()
-            .serialize()
-            .map_err(|_| InternalError::Unknown)?;
+            .serialize()?;
 
         Ok((public, private))
     }
@@ -53,7 +48,7 @@ impl IdentityKeyStore for InMemoryIdentityKeyStore {
         &self,
         address: Address,
         identity_key: &[u8],
-    ) -> Result<bool, InternalError> {
+    ) -> Result<bool, Error> {
         let identities = self.trusted_identities.lock().unwrap();
 
         if let Some(identity) = identities.get(&address) {
@@ -67,7 +62,7 @@ impl IdentityKeyStore for InMemoryIdentityKeyStore {
         &self,
         addr: Address,
         identity_key: &[u8],
-    ) -> Result<(), InternalError> {
+    ) -> Result<(), Error> {
         self.trusted_identities
             .lock()
             .unwrap()

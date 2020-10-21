@@ -1,4 +1,11 @@
-use crate::{Address, Buffer, Error, context::{Context, ContextInner}, errors::{FromInternalErrorCode}, messages::{CiphertextMessage, PreKeySignalMessage, SignalMessage}, raw_ptr::Raw, store_context::{StoreContext, StoreContextInner}};
+use crate::{
+    context::{Context, ContextInner},
+    errors::FromInternalErrorCode,
+    messages::{CiphertextMessage, PreKeySignalMessage, SignalMessage},
+    raw_ptr::Raw,
+    store_context::{StoreContext, StoreContextInner},
+    Address, Buffer, Error,
+};
 
 use std::{
     fmt::{self, Debug, Formatter},
@@ -41,10 +48,7 @@ impl SessionCipher {
     }
 
     /// Encrypt a message.
-    pub fn encrypt(
-        &self,
-        message: &[u8],
-    ) -> Result<CiphertextMessage, Error> {
+    pub fn encrypt(&self, message: &[u8]) -> Result<CiphertextMessage, Error> {
         unsafe {
             let mut raw = ptr::null_mut();
             sys::session_cipher_encrypt(

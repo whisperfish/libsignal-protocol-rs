@@ -1,4 +1,7 @@
-use crate::{Buffer, ContextInner, Error, Serializable, errors::InternalError, raw_ptr::Raw};
+use crate::{
+    errors::InternalError, raw_ptr::Raw, Buffer, ContextInner, Error,
+    Serializable,
+};
 use std::{convert::TryFrom, rc::Rc};
 
 // For rustdoc link resolution
@@ -57,7 +60,9 @@ impl Serializable for CiphertextMessage {
                 sys::ciphertext_message_get_serialized(self.raw.as_const_ptr());
 
             if buffer.is_null() {
-                return Err(Error::InternalError(InternalError::SerializationError));
+                return Err(Error::InternalError(
+                    InternalError::SerializationError,
+                ));
             }
 
             let temporary_not_owned_buffer = Buffer::from_raw(buffer);

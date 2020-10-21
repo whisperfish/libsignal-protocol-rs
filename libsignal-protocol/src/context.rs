@@ -17,7 +17,7 @@ use log::Level;
 use crate::{crypto::DefaultCrypto, errors::Error};
 use crate::{
     crypto::{Crypto, CryptoProvider},
-    errors::{FromInternalErrorCode},
+    errors::FromInternalErrorCode,
     hkdf::HMACBasedKeyDerivationFunction,
     keys::{
         IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
