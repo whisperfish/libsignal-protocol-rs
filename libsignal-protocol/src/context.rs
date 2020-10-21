@@ -73,7 +73,7 @@ pub fn generate_key_pair(ctx: &Context) -> Result<KeyPair, Error> {
 ///
 /// ```rust
 /// # use libsignal_protocol::{keys::PublicKey, Context};
-/// # use failure::Error;
+/// # use anyhow::Error;
 /// # use cfg_if::cfg_if;
 /// # fn main() -> Result<(), Error> {
 /// # cfg_if::cfg_if! {
