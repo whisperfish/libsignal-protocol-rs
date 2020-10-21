@@ -14,10 +14,10 @@ use std::{
 use log::Level;
 
 #[cfg(feature = "crypto-native")]
-use crate::{crypto::DefaultCrypto, errors::Error};
+use crate::crypto::DefaultCrypto;
 use crate::{
     crypto::{Crypto, CryptoProvider},
-    errors::FromInternalErrorCode,
+    errors::{Error, FromInternalErrorCode},
     hkdf::HMACBasedKeyDerivationFunction,
     keys::{
         IdentityKeyPair, KeyPair, PreKeyList, PrivateKey, SessionSignedPreKey,
