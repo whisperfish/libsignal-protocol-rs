@@ -1,6 +1,6 @@
 use crate::{
     stores::{PreKeyStore, SignedPreKeyStore},
-    Error, InternalError,
+    Error,
 };
 use std::{
     collections::HashMap,

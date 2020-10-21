@@ -1,4 +1,4 @@
-use crate::{Address, Buffer, Error, InternalError, Serializable, keys::IdentityKeyPair, stores::IdentityKeyStore};
+use crate::{Address, Buffer, Error, Serializable, keys::IdentityKeyPair, stores::IdentityKeyStore};
 use std::{collections::HashMap, sync::Mutex};
 
 /// An in-memory [`IdentityKeyStore`].

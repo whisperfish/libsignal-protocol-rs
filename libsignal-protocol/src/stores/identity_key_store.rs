@@ -1,4 +1,4 @@
-use crate::{Address, Buffer, Error, errors::InternalError};
+use crate::{Address, Buffer, Error};
 use std::{
     os::raw::{c_int, c_void},
     panic::RefUnwindSafe,

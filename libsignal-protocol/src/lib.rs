@@ -59,7 +59,7 @@
     clippy::cargo_common_metadata,
     clippy::fallible_impl_from,
     clippy::missing_const_for_fn,
-    intra_doc_link_resolution_failure
+    broken_intra_doc_links
 )]
 
 // we use the *-sys crate everywhere so give it a shorter name
