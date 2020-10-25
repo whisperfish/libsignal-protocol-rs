@@ -533,6 +533,7 @@
 <span id="530">530</span>
 <span id="531">531</span>
 <span id="532">532</span>
+<span id="533">533</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Underlying cryptographic routines.</span>
 
@@ -567,6 +568,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SignalCipherTypeError</span>(<span class="ident">i32</span>);
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">enum</span> <span class="ident">CipherMode</span> {
     <span class="ident">Encrypt</span>,
     <span class="ident">Decrypt</span>,

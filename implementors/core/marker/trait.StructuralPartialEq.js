@@ -3,6 +3,7 @@ implementors["backtrace"] = [{"text":"impl StructuralPartialEq for PrintFmt","sy
 implementors["base64"] = [{"text":"impl StructuralPartialEq for DecodeError","synthetic":false,"types":[]}];
 implementors["block_cipher"] = [{"text":"impl StructuralPartialEq for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["byteorder"] = [{"text":"impl StructuralPartialEq for BigEndian","synthetic":false,"types":[]},{"text":"impl StructuralPartialEq for LittleEndian","synthetic":false,"types":[]}];
+implementors["cipher"] = [{"text":"impl StructuralPartialEq for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["crypto_mac"] = [{"text":"impl StructuralPartialEq for MacError","synthetic":false,"types":[]},{"text":"impl StructuralPartialEq for InvalidKeyLength","synthetic":false,"types":[]}];
 implementors["failure"] = [{"text":"impl&lt;E&gt; StructuralPartialEq for Compat&lt;E&gt;","synthetic":false,"types":[]}];
 implementors["getrandom"] = [{"text":"impl StructuralPartialEq for Error","synthetic":false,"types":[]}];

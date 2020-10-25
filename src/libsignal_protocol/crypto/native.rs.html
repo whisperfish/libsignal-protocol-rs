@@ -177,11 +177,11 @@
 <span id="174">174</span>
 <span id="175">175</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">aes</span>::{<span class="ident">Aes128</span>, <span class="ident">Aes192</span>, <span class="ident">Aes256</span>};
-<span class="kw">use</span> <span class="ident">aes_ctr</span>::{
-    <span class="ident">stream_cipher</span>::{<span class="ident">NewStreamCipher</span>, <span class="ident">SyncStreamCipher</span>},
-    <span class="ident">Aes128Ctr</span>, <span class="ident">Aes192Ctr</span>, <span class="ident">Aes256Ctr</span>,
+<span class="kw">use</span> <span class="ident">aes</span>::{
+    <span class="ident">cipher</span>::{<span class="ident">NewStreamCipher</span>, <span class="ident">SyncStreamCipher</span>},
+    <span class="ident">Aes128</span>, <span class="ident">Aes192</span>, <span class="ident">Aes256</span>,
 };
+<span class="kw">use</span> <span class="ident">aes_ctr</span>::{<span class="ident">Aes128Ctr</span>, <span class="ident">Aes192Ctr</span>, <span class="ident">Aes256Ctr</span>};
 <span class="kw">use</span> <span class="ident">block_modes</span>::{<span class="ident">block_padding</span>::<span class="ident">Pkcs7</span>, <span class="ident">BlockMode</span>, <span class="ident">Cbc</span>};
 <span class="kw">use</span> <span class="ident">hmac</span>::{<span class="ident">Hmac</span>, <span class="ident">Mac</span>, <span class="ident">NewMac</span>};
 <span class="kw">use</span> <span class="ident">sha2</span>::{<span class="ident">Digest</span>, <span class="ident">Sha256</span>, <span class="ident">Sha512</span>};
