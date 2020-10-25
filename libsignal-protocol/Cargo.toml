@@ -14,7 +14,7 @@ categories = ["api-bindings", "cryptography"]
 [dependencies]
 libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }
 #libsignal-protocol-sys = "0.1.0"
-failure = "0.1.5"
+backtrace = "0.3"
 thiserror = "1.0.0"
 rand = "0.7.3"
 log = "0.4.6"
@@ -38,5 +38,6 @@ crypto-native = ["sha2", "hmac", "aes", "block-modes", "aes-ctr"]
 crypto-openssl = ["openssl", "rental"]
 
 [dev-dependencies]
+anyhow = "1.0"
 cfg-if = "0.1.9"
 env_logger = "0.7.1"

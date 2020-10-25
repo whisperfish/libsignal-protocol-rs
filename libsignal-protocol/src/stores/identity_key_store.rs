@@ -1,4 +1,4 @@
-use crate::{errors::InternalError, Address, Buffer};
+use crate::{Address, Buffer, Error};
 use std::{
     os::raw::{c_int, c_void},
     panic::RefUnwindSafe,
@@ -8,13 +8,13 @@ use std::{
 pub trait IdentityKeyStore: RefUnwindSafe {
     /// Get the local client's identity key pair as the tuple `(public,
     /// private)`.
-    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), InternalError>;
+    fn identity_key_pair(&self) -> Result<(Buffer, Buffer), Error>;
 
     /// Get the local client's registration ID.
     ///
     /// Clients should maintain a registration ID, a random number
     /// between 1 and 16380 that's generated once at install time.
-    fn local_registration_id(&self) -> Result<u32, InternalError>;
+    fn local_registration_id(&self) -> Result<u32, Error>;
 
     /// Verify a remote client's identity key.
     ///
@@ -28,7 +28,7 @@ pub trait IdentityKeyStore: RefUnwindSafe {
         &self,
         address: Address,
         identity_key: &[u8],
-    ) -> Result<bool, InternalError>;
+    ) -> Result<bool, Error>;
 
     /// Save a remote client's identity key as trusted.
     ///
@@ -39,7 +39,7 @@ pub trait IdentityKeyStore: RefUnwindSafe {
         &self,
         address: Address,
         identity_key: &[u8],
-    ) -> Result<(), InternalError>;
+    ) -> Result<(), Error>;
 }
 
 pub(crate) fn new_vtable<I: IdentityKeyStore + 'static>(

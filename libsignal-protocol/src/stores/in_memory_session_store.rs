@@ -1,6 +1,6 @@
 use crate::{
     stores::{SerializedSession, SessionStore},
-    Address, InternalError,
+    Address, Error, InternalError,
 };
 use std::{collections::HashMap, sync::Mutex};
 
@@ -14,7 +14,7 @@ impl SessionStore for InMemorySessionStore {
     fn load_session(
         &self,
         address: Address,
-    ) -> Result<Option<SerializedSession>, InternalError> {
+    ) -> Result<Option<SerializedSession>, Error> {
         Ok(self.sessions.lock().unwrap().get(&address).cloned())
     }
 
@@ -46,12 +46,12 @@ impl SessionStore for InMemorySessionStore {
         Ok(())
     }
 
-    fn delete_session(&self, addr: Address) -> Result<(), InternalError> {
+    fn delete_session(&self, addr: Address) -> Result<(), Error> {
         self.sessions.lock().unwrap().remove(&addr);
         Ok(())
     }
 
-    fn delete_all_sessions(&self, name: &[u8]) -> Result<usize, InternalError> {
+    fn delete_all_sessions(&self, name: &[u8]) -> Result<usize, Error> {
         let mut sessions = self.sessions.lock().unwrap();
 
         let to_delete: Vec<_> = sessions
@@ -67,7 +67,7 @@ impl SessionStore for InMemorySessionStore {
         Ok(to_delete.len())
     }
 
-    fn contains_session(&self, addr: Address) -> Result<bool, InternalError> {
+    fn contains_session(&self, addr: Address) -> Result<bool, Error> {
         Ok(self.sessions.lock().unwrap().contains_key(&addr))
     }
 }

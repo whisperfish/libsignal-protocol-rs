@@ -3,7 +3,7 @@ macro_rules! impl_serializable {
         impl $crate::Serializable for $name {
             fn serialize(
                 &self,
-            ) -> Result<$crate::Buffer, $crate::errors::InternalError> {
+            ) -> Result<$crate::Buffer, $crate::errors::Error> {
                 #[allow(unused_imports)]
                 use $crate::errors::FromInternalErrorCode;
 
@@ -31,8 +31,7 @@ macro_rules! impl_deserializable {
             fn deserialize(
                 ctx: &$crate::Context,
                 data: &[u8],
-            ) -> Result<Self, $crate::errors::InternalError> {
-                use failure::ResultExt;
+            ) -> Result<Self, $crate::errors::Error> {
                 use $crate::errors::FromInternalErrorCode;
 
                 let mut raw = std::mem::MaybeUninit::uninit();
@@ -85,10 +84,8 @@ macro_rules! signal_assert {
                 line!(),
                 stringify!($condition),
             );
-            let bt = ::failure::Backtrace::new().to_string();
-            if !bt.is_empty() {
-                ::log::error!("{}", bt);
-            }
+            let bt = backtrace::Backtrace::new();
+            ::log::error!("{:?}", bt);
 
             return $ret.into();
         }

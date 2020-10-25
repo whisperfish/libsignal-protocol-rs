@@ -1,8 +1,9 @@
 use crate::{
-    errors::FromInternalErrorCode, keys::PublicKey, raw_ptr::Raw, Buffer,
-    Context,
+    errors::{Error, FromInternalErrorCode},
+    keys::PublicKey,
+    raw_ptr::Raw,
+    Buffer, Context,
 };
-use failure::Error;
 use std::{
     cmp::{Ord, Ordering},
     ptr,

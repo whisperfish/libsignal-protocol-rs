@@ -1,5 +1,60 @@
 use std::convert::TryFrom;
 
+#[derive(Debug, thiserror::Error)]
+#[allow(missing_docs)]
+pub enum Error {
+    #[error("internal error: {0}")]
+    InternalError(#[from] InternalError),
+    #[error("IO error: {0}")]
+    IoError(#[from] std::io::Error),
+    #[error("invalid signature")]
+    InvalidSignature,
+    #[error("failed to calculate secrets")]
+    SecretsCalculationError,
+    #[error("system time error: {0}")]
+    SystemTimeError(#[from] std::time::SystemTimeError),
+    #[error("expected a pre-key ciphertext message")]
+    NoPreKeyCipherTextMessage,
+    #[error("expected a signal message")]
+    NoSignalMessage,
+    #[error("unable to generate a signed pre key")]
+    SignedPreKeyGenerationError,
+    #[error("unable to get the pre-key")]
+    PreKeyGetError,
+    #[error("unable to get the signed pre-key")]
+    SignedPreKeyGetError,
+    #[error("unable to get the identity key")]
+    IdentityKeyGetError,
+    #[error("a missing field is required: {0}")]
+    MissingRequiredField(RequiredField),
+    #[error("unknown error: {reason}")]
+    Unknown {
+        reason: String
+    }
+}
+
+#[derive(Debug, Copy, Clone, thiserror::Error)]
+pub enum RequiredField {
+    #[error("registration ID")]
+    RegistrationId,
+    #[error("device ID")]
+    DeviceId,
+    #[error("identity key is missing")]
+    IdentityKey,
+}
+
+impl Error {
+    /// Get the error code for libsignal-protocol-c.
+    /// For anything else than InternalError, returns SG_ERR_UNKNOWN.
+    pub(crate) fn code(self) -> i32 {
+        match self {
+            Error::InternalError(e) => e.code(),
+            _ => sys::SG_ERR_UNKNOWN,
+        }
+    }
+}
+
+/// Mapping of internal errors that can happen inside of libsignal-protocol-c
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, thiserror::Error)]
 #[allow(missing_docs)]
 pub enum InternalError {
@@ -29,7 +84,7 @@ pub enum InternalError {
     StaleKeyExchange,
     #[error("Untrusted identity")]
     UntrustedIdentity,
-    #[error("Varifying signature failed")]
+    #[error("Verifying signature failed")]
     VerifySignatureVerificationFailed,
     #[error("Invalid protobuf")]
     InvalidProtoBuf,

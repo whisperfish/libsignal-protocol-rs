@@ -1,4 +1,4 @@
-use crate::{buffer::Buffer, errors::InternalError};
+use crate::{buffer::Buffer, Error, InternalError};
 use std::{
     io::{self, Write},
     os::raw::{c_int, c_void},
@@ -10,11 +10,11 @@ pub trait SignedPreKeyStore: RefUnwindSafe {
     /// Load a signed pre-key.
     fn load(&self, id: u32, writer: &mut dyn Write) -> io::Result<()>;
     /// Store a signed pre-key.
-    fn store(&self, id: u32, body: &[u8]) -> Result<(), InternalError>;
+    fn store(&self, id: u32, body: &[u8]) -> Result<(), Error>;
     /// Is the signed pre-key with this ID present in the store?
     fn contains(&self, id: u32) -> bool;
     /// Remove a signed pre-key from the store.
-    fn remove(&self, id: u32) -> Result<(), InternalError>;
+    fn remove(&self, id: u32) -> Result<(), Error>;
 }
 
 pub(crate) fn new_vtable<P>(

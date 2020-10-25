@@ -4,10 +4,8 @@ use std::{
     ptr,
 };
 
-use failure::Error;
-
 use crate::{
-    errors::{FromInternalErrorCode, InternalError},
+    errors::{Error, FromInternalErrorCode, InternalError},
     keys::PrivateKey,
     raw_ptr::Raw,
     Buffer, Context,
@@ -56,11 +54,11 @@ impl PublicKey {
             if result == 1 {
                 Ok(())
             } else if result == 0 {
-                Err(failure::err_msg("Invalid signature"))
+                Err(Error::InvalidSignature)
             } else if let Some(err) = InternalError::from_error_code(result) {
                 Err(err.into())
             } else {
-                Err(failure::format_err!("Unknown error code: {}", result))
+                Err(Error::InternalError(InternalError::Other(result)))
             }
         }
     }
@@ -88,11 +86,10 @@ impl PublicKey {
                 libc::free(shared_data as *mut libc::c_void);
                 Ok(secret)
             } else {
-                Err(failure::err_msg("Error while calculating shared secret"))
+                Err(Error::SecretsCalculationError)
             }
         }
     }
-
 
     /// returns this public key as a base64 encoded string
     pub fn as_base64(&self) -> Result<String, InternalError> {

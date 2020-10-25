@@ -1,4 +1,4 @@
-use crate::{errors::InternalError, Address, Buffer};
+use crate::{Address, Buffer, Error, InternalError};
 use std::{
     os::raw::{c_char, c_int, c_void},
     panic::RefUnwindSafe,
@@ -20,7 +20,7 @@ pub trait SessionStore: RefUnwindSafe {
     fn load_session(
         &self,
         address: Address,
-    ) -> Result<Option<SerializedSession>, InternalError>;
+    ) -> Result<Option<SerializedSession>, Error>;
 
     /// Get the IDs of all known devices with active sessions for a recipient.
     fn get_sub_device_sessions(
@@ -30,7 +30,7 @@ pub trait SessionStore: RefUnwindSafe {
 
     /// Determine whether there is a committed session record for a
     /// recipient ID + device ID tuple.
-    fn contains_session(&self, addr: Address) -> Result<bool, InternalError>;
+    fn contains_session(&self, addr: Address) -> Result<bool, Error>;
 
     /// Commit to storage the session record for a given recipient ID + device
     /// ID tuple.
@@ -41,13 +41,13 @@ pub trait SessionStore: RefUnwindSafe {
     ) -> Result<(), InternalError>;
 
     /// Remove a session record for a recipient ID + device ID tuple.
-    fn delete_session(&self, addr: Address) -> Result<(), InternalError>;
+    fn delete_session(&self, addr: Address) -> Result<(), Error>;
 
     /// Remove the session records corresponding to all devices of a recipient
     /// ID.
     ///
     /// Returns the number of deleted sessions.
-    fn delete_all_sessions(&self, name: &[u8]) -> Result<usize, InternalError>;
+    fn delete_all_sessions(&self, name: &[u8]) -> Result<usize, Error>;
 }
 
 pub(crate) fn new_vtable<S: SessionStore + 'static>(

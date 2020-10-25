@@ -1,5 +1,8 @@
-use crate::{keys::PublicKey, raw_ptr::Raw};
-use failure::Error;
+use crate::{
+    errors::{Error, RequiredField},
+    keys::PublicKey,
+    raw_ptr::Raw,
+};
 use std::{
     fmt::{self, Debug, Formatter},
     ptr,
@@ -45,7 +48,7 @@ impl PreKeyBundle {
                 self.raw.as_const_ptr(),
             );
             if raw.is_null() {
-                Err(failure::err_msg("Unable to get the pre-key"))
+                Err(Error::PreKeyGetError)
             } else {
                 Ok(PublicKey {
                     raw: Raw::copied_from(raw),
@@ -70,7 +73,7 @@ impl PreKeyBundle {
                 self.raw.as_const_ptr(),
             );
             if raw.is_null() {
-                Err(failure::err_msg("Unable to get the signed pre-key"))
+                Err(Error::SignedPreKeyGetError)
             } else {
                 Ok(PublicKey {
                     raw: Raw::copied_from(raw),
@@ -86,7 +89,7 @@ impl PreKeyBundle {
                 self.raw.as_const_ptr(),
             );
             if raw.is_null() {
-                Err(failure::err_msg("Unable to get the identity key"))
+                Err(Error::IdentityKeyGetError)
             } else {
                 Ok(PublicKey {
                     raw: Raw::copied_from(raw),
@@ -161,19 +164,22 @@ impl PreKeyBundleBuilder {
     }
 
     fn get_registration_id(&self) -> Result<u32, Error> {
-        self.registration_id
-            .ok_or_else(|| failure::err_msg("a registration ID is required"))
+        self.registration_id.ok_or_else(|| {
+            Error::MissingRequiredField(RequiredField::RegistrationId)
+        })
     }
 
     fn get_device_id(&self) -> Result<i32, Error> {
         self.device_id
-            .ok_or_else(|| failure::err_msg("a device ID is required"))
+            .ok_or_else(|| Error::MissingRequiredField(RequiredField::DeviceId))
     }
 
     fn get_identity_key(&self) -> Result<*mut sys::ec_public_key, Error> {
         match self.identity_key {
             Some(ref key) => Ok(key.raw.as_ptr()),
-            None => Err(failure::err_msg("Identity key is required")),
+            None => {
+                Err(Error::MissingRequiredField(RequiredField::IdentityKey))
+            },
         }
     }
 

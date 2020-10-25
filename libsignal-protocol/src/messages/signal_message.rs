@@ -1,11 +1,10 @@
 use crate::{
-    errors::InternalError,
+    errors::{Error, InternalError},
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType},
     raw_ptr::Raw,
     Context, ContextInner,
 };
-use failure::Error;
 use std::{convert::TryFrom, rc::Rc};
 
 // For rustdoc link resolution
@@ -95,7 +94,7 @@ impl TryFrom<CiphertextMessage> for SignalMessage {
 
     fn try_from(other: CiphertextMessage) -> Result<Self, Self::Error> {
         if other.get_type()? != CiphertextType::Signal {
-            Err(failure::err_msg("Expected a signal message"))
+            Err(Error::NoSignalMessage)
         } else {
             // safety: the `CiphertextType` check tells us this is actually a
             // pointer to a `signal_message`

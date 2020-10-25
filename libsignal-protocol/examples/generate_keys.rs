@@ -27,7 +27,7 @@ extern crate libsignal_protocol as sig;
 
 use std::time::SystemTime;
 
-use failure::Error;
+use anyhow::Error;
 
 use sig::Context;
 

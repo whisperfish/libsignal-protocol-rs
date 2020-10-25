@@ -1,5 +1,6 @@
 use crate::{
-    errors::InternalError, raw_ptr::Raw, Buffer, ContextInner, Serializable,
+    errors::InternalError, raw_ptr::Raw, Buffer, ContextInner, Error,
+    Serializable,
 };
 use std::{convert::TryFrom, rc::Rc};
 
@@ -52,14 +53,16 @@ impl CiphertextMessage {
 }
 
 impl Serializable for CiphertextMessage {
-    fn serialize(&self) -> Result<Buffer, InternalError> {
+    fn serialize(&self) -> Result<Buffer, Error> {
         unsafe {
             // get a reference to the *cached* serialized message
             let buffer =
                 sys::ciphertext_message_get_serialized(self.raw.as_const_ptr());
 
             if buffer.is_null() {
-                return Err(InternalError::SerializationError);
+                return Err(Error::InternalError(
+                    InternalError::SerializationError,
+                ));
             }
 
             let temporary_not_owned_buffer = Buffer::from_raw(buffer);

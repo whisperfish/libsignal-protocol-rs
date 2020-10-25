@@ -1,10 +1,10 @@
 use crate::{
+    errors::Error,
     keys::PublicKey,
     messages::{CiphertextMessage, CiphertextType, SignalMessage},
     raw_ptr::Raw,
     ContextInner,
 };
-use failure::Error;
 use std::{convert::TryFrom, rc::Rc};
 
 /// A message containing everything necessary to establish a session.
@@ -109,7 +109,7 @@ impl TryFrom<CiphertextMessage> for PreKeySignalMessage {
 
     fn try_from(other: CiphertextMessage) -> Result<Self, Self::Error> {
         if other.get_type()? != CiphertextType::PreKey {
-            Err(failure::err_msg("Expected a pre-key ciphertext message"))
+            Err(Error::NoPreKeyCipherTextMessage)
         } else {
             // safety: the `CiphertextType` check tells us this is actually a
             // pointer to a `pre_key_signal_message`

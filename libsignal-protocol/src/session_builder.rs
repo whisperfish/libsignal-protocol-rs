@@ -1,9 +1,10 @@
 use crate::{
     address::Address,
     context::{Context, ContextInner},
-    errors::{FromInternalErrorCode, InternalError},
+    errors::FromInternalErrorCode,
     pre_key_bundle::PreKeyBundle,
     store_context::{StoreContext, StoreContextInner},
+    Error,
 };
 use std::{
     fmt::{self, Debug, Formatter},
@@ -50,13 +51,13 @@ impl SessionBuilder {
     pub fn process_pre_key_bundle(
         &self,
         pre_key_bundle: &PreKeyBundle,
-    ) -> Result<(), InternalError> {
+    ) -> Result<(), Error> {
         unsafe {
-            sys::session_builder_process_pre_key_bundle(
+            Ok(sys::session_builder_process_pre_key_bundle(
                 self.raw,
                 pre_key_bundle.raw.as_ptr(),
             )
-            .into_result()
+            .into_result()?)
         }
     }
 }
