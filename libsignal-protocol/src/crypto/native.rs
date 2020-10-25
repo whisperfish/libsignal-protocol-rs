@@ -1,8 +1,8 @@
-use aes::{Aes128, Aes192, Aes256};
-use aes_ctr::{
-    stream_cipher::{NewStreamCipher, SyncStreamCipher},
-    Aes128Ctr, Aes192Ctr, Aes256Ctr,
+use aes::{
+    cipher::{NewStreamCipher, SyncStreamCipher},
+    Aes128, Aes192, Aes256,
 };
+use aes_ctr::{Aes128Ctr, Aes192Ctr, Aes256Ctr};
 use block_modes::{block_padding::Pkcs7, BlockMode, Cbc};
 use hmac::{Hmac, Mac, NewMac};
 use sha2::{Digest, Sha256, Sha512};

@@ -27,10 +27,10 @@ openssl = { version = "0.10", optional = true }
 rental = { version = "0.5.3", optional = true }
 
 sha2 = { version = "0.9.0", optional = true }
-hmac = { version = "0.9.0", optional = true }
-aes = { version = "0.5.0", optional = true }
-block-modes = { version = "0.6.0", optional = true }
-aes-ctr = { version = "0.5.0", optional = true }
+hmac = { version = "0.10.0", optional = true }
+aes = { version = "0.6.0", optional = true }
+block-modes = { version = "0.7.0", optional = true }
+aes-ctr = { version = "0.6.0", optional = true }
 
 [features]
 default = ["crypto-native"]
@@ -39,5 +39,5 @@ crypto-openssl = ["openssl", "rental"]
 
 [dev-dependencies]
 anyhow = "1.0"
-cfg-if = "0.1.9"
-env_logger = "0.7.1"
+cfg-if = "1.0.0"
+env_logger = "0.8.1"
