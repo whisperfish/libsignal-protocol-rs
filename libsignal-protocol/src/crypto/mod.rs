@@ -31,6 +31,7 @@ mod openssl;
 pub struct SignalCipherTypeError(i32);
 
 #[derive(Debug, Copy, Clone)]
+#[repr(C)]
 enum CipherMode {
     Encrypt,
     Decrypt,
