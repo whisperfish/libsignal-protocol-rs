@@ -103,6 +103,29 @@ impl SessionCipher {
             Ok(Buffer::from_raw(buffer))
         }
     }
+
+    /// Return the version of the session
+    pub fn get_session_version(&self) -> Result<u32, Error> {
+        let mut version = 0;
+        unsafe {
+            sys::session_cipher_get_session_version(self.raw, &mut version)
+                .into_result()?;
+            Ok(version)
+        }
+    }
+
+    /// Return the remote registration ID of the session
+    pub fn get_remote_registration_id(&self) -> Result<u32, Error> {
+        let mut registration_id = 0;
+        unsafe {
+            sys::session_cipher_get_remote_registration_id(
+                self.raw,
+                &mut registration_id,
+            )
+            .into_result()?;
+            Ok(registration_id)
+        }
+    }
 }
 
 impl Drop for SessionCipher {
