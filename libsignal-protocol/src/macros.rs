@@ -114,7 +114,7 @@ macro_rules! signal_catch_unwind {
                 );
 
                 return $crate::InternalError::Unknown.into();
-            },
+            }
         }
     };
 }

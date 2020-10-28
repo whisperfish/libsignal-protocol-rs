@@ -46,21 +46,21 @@ impl DefaultCrypto {
                     .map_err(|_| InternalError::Unknown)?;
                 c.apply_keystream(&mut buf);
                 buf
-            },
+            }
             (SignalCipherType::AesCtrNoPadding, 24) => {
                 let mut buf = data.to_vec();
                 let mut c = Aes192Ctr::new_var(key, iv)
                     .map_err(|_| InternalError::Unknown)?;
                 c.apply_keystream(&mut buf);
                 buf
-            },
+            }
             (SignalCipherType::AesCtrNoPadding, 32) => {
                 let mut buf = data.to_vec();
                 let mut c = Aes256Ctr::new_var(key, iv)
                     .map_err(|_| InternalError::Unknown)?;
                 c.apply_keystream(&mut buf);
                 buf
-            },
+            }
             (SignalCipherType::AesCbcPkcs5, 16) => {
                 let c = Aes128Cbc::new_var(&key, &iv)
                     .map_err(|_| InternalError::Unknown)?;
@@ -70,7 +70,7 @@ impl DefaultCrypto {
                         .decrypt_vec(data)
                         .map_err(|_| InternalError::Unknown)?,
                 }
-            },
+            }
             (SignalCipherType::AesCbcPkcs5, 24) => {
                 let c = Aes192Cbc::new_var(&key, &iv)
                     .map_err(|_| InternalError::Unknown)?;
@@ -80,7 +80,7 @@ impl DefaultCrypto {
                         .decrypt_vec(data)
                         .map_err(|_| InternalError::Unknown)?,
                 }
-            },
+            }
             (SignalCipherType::AesCbcPkcs5, 32) => {
                 let c = Aes256Cbc::new_var(&key, &iv)
                     .map_err(|_| InternalError::Unknown)?;
@@ -90,7 +90,7 @@ impl DefaultCrypto {
                         .decrypt_vec(data)
                         .map_err(|_| InternalError::Unknown)?,
                 }
-            },
+            }
             (cipher, size) => unreachable!(
                 "A combination of {:?} and {} doesn't make sense",
                 cipher, size
@@ -145,7 +145,9 @@ impl Crypto for DefaultCrypto {
 
 #[cfg(feature = "crypto-native")]
 impl Default for DefaultCrypto {
-    fn default() -> Self { Self }
+    fn default() -> Self {
+        Self
+    }
 }
 
 #[cfg(feature = "crypto-native")]

@@ -96,7 +96,7 @@ fn get_cmake_config() -> cmake::Config {
     let mut libsignal_cmake = cmake::Config::new("libsignal-protocol-c");
 
     // Add platform-specific parameters.
-    return match os.as_ref() {
+    match os.as_ref() {
         "android" => {
             // We need ANDROID_NDK_HOME to be set properly.
             let android_ndk_home = std::env::var("ANDROID_NDK_HOME")
@@ -116,7 +116,7 @@ fn get_cmake_config() -> cmake::Config {
             }
 
             libsignal_cmake
-        },
+        }
 
         "ios" => {
             for (ios_arch, params) in CMAKE_PARAMS_IOS {
@@ -133,8 +133,8 @@ fn get_cmake_config() -> cmake::Config {
             libsignal_cmake.cflag("-fembed-bitcode");
 
             libsignal_cmake
-        },
+        }
 
         _ => libsignal_cmake,
-    };
+    }
 }

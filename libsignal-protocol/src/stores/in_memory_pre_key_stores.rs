@@ -21,9 +21,13 @@ impl PreKeyStore for InMemoryPreKeyStore {
         self.0.store(id, body)
     }
 
-    fn contains(&self, id: u32) -> bool { self.0.contains(id) }
+    fn contains(&self, id: u32) -> bool {
+        self.0.contains(id)
+    }
 
-    fn remove(&self, id: u32) -> Result<(), Error> { self.0.remove(id) }
+    fn remove(&self, id: u32) -> Result<(), Error> {
+        self.0.remove(id)
+    }
 }
 
 /// An in-memory [`SignedPreKeyStore`].
@@ -39,9 +43,13 @@ impl SignedPreKeyStore for InMemorySignedPreKeyStore {
         self.0.store(id, body)
     }
 
-    fn contains(&self, id: u32) -> bool { self.0.contains(id) }
+    fn contains(&self, id: u32) -> bool {
+        self.0.contains(id)
+    }
 
-    fn remove(&self, id: u32) -> Result<(), Error> { self.0.remove(id) }
+    fn remove(&self, id: u32) -> Result<(), Error> {
+        self.0.remove(id)
+    }
 }
 
 #[derive(Debug, Default)]

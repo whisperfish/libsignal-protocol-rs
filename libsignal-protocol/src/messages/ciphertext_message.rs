@@ -45,7 +45,7 @@ impl CiphertextMessage {
                 sys::CIPHERTEXT_SENDERKEY_TYPE => Ok(CiphertextType::SenderKey),
                 sys::CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE => {
                     Ok(CiphertextType::SenderKeyDistribution)
-                },
+                }
                 other => Err(InternalError::UnknownCiphertextType(other)),
             }
         }

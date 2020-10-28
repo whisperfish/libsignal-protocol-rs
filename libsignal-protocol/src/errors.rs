@@ -28,9 +28,7 @@ pub enum Error {
     #[error("a missing field is required: {0}")]
     MissingRequiredField(RequiredField),
     #[error("unknown error: {reason}")]
-    Unknown {
-        reason: String
-    }
+    Unknown { reason: String },
 }
 
 #[derive(Debug, Copy, Clone, thiserror::Error)]
@@ -102,14 +100,14 @@ pub enum InternalError {
 
 impl InternalError {
     /// Try to figure out what type of error a code corresponds to.
-    pub fn from_error_code(code: i32) -> Option<InternalError> {
+    pub const fn from_error_code(code: i32) -> Option<InternalError> {
         match code {
             sys::SG_ERR_NOMEM => Some(InternalError::NoMemory),
             sys::SG_ERR_INVAL => Some(InternalError::InvalidArgument),
             sys::SG_ERR_UNKNOWN => Some(InternalError::Unknown),
             sys::SG_ERR_DUPLICATE_MESSAGE => {
                 Some(InternalError::DuplicateMessage)
-            },
+            }
             sys::SG_ERR_INVALID_KEY => Some(InternalError::InvalidKey),
             sys::SG_ERR_INVALID_KEY_ID => Some(InternalError::InvalidKeyId),
             sys::SG_ERR_INVALID_MAC => Some(InternalError::InvalidMAC),
@@ -119,28 +117,28 @@ impl InternalError {
             sys::SG_ERR_NO_SESSION => Some(InternalError::NoSession),
             sys::SG_ERR_STALE_KEY_EXCHANGE => {
                 Some(InternalError::StaleKeyExchange)
-            },
+            }
             sys::SG_ERR_UNTRUSTED_IDENTITY => {
                 Some(InternalError::UntrustedIdentity)
-            },
+            }
             sys::SG_ERR_VRF_SIG_VERIF_FAILED => {
                 Some(InternalError::VerifySignatureVerificationFailed)
-            },
+            }
             sys::SG_ERR_INVALID_PROTO_BUF => {
                 Some(InternalError::InvalidProtoBuf)
-            },
+            }
             sys::SG_ERR_FP_VERSION_MISMATCH => {
                 Some(InternalError::FPVersionMismatch)
-            },
+            }
             sys::SG_ERR_FP_IDENT_MISMATCH => {
                 Some(InternalError::FPIdentMismatch)
-            },
+            }
             _ => None,
         }
     }
 
     /// Get the code which corresponds to this error.
-    pub fn code(self) -> i32 {
+    pub const fn code(self) -> i32 {
         match self {
             InternalError::NoMemory => sys::SG_ERR_NOMEM,
             InternalError::InvalidArgument => sys::SG_ERR_INVAL,
@@ -157,14 +155,14 @@ impl InternalError {
             InternalError::UntrustedIdentity => sys::SG_ERR_UNTRUSTED_IDENTITY,
             InternalError::VerifySignatureVerificationFailed => {
                 sys::SG_ERR_VRF_SIG_VERIF_FAILED
-            },
+            }
             InternalError::InvalidProtoBuf => sys::SG_ERR_INVALID_PROTO_BUF,
             InternalError::FPVersionMismatch => sys::SG_ERR_FP_VERSION_MISMATCH,
             InternalError::FPIdentMismatch => sys::SG_ERR_FP_IDENT_MISMATCH,
             InternalError::Other(c) => c,
             InternalError::UnknownCiphertextType(_) => {
                 sys::SG_ERR_INVALID_PROTO_BUF
-            },
+            }
             InternalError::SerializationError => sys::SG_ERR_INVALID_PROTO_BUF,
         }
     }
@@ -211,5 +209,7 @@ impl<T> IntoInternalErrorCode for Result<T, InternalError> {
 }
 
 impl From<InternalError> for i32 {
-    fn from(other: InternalError) -> i32 { other.code() }
+    fn from(other: InternalError) -> i32 {
+        other.code()
+    }
 }

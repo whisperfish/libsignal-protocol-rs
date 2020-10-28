@@ -94,7 +94,7 @@ unsafe extern "C" fn load_session_func(
             }
 
             1
-        },
+        }
         Ok(None) => 0,
         Err(e) => e.code(),
     }
@@ -126,7 +126,7 @@ unsafe extern "C" fn get_sub_device_sessions_func(
 
             *sessions = list;
             sys::SG_SUCCESS as _
-        },
+        }
         Err(e) => e.code(),
     }
 }

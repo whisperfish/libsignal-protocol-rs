@@ -1,4 +1,7 @@
-use crate::{Address, Buffer, Error, Serializable, keys::IdentityKeyPair, stores::IdentityKeyStore};
+use crate::{
+    keys::IdentityKeyPair, stores::IdentityKeyStore, Address, Buffer, Error,
+    Serializable,
+};
 use std::{collections::HashMap, sync::Mutex};
 
 /// An in-memory [`IdentityKeyStore`].
@@ -32,14 +35,8 @@ impl IdentityKeyStore for InMemoryIdentityKeyStore {
     }
 
     fn identity_key_pair(&self) -> Result<(Buffer, Buffer), Error> {
-        let public = self
-            .identity
-            .public()
-            .serialize()?;
-        let private = self
-            .identity
-            .private()
-            .serialize()?;
+        let public = self.identity.public().serialize()?;
+        let private = self.identity.private().serialize()?;
 
         Ok((public, private))
     }

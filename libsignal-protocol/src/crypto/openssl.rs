@@ -41,14 +41,14 @@ impl OpenSSLCrypto {
                 let nid = Nid::AES_192_CTR;
                 Cipher::from_nid(nid)
                     .expect("OpenSSL should have AES_192_CTR !!")
-            },
+            }
             (SignalCipherType::AesCtrNoPadding, 32) => Cipher::aes_256_ctr(),
             (SignalCipherType::AesCbcPkcs5, 16) => Cipher::aes_128_cbc(),
             (SignalCipherType::AesCbcPkcs5, 24) => {
                 let nid = Nid::AES_192_CBC;
                 Cipher::from_nid(nid)
                     .expect("OpenSSL should have AES_192_CBC !!")
-            },
+            }
             (SignalCipherType::AesCbcPkcs5, 32) => Cipher::aes_256_cbc(),
             _ => unreachable!(),
         };
@@ -59,7 +59,7 @@ impl OpenSSLCrypto {
             SignalCipherType::AesCtrNoPadding => {
                 crypter.pad(false); // in ctr we need to set padding to false
                 vec![0u8; data.len()]
-            },
+            }
             SignalCipherType::AesCbcPkcs5 => vec![0u8; data.len() + block_size],
         };
         let count = crypter
@@ -121,7 +121,9 @@ impl Crypto for OpenSSLCrypto {
 }
 
 impl Default for OpenSSLCrypto {
-    fn default() -> OpenSSLCrypto { OpenSSLCrypto }
+    fn default() -> OpenSSLCrypto {
+        OpenSSLCrypto
+    }
 }
 
 impl Sha256Hmac for hmac::HmacSigner {

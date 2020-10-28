@@ -281,9 +281,13 @@ impl Context {
     }
 
     /// Access the original [`Crypto`] object.
-    pub fn crypto(&self) -> &dyn Crypto { self.0.crypto.state() }
+    pub fn crypto(&self) -> &dyn Crypto {
+        self.0.crypto.state()
+    }
 
-    pub(crate) fn raw(&self) -> *mut sys::signal_context { self.0.raw() }
+    pub(crate) fn raw(&self) -> *mut sys::signal_context {
+        self.0.raw()
+    }
 
     /// Se the function to use when `libsignal-protocol-c` emits a log message.
     pub fn set_log_func<F>(&self, log_func: F)
@@ -302,7 +306,7 @@ impl Default for Context {
             Ok(c) => c,
             Err(e) => {
                 panic!("Unable to create a context using the defaults: {}", e)
-            },
+            }
         }
     }
 }
@@ -363,7 +367,9 @@ impl ContextInner {
         }
     }
 
-    pub(crate) const fn raw(&self) -> *mut sys::signal_context { self.raw }
+    pub(crate) const fn raw(&self) -> *mut sys::signal_context {
+        self.raw
+    }
 }
 
 impl Drop for ContextInner {

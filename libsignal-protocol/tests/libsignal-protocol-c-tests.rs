@@ -6,14 +6,14 @@ use std::{
 };
 
 use sig::{
-    Error, InternalError,
     keys::{PrivateKey, PublicKey},
     messages::{PreKeySignalMessage, SignalMessage},
     stores::{
         InMemoryIdentityKeyStore, InMemoryPreKeyStore, InMemorySessionStore,
         InMemorySignedPreKeyStore,
     },
-    Address, Context, Deserializable, PreKeyBundle, Serializable,
+    Address, Context, Deserializable, Error, InternalError, PreKeyBundle,
+    Serializable,
 };
 
 use crate::helpers::{fake_random_generator, MockCrypto};
@@ -313,10 +313,13 @@ fn test_basic_pre_key_v2() {
     // Have Alice process Bob's pre key bundle, which should fail due to a
     // missing unsigned pre key.
     let got = alice_session_builder.process_pre_key_bundle(&bob_pre_key_bundle);
-    assert!(match got {
-        Err(Error::InternalError(InternalError::InvalidKey)) => true,
-        _ => false
-    }, "result is not InternalError::InvalidKey");
+    assert!(
+        match got {
+            Err(Error::InternalError(InternalError::InvalidKey)) => true,
+            _ => false,
+        },
+        "result is not InternalError::InvalidKey"
+    );
 }
 
 #[test]

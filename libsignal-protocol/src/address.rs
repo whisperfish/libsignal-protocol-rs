@@ -47,7 +47,9 @@ impl Address {
     /// utf-8 string).
     ///
     /// You may also be looking for the [`Address::as_str`] method.
-    pub fn bytes(&self) -> &[u8] { self.0.name_bytes() }
+    pub fn bytes(&self) -> &[u8] {
+        self.0.name_bytes()
+    }
 
     /// Get the name attached to this address, converted to a `&str`.
     pub fn as_str(&self) -> Result<&str, std::str::Utf8Error> {
@@ -55,17 +57,25 @@ impl Address {
     }
 
     /// Get the device ID attached to this address.
-    pub fn device_id(&self) -> i32 { self.0.device_id() }
+    pub fn device_id(&self) -> i32 {
+        self.0.device_id()
+    }
 
-    pub(crate) fn raw(&self) -> &sys::signal_protocol_address { &self.0.raw }
+    pub(crate) fn raw(&self) -> &sys::signal_protocol_address {
+        &self.0.raw
+    }
 }
 
 impl Debug for Address {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result { self.0.fmt(f) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
+    }
 }
 
 impl Clone for Address {
-    fn clone(&self) -> Address { Address(Rc::clone(&self.0)) }
+    fn clone(&self) -> Address {
+        Address(Rc::clone(&self.0))
+    }
 }
 
 struct OwnedAddress {
@@ -88,13 +98,17 @@ impl OwnedAddress {
         }
     }
 
-    pub fn name_bytes(&self) -> &[u8] { &self.name }
+    pub fn name_bytes(&self) -> &[u8] {
+        &self.name
+    }
 
     pub fn name_utf8(&self) -> Result<&str, std::str::Utf8Error> {
         std::str::from_utf8(self.name_bytes())
     }
 
-    pub const fn device_id(&self) -> i32 { self.raw.device_id }
+    pub const fn device_id(&self) -> i32 {
+        self.raw.device_id
+    }
 }
 
 impl Debug for OwnedAddress {
@@ -104,10 +118,10 @@ impl Debug for OwnedAddress {
         match self.name_utf8() {
             Ok(name) => {
                 f.field("name", &name);
-            },
+            }
             Err(_) => {
                 f.field("name", &self.name_bytes());
-            },
+            }
         }
 
         f.field("device_id", &self.device_id()).finish()
