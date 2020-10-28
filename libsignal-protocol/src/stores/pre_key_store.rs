@@ -55,7 +55,7 @@ unsafe extern "C" fn load_pre_key(
                     e
                 );
                 Err(InternalError::Unknown)
-            },
+            }
         }
     });
 
@@ -63,7 +63,7 @@ unsafe extern "C" fn load_pre_key(
         Ok(buffer) => {
             *record = buffer.into_raw();
             sys::SG_SUCCESS as c_int
-        },
+        }
         Err(_) => InternalError::Unknown.code(),
     }
 }

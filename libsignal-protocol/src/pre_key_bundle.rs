@@ -16,7 +16,9 @@ pub struct PreKeyBundle {
 
 impl PreKeyBundle {
     /// Get a builder struct for the [`PreKeyBundle`].
-    pub fn builder() -> PreKeyBundleBuilder { PreKeyBundleBuilder::default() }
+    pub fn builder() -> PreKeyBundleBuilder {
+        PreKeyBundleBuilder::default()
+    }
 
     /// Get the registration ID.
     pub fn registration_id(&self) -> u32 {
@@ -146,13 +148,13 @@ impl PreKeyBundleBuilder {
     }
 
     /// Set the registration ID.
-    pub fn registration_id(mut self, id: u32) -> Self {
+    pub const fn registration_id(mut self, id: u32) -> Self {
         self.registration_id = Some(id);
         self
     }
 
     /// Set the device ID.
-    pub fn device_id(mut self, id: i32) -> Self {
+    pub const fn device_id(mut self, id: i32) -> Self {
         self.device_id = Some(id);
         self
     }
@@ -179,7 +181,7 @@ impl PreKeyBundleBuilder {
             Some(ref key) => Ok(key.raw.as_ptr()),
             None => {
                 Err(Error::MissingRequiredField(RequiredField::IdentityKey))
-            },
+            }
         }
     }
 

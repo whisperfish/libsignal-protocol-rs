@@ -75,7 +75,7 @@ unsafe extern "C" fn get_identity_key_pair(
             *public_data = public.into_raw();
             *private_data = private.into_raw();
             sys::SG_SUCCESS as c_int
-        },
+        }
         Err(e) => e.code(),
     }
 }
@@ -92,7 +92,7 @@ unsafe extern "C" fn get_local_registration_id(
         Ok(id) => {
             *registration_id = id;
             sys::SG_SUCCESS as c_int
-        },
+        }
         Err(e) => e.code(),
     }
 }

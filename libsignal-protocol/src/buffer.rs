@@ -13,7 +13,9 @@ pub struct Buffer {
 
 impl Buffer {
     /// Create a new empty buffer.
-    pub fn new() -> Buffer { Buffer::with_capacity(0) }
+    pub fn new() -> Buffer {
+        Buffer::with_capacity(0)
+    }
 
     pub(crate) unsafe fn from_raw(raw: *mut sys::signal_buffer) -> Buffer {
         assert!(!raw.is_null());
@@ -26,10 +28,14 @@ impl Buffer {
     }
 
     /// How many bytes are in this buffer?
-    pub fn len(&self) -> usize { unsafe { sys::signal_buffer_len(self.raw) } }
+    pub fn len(&self) -> usize {
+        unsafe { sys::signal_buffer_len(self.raw) }
+    }
 
     /// Is the buffer empty?
-    pub fn is_empty(&self) -> bool { self.len() > 0 }
+    pub fn is_empty(&self) -> bool {
+        self.len() > 0
+    }
 
     /// Extract the underlying raw pointer.
     ///
@@ -96,13 +102,17 @@ impl PartialOrd for Buffer {
 }
 
 impl PartialEq for Buffer {
-    fn eq(&self, other: &Buffer) -> bool { self.cmp(other) == Ordering::Equal }
+    fn eq(&self, other: &Buffer) -> bool {
+        self.cmp(other) == Ordering::Equal
+    }
 }
 
 impl Eq for Buffer {}
 
 impl Default for Buffer {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Debug for Buffer {
@@ -112,7 +122,9 @@ impl Debug for Buffer {
 }
 
 impl From<Vec<u8>> for Buffer {
-    fn from(other: Vec<u8>) -> Buffer { Buffer::from(other.as_slice()) }
+    fn from(other: Vec<u8>) -> Buffer {
+        Buffer::from(other.as_slice())
+    }
 }
 
 impl<'a> From<&'a [u8]> for Buffer {
@@ -127,11 +139,15 @@ impl<'a> From<&'a [u8]> for Buffer {
 }
 
 impl AsRef<[u8]> for Buffer {
-    fn as_ref(&self) -> &[u8] { self.as_slice() }
+    fn as_ref(&self) -> &[u8] {
+        self.as_slice()
+    }
 }
 
 impl AsMut<[u8]> for Buffer {
-    fn as_mut(&mut self) -> &mut [u8] { self.as_slice_mut() }
+    fn as_mut(&mut self) -> &mut [u8] {
+        self.as_slice_mut()
+    }
 }
 
 impl<T> Index<T> for Buffer
@@ -140,7 +156,9 @@ where
 {
     type Output = <[u8] as Index<T>>::Output;
 
-    fn index(&self, ix: T) -> &Self::Output { self.as_slice().index(ix) }
+    fn index(&self, ix: T) -> &Self::Output {
+        self.as_slice().index(ix)
+    }
 }
 
 impl<T> IndexMut<T> for Buffer
@@ -158,7 +176,9 @@ impl Write for Buffer {
         Ok(data.len())
     }
 
-    fn flush(&mut self) -> io::Result<()> { Ok(()) }
+    fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
 }
 
 impl Clone for Buffer {

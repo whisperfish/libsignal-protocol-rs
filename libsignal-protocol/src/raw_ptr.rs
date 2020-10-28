@@ -41,7 +41,9 @@ impl<T: IsA<sys::signal_type_base>> Raw<T> {
         unsafe { Raw::from_ptr(T::upcast(self.into_inner())) }
     }
 
-    pub fn as_ptr(&self) -> *mut T { self.0.as_ptr() }
+    pub fn as_ptr(&self) -> *mut T {
+        self.0.as_ptr()
+    }
 
     /// Consume this [`Raw`] and extract the underlying pointer **without**
     /// decrementing its reference count.
@@ -51,11 +53,15 @@ impl<T: IsA<sys::signal_type_base>> Raw<T> {
         ptr
     }
 
-    pub fn as_const_ptr(&self) -> *const T { self.as_ptr() as *const T }
+    pub fn as_const_ptr(&self) -> *const T {
+        self.as_ptr() as *const T
+    }
 }
 
 impl<T: IsA<sys::signal_type_base>> Clone for Raw<T> {
-    fn clone(&self) -> Raw<T> { unsafe { Raw::copied_from(self.as_ptr()) } }
+    fn clone(&self) -> Raw<T> {
+        unsafe { Raw::copied_from(self.as_ptr()) }
+    }
 }
 
 impl<T: IsA<sys::signal_type_base>> Drop for Raw<T> {
