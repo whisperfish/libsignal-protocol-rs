@@ -102,7 +102,7 @@ impl PublicKey {
     }
 
     /// Return this public key as a base64 encoded string.
-    fn to_base64(&self) -> Result<String, Error> {
+    pub fn to_base64(&self) -> Result<String, Error> {
         Ok(base64::encode(self.to_bytes()?))
     }
 }
