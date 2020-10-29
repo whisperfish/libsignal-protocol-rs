@@ -170,6 +170,11 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">cmp</span>::{<span class="ident">Ord</span>, <span class="ident">Ordering</span>},
@@ -264,14 +269,19 @@
         }
     }
 
-    <span class="doccomment">/// returns this public key as a base64 encoded string</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Get a copy of to the underlying private key data.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Buffer</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw</span> <span class="op">=</span> <span class="ident">ptr</span>::<span class="ident">null_mut</span>();
             <span class="ident">sys</span>::<span class="ident">ec_public_key_serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">raw</span>, <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_const_ptr</span>())
                 .<span class="ident">into_result</span>()<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">base64</span>::<span class="ident">encode</span>(<span class="ident">Buffer</span>::<span class="ident">from_raw</span>(<span class="ident">raw</span>).<span class="ident">as_slice</span>()))
+            <span class="prelude-val">Ok</span>(<span class="ident">Buffer</span>::<span class="ident">from_raw</span>(<span class="ident">raw</span>))
         }
+    }
+
+    <span class="doccomment">/// Return this public key as a base64 encoded string.</span>
+    <span class="kw">fn</span> <span class="ident">to_base64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">base64</span>::<span class="ident">encode</span>(<span class="self">self</span>.<span class="ident">to_bytes</span>()<span class="question-mark">?</span>))
     }
 }
 
@@ -310,7 +320,7 @@
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_base64</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt</span>::<span class="ident">Error</span>)<span class="question-mark">?</span>)
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_base64</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt</span>::<span class="ident">Error</span>)<span class="question-mark">?</span>)
     }
 }
 
