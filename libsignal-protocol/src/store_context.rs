@@ -106,6 +106,31 @@ impl StoreContext {
         }
     }
 
+    /// Load the sub-device sessions corresponding to the provided recipient
+    /// identifier.
+    pub fn get_sub_device_sessions(
+        &self,
+        identifier: &str,
+    ) -> Result<Vec<i32>, Error> {
+        unsafe {
+            let mut sessions = ptr::null_mut();
+            sys::signal_protocol_session_get_sub_device_sessions(
+                self.raw(),
+                &mut sessions,
+                identifier.as_ptr() as *const i8,
+                identifier.len(),
+            )
+            .into_result()?;
+            let mut ids = Vec::with_capacity(
+                sys::signal_int_list_size(sessions) as usize,
+            );
+            for i in 0..sys::signal_int_list_size(sessions) {
+                ids.push(sys::signal_int_list_at(sessions, i));
+            }
+            Ok(ids)
+        }
+    }
+
     pub(crate) fn raw(&self) -> *mut sys::signal_protocol_store_context {
         self.0.raw
     }
