@@ -102,7 +102,7 @@ impl PublicKey {
     }
 
     /// Return this public key as a base64 encoded string.
-    fn as_base64(&self) -> Result<String, Error> {
+    fn to_base64(&self) -> Result<String, Error> {
         Ok(base64::encode(self.to_bytes()?))
     }
 }
@@ -142,7 +142,7 @@ impl PartialOrd for PublicKey {
 
 impl Display for PublicKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.as_base64().map_err(|_| fmt::Error)?)
+        f.write_str(&self.to_base64().map_err(|_| fmt::Error)?)
     }
 }
 
