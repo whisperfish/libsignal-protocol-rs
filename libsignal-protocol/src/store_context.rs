@@ -117,7 +117,7 @@ impl StoreContext {
             sys::signal_protocol_session_get_sub_device_sessions(
                 self.raw(),
                 &mut sessions,
-                identifier.as_ptr() as *const i8,
+                identifier.as_ptr() as *const ::std::os::raw::c_char,
                 identifier.len(),
             )
             .into_result()?;
