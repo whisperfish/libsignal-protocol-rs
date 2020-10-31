@@ -131,6 +131,18 @@ impl StoreContext {
         }
     }
 
+    /// Delete an existing session corresponding to the provided address.
+    pub fn delete_session(&self, address: &Address) -> Result<(), Error> {
+        unsafe {
+            sys::signal_protocol_session_delete_session(
+                self.raw(),
+                address.raw(),
+            )
+            .into_result()?;
+        }
+        Ok(())
+    }
+
     pub(crate) fn raw(&self) -> *mut sys::signal_protocol_store_context {
         self.0.raw
     }
