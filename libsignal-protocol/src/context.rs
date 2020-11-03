@@ -7,7 +7,8 @@ use std::{
     pin::Pin,
     ptr,
     rc::Rc,
-    sync::Mutex,
+    sync::Arc,
+    sync::{Mutex, RwLock},
     time::SystemTime,
 };
 
@@ -215,35 +216,32 @@ where
         sys::signal_protocol_store_context_create(&mut store_ctx, ctx.raw())
             .into_result()?;
 
-        let pre_key_store = pks::new_vtable(pre_key_store);
         sys::signal_protocol_store_context_set_pre_key_store(
             store_ctx,
-            &pre_key_store,
+            &pks::new_vtable(pre_key_store),
         )
         .into_result()?;
 
-        let signed_pre_key_store = spks::new_vtable(signed_pre_key_store);
         sys::signal_protocol_store_context_set_signed_pre_key_store(
             store_ctx,
-            &signed_pre_key_store,
+            &spks::new_vtable(signed_pre_key_store),
         )
         .into_result()?;
 
-        let session_store = sess::new_vtable(session_store);
         sys::signal_protocol_store_context_set_session_store(
             store_ctx,
-            &session_store,
+            &sess::new_vtable(session_store),
         )
         .into_result()?;
 
-        let identity_key_store = iks::new_vtable(identity_key_store);
+        let identity_key_store = Arc::new(RwLock::new(identity_key_store));
         sys::signal_protocol_store_context_set_identity_key_store(
             store_ctx,
-            &identity_key_store,
+            &iks::new_vtable(identity_key_store.clone()),
         )
         .into_result()?;
 
-        Ok(StoreContext::new(store_ctx, &ctx.0))
+        Ok(StoreContext::new(store_ctx, &ctx.0, identity_key_store))
     }
 }
 

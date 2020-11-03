@@ -2,6 +2,8 @@ use crate::{Address, Buffer, Error};
 use std::{
     os::raw::{c_int, c_void},
     panic::RefUnwindSafe,
+    sync::Arc,
+    sync::RwLock,
 };
 
 /// Something used to store identity keys and track trusted identities.
@@ -30,6 +32,9 @@ pub trait IdentityKeyStore: RefUnwindSafe {
         identity_key: &[u8],
     ) -> Result<bool, Error>;
 
+    /// Get a trusted remote client's identity.
+    fn get_identity(&self, address: Address) -> Result<Option<Buffer>, Error>;
+
     /// Save a remote client's identity key as trusted.
     ///
     /// The value of `identity_key` may be empty. In this case remove the key
@@ -43,9 +48,9 @@ pub trait IdentityKeyStore: RefUnwindSafe {
 }
 
 pub(crate) fn new_vtable<I: IdentityKeyStore + 'static>(
-    identity_key_store: I,
+    identity_key_store: Arc<RwLock<I>>,
 ) -> sys::signal_protocol_identity_key_store {
-    let state: Box<State> = Box::new(State(Box::new(identity_key_store)));
+    let state: Box<State> = Box::new(State(identity_key_store));
 
     sys::signal_protocol_identity_key_store {
         user_data: Box::into_raw(state) as *mut c_void,
@@ -57,7 +62,7 @@ pub(crate) fn new_vtable<I: IdentityKeyStore + 'static>(
     }
 }
 
-struct State(Box<dyn IdentityKeyStore>);
+struct State(Arc<RwLock<dyn IdentityKeyStore>>);
 
 unsafe extern "C" fn get_identity_key_pair(
     public_data: *mut *mut sys::signal_buffer,
@@ -70,7 +75,12 @@ unsafe extern "C" fn get_identity_key_pair(
 
     let user_data = &*(user_data as *const State);
 
-    match signal_catch_unwind!(user_data.0.identity_key_pair()) {
+    match signal_catch_unwind!(user_data
+        .0
+        .read()
+        .expect("poisoned mutex")
+        .identity_key_pair())
+    {
         Ok((public, private)) => {
             *public_data = public.into_raw();
             *private_data = private.into_raw();
@@ -88,7 +98,12 @@ unsafe extern "C" fn get_local_registration_id(
 
     let user_data = &*(user_data as *const State);
 
-    match signal_catch_unwind!(user_data.0.local_registration_id()) {
+    match signal_catch_unwind!(user_data
+        .0
+        .read()
+        .expect("poisoned mutex")
+        .local_registration_id())
+    {
         Ok(id) => {
             *registration_id = id;
             sys::SG_SUCCESS as c_int
@@ -114,7 +129,12 @@ unsafe extern "C" fn save_identity(
         std::slice::from_raw_parts(key_data, key_len)
     };
 
-    match signal_catch_unwind!(user_data.0.save_identity(address, key)) {
+    match signal_catch_unwind!(user_data
+        .0
+        .write()
+        .expect("poisoned mutex")
+        .save_identity(address, key))
+    {
         Ok(_) => sys::SG_SUCCESS as _,
         Err(e) => e.code(),
     }
@@ -138,7 +158,12 @@ unsafe extern "C" fn is_trusted_identity(
     });
     let key = std::slice::from_raw_parts(key_data, key_len);
 
-    match signal_catch_unwind!(user_data.0.is_trusted_identity(address, key)) {
+    match signal_catch_unwind!(user_data
+        .0
+        .read()
+        .expect("poisoned mutex")
+        .is_trusted_identity(address, key))
+    {
         Ok(true) => 1,
         Ok(false) => 0,
         Err(e) => e.code(),

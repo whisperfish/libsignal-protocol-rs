@@ -68,7 +68,7 @@ impl SignalMessage {
         receiver_identity_key: &PublicKey,
         mac: &[u8],
         ctx: &Context,
-    ) -> Result<bool, InternalError> {
+    ) -> Result<bool, Error> {
         unsafe {
             let code = sys::signal_message_verify_mac(
                 self.raw.as_ptr(),
@@ -83,7 +83,8 @@ impl SignalMessage {
                 0 => Ok(false),
                 1 => Ok(true),
                 other => Err(InternalError::from_error_code(other)
-                    .unwrap_or(InternalError::Unknown)),
+                    .unwrap_or(InternalError::Unknown)
+                    .into()),
             }
         }
     }

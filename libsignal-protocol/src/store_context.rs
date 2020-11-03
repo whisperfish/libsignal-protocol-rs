@@ -1,32 +1,74 @@
 use crate::{
     context::ContextInner,
     errors::FromInternalErrorCode,
-    keys::{PreKey, SessionSignedPreKey},
+    keys::{IdentityKeyPair, PreKey, PublicKey, SessionSignedPreKey},
     raw_ptr::Raw,
-    Address, Error, InternalError, SessionRecord,
+    stores::IdentityKeyStore,
+    Address, Context, Error, InternalError, SessionRecord,
 };
 use std::{
     fmt::{self, Debug, Formatter},
     ptr,
     rc::Rc,
+    sync::{Arc, RwLock},
 };
 
 /// Something which contains state used by the signal protocol.
 ///
 /// Under the hood this contains several "Stores" for various keys and session
 /// state (e.g. which identities are trusted, and their pre-keys).
-#[derive(Debug, Clone)]
-pub struct StoreContext(pub(crate) Rc<StoreContextInner>);
+#[allow(missing_debug_implementations)]
+#[derive(Clone)]
+pub struct StoreContext(
+    pub(crate) Rc<StoreContextInner>,
+    /// doing this temporarily until libsignal-protocol-c gets a signal_protocol_identity_get_identity(addr) function
+    Arc<RwLock<dyn IdentityKeyStore>>,
+);
 
 impl StoreContext {
     pub(crate) fn new(
         raw: *mut sys::signal_protocol_store_context,
         ctx: &Rc<ContextInner>,
+        identity_key_store: Arc<RwLock<dyn IdentityKeyStore>>,
     ) -> StoreContext {
-        StoreContext(Rc::new(StoreContextInner {
-            raw,
-            ctx: Rc::clone(ctx),
-        }))
+        StoreContext(
+            Rc::new(StoreContextInner {
+                raw,
+                ctx: Rc::clone(ctx),
+            }),
+            identity_key_store,
+        )
+    }
+
+    /// Return the identity key pair of this store.
+    pub fn identity_key_pair(&self) -> Result<IdentityKeyPair, Error> {
+        unsafe {
+            let mut key_pair = std::ptr::null_mut();
+            sys::signal_protocol_identity_get_key_pair(
+                self.raw(),
+                &mut key_pair,
+            )
+            .into_result()?;
+            Ok(IdentityKeyPair {
+                raw: Raw::from_ptr(key_pair),
+            })
+        }
+    }
+
+    /// Return the saved public identity key for a remote client.
+    pub fn get_identity(
+        &self,
+        address: Address,
+    ) -> Result<Option<PublicKey>, Error> {
+        // TODO: this whole function should be replaced by a call to `libsignal-protocol-c`
+        // once the missing functionality has been added.
+        let context = Context(self.0.ctx.clone());
+        Ok(self
+            .1
+            .read()
+            .expect("poisoned mutex")
+            .get_identity(address)?
+            .and_then(|b| PublicKey::decode_point(&context, b.as_slice()).ok()))
     }
 
     /// Store pre key
