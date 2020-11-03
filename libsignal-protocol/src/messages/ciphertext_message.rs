@@ -35,7 +35,7 @@ pub struct CiphertextMessage {
 
 impl CiphertextMessage {
     /// Which type of message is this?
-    pub fn get_type(&self) -> Result<CiphertextType, InternalError> {
+    pub fn get_type(&self) -> Result<CiphertextType, Error> {
         unsafe {
             let ty = sys::ciphertext_message_get_type(self.raw.as_ptr());
 
@@ -46,7 +46,9 @@ impl CiphertextMessage {
                 sys::CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE => {
                     Ok(CiphertextType::SenderKeyDistribution)
                 }
-                other => Err(InternalError::UnknownCiphertextType(other)),
+                other => {
+                    Err(InternalError::UnknownCiphertextType(other).into())
+                }
             }
         }
     }
