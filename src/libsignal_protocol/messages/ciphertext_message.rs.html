@@ -76,6 +76,8 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">errors</span>::<span class="ident">InternalError</span>, <span class="ident">raw_ptr</span>::<span class="ident">Raw</span>, <span class="ident">Buffer</span>, <span class="ident">ContextInner</span>, <span class="ident">Error</span>,
@@ -114,7 +116,7 @@
 
 <span class="kw">impl</span> <span class="ident">CiphertextMessage</span> {
     <span class="doccomment">/// Which type of message is this?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CiphertextType</span>, <span class="ident">InternalError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CiphertextType</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">unsafe</span> {
             <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">sys</span>::<span class="ident">ciphertext_message_get_type</span>(<span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">as_ptr</span>());
 
@@ -125,7 +127,9 @@
                 <span class="ident">sys</span>::<span class="ident">CIPHERTEXT_SENDERKEY_DISTRIBUTION_TYPE</span> <span class="op">=&gt;</span> {
                     <span class="prelude-val">Ok</span>(<span class="ident">CiphertextType</span>::<span class="ident">SenderKeyDistribution</span>)
                 }
-                <span class="ident">other</span> <span class="op">=&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">InternalError</span>::<span class="ident">UnknownCiphertextType</span>(<span class="ident">other</span>)),
+                <span class="ident">other</span> <span class="op">=&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="ident">InternalError</span>::<span class="ident">UnknownCiphertextType</span>(<span class="ident">other</span>).<span class="ident">into</span>())
+                }
             }
         }
     }

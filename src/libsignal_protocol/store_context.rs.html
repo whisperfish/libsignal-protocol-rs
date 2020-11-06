@@ -169,36 +169,120 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">context</span>::<span class="ident">ContextInner</span>,
     <span class="ident">errors</span>::<span class="ident">FromInternalErrorCode</span>,
-    <span class="ident">keys</span>::{<span class="ident">PreKey</span>, <span class="ident">SessionSignedPreKey</span>},
+    <span class="ident">keys</span>::{<span class="ident">IdentityKeyPair</span>, <span class="ident">PreKey</span>, <span class="ident">PublicKey</span>, <span class="ident">SessionSignedPreKey</span>},
     <span class="ident">raw_ptr</span>::<span class="ident">Raw</span>,
-    <span class="ident">Address</span>, <span class="ident">Error</span>, <span class="ident">InternalError</span>, <span class="ident">SessionRecord</span>,
+    <span class="ident">stores</span>::<span class="ident">IdentityKeyStore</span>,
+    <span class="ident">Address</span>, <span class="ident">Context</span>, <span class="ident">Error</span>, <span class="ident">InternalError</span>, <span class="ident">SessionRecord</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>},
     <span class="ident">ptr</span>,
     <span class="ident">rc</span>::<span class="ident">Rc</span>,
+    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">RwLock</span>},
 };
 
 <span class="doccomment">/// Something which contains state used by the signal protocol.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Under the hood this contains several &quot;Stores&quot; for various keys and session</span>
 <span class="doccomment">/// state (e.g. which identities are trusted, and their pre-keys).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StoreContext</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">StoreContextInner</span><span class="op">&gt;</span>);
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StoreContext</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">StoreContextInner</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// doing this temporarily until libsignal-protocol-c gets a signal_protocol_identity_get_identity(addr) function</span>
+    <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">IdentityKeyStore</span><span class="op">&gt;&gt;</span>,
+);
 
 <span class="kw">impl</span> <span class="ident">StoreContext</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">raw</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">sys</span>::<span class="ident">signal_protocol_store_context</span>,
         <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">ContextInner</span><span class="op">&gt;</span>,
+        <span class="ident">identity_key_store</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">IdentityKeyStore</span><span class="op">&gt;&gt;</span>,
     ) <span class="op">-&gt;</span> <span class="ident">StoreContext</span> {
-        <span class="ident">StoreContext</span>(<span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">StoreContextInner</span> {
-            <span class="ident">raw</span>,
-            <span class="ident">ctx</span>: <span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="ident">ctx</span>),
-        }))
+        <span class="ident">StoreContext</span>(
+            <span class="ident">Rc</span>::<span class="ident">new</span>(<span class="ident">StoreContextInner</span> {
+                <span class="ident">raw</span>,
+                <span class="ident">ctx</span>: <span class="ident">Rc</span>::<span class="ident">clone</span>(<span class="ident">ctx</span>),
+            }),
+            <span class="ident">identity_key_store</span>,
+        )
+    }
+
+    <span class="doccomment">/// Return the identity key pair of this store.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identity_key_pair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IdentityKeyPair</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">unsafe</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_pair</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">ptr</span>::<span class="ident">null_mut</span>();
+            <span class="ident">sys</span>::<span class="ident">signal_protocol_identity_get_key_pair</span>(
+                <span class="self">self</span>.<span class="ident">raw</span>(),
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">key_pair</span>,
+            )
+            .<span class="ident">into_result</span>()<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">IdentityKeyPair</span> {
+                <span class="ident">raw</span>: <span class="ident">Raw</span>::<span class="ident">from_ptr</span>(<span class="ident">key_pair</span>),
+            })
+        }
+    }
+
+    <span class="doccomment">/// Return the saved public identity key for a remote client.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_identity</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">address</span>: <span class="ident">Address</span>,
+    ) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// TODO: this whole function should be replaced by a call to `libsignal-protocol-c`</span>
+        <span class="comment">// once the missing functionality has been added.</span>
+        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">Context</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">ctx</span>.<span class="ident">clone</span>());
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>
+            .<span class="number">1</span>
+            .<span class="ident">read</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;poisoned mutex&quot;</span>)
+            .<span class="ident">get_identity</span>(<span class="ident">address</span>)<span class="question-mark">?</span>
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">PublicKey</span>::<span class="ident">decode_point</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="ident">b</span>.<span class="ident">as_slice</span>()).<span class="ident">ok</span>()))
     }
 
     <span class="doccomment">/// Store pre key</span>
