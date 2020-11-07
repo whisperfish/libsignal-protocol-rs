@@ -17,13 +17,25 @@ use std::{
 ///
 /// Under the hood this contains several "Stores" for various keys and session
 /// state (e.g. which identities are trusted, and their pre-keys).
-#[allow(missing_debug_implementations)]
 #[derive(Clone)]
 pub struct StoreContext(
     pub(crate) Rc<StoreContextInner>,
     /// doing this temporarily until libsignal-protocol-c gets a signal_protocol_identity_get_identity(addr) function
     Arc<RwLock<dyn IdentityKeyStore>>,
 );
+
+impl Debug for StoreContext {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("StoreContext")
+            .field(&self.0)
+            .field(&format!(
+                "IdentityKeyStore(strong: {}, weak: {})",
+                Arc::strong_count(&self.1),
+                Arc::weak_count(&self.1),
+            ))
+            .finish()
+    }
+}
 
 impl StoreContext {
     pub(crate) fn new(
