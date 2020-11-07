@@ -211,6 +211,18 @@
 <span id="210">210</span>
 <span id="211">211</span>
 <span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">context</span>::<span class="ident">ContextInner</span>,
@@ -231,13 +243,25 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Under the hood this contains several &quot;Stores&quot; for various keys and session</span>
 <span class="doccomment">/// state (e.g. which identities are trusted, and their pre-keys).</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_debug_implementations</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StoreContext</span>(
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">StoreContextInner</span><span class="op">&gt;</span>,
     <span class="doccomment">/// doing this temporarily until libsignal-protocol-c gets a signal_protocol_identity_get_identity(addr) function</span>
     <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">IdentityKeyStore</span><span class="op">&gt;&gt;</span>,
 );
+
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">StoreContext</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;StoreContext&quot;</span>)
+            .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+            .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
+                <span class="string">&quot;IdentityKeyStore(strong: {}, weak: {})&quot;</span>,
+                <span class="ident">Arc</span>::<span class="ident">strong_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>),
+                <span class="ident">Arc</span>::<span class="ident">weak_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>),
+            ))
+            .<span class="ident">finish</span>()
+    }
+}
 
 <span class="kw">impl</span> <span class="ident">StoreContext</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
