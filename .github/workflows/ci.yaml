@@ -1,0 +1,74 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+name: CI
+
+env:
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  rustfmt:
+    name: Check code formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1    
+        with:
+          command: build
+          args: --all-targets
+      - uses: actions-rs/cargo@v1    
+        with:
+          command: test
+          args: --all-targets --all-features
+      # Run test with feature flags in sub-directory as cargo does not support feature
+      # flags in virtual workspace
+      - uses: actions-rs/cargo@v1    
+        env:
+          working-directory: libsignal-protocol
+        with:
+          command: test
+          args: --all-targets --no-default-features --features="crypto-openssl"
+      - uses: actions-rs/cargo@v1    
+        env:
+          working-directory: libsignal-protocol
+        with:
+          command: test
+          args: --all-targets --no-default-features --features="crypto-native"
+      - run: python3 ./scripts/valgrind.py
