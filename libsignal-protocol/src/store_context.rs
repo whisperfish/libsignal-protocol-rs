@@ -197,6 +197,19 @@ impl StoreContext {
         Ok(())
     }
 
+    /// Remove the session records corresponding to all devices of a recipientId
+    pub fn delete_all_sessions(&self, identifier: &str) -> Result<(), Error> {
+        unsafe {
+            sys::signal_protocol_session_delete_all_sessions(
+                self.raw(),
+                identifier.as_ptr() as *const ::std::os::raw::c_char,
+                identifier.len(),
+            )
+            .into_result()?;
+        }
+        Ok(())
+    }
+
     pub(crate) fn raw(&self) -> *mut sys::signal_protocol_store_context {
         self.0.raw
     }
