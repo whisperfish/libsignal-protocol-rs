@@ -197,7 +197,9 @@ impl StoreContext {
         Ok(())
     }
 
-    /// Remove the session records corresponding to all devices of a recipientId
+    /// Remove the session records corresponding to all devices of a recipientId.
+    ///
+    /// This would have to be called twice to delete all sessions by uuid and e164.
     pub fn delete_all_sessions(&self, identifier: &str) -> Result<(), Error> {
         unsafe {
             sys::signal_protocol_session_delete_all_sessions(
