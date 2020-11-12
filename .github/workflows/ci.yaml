@@ -46,7 +46,7 @@ jobs:
           profile: minimal
           toolchain: stable
           components: rustfmt
-      - name: Run cargo clippy
+      - name: Run Clippy
         uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -84,12 +84,12 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: --manifest-path libsignal-protocol/Cargo.toml --no-default-features --features="crypto-openssl"
+          args: --manifest-path libsignal-protocol/Cargo.toml --no-default-features --features=crypto-openssl
       - name: Run tests (with rust crypto)
         uses: actions-rs/cargo@v1
         with:
           working-directory: libsignal-protocol
           command: test
-          args: --manifest-path libsignal-protocol/Cargo.toml --no-default-features --features="crypto-native"
+          args: --manifest-path libsignal-protocol/Cargo.toml --no-default-features --features=crypto-native
       - name: Run valgrind (check for memory bugs)
         run: python3 ./scripts/valgrind.py
