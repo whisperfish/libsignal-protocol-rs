@@ -16,17 +16,18 @@ jobs:
     name: Check code formatting
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repositories
+      - name: Checkout repositories
         uses: actions/checkout@v2
         with:
           submodules: true
-      - name: rustup
+      - name: Prepare Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           components: rustfmt
-      - uses: actions-rs/cargo@v1
+      - name: Check code formatting
+        uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: -- --check
@@ -35,17 +36,17 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repositories
+      - name: Checkout repositories
         uses: actions/checkout@v2
         with:
           submodules: true
-      - name: rustup
+      - name: Prepare Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
           components: rustfmt
-      - name: cargo clippy
+      - name: Run cargo clippy
         uses: actions-rs/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -54,41 +55,41 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     steps:
-      - name: checkout repositories
+      - name: Checkout repositories
         uses: actions/checkout@v2
         with:
           submodules: true
-      - name: rustup
+      - name: Prepare Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - name: cargo build
+      - name: Build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --workspace
-      - name: cargo test
+      - name: Run tests
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --workspace --all-features
-      - name: cargo doc
+      - name: Build documentation
         uses: actions-rs/cargo@v1
         with:
           command: doc
           args: --workspace
       # Run test with feature flags in sub-directory as cargo does not support feature
       # flags in virtual workspace
-      - name: cargo test (with openssl)
+      - name: Run tests (with openssl)
         uses: actions-rs/cargo@v1
         with:
           command: test
           args: --manifest-path libsignal-protocol/Cargo.toml --no-default-features --features="crypto-openssl"
-      - name: cargo test (with rust crypto)
+      - name: Run tests (with rust crypto)
         uses: actions-rs/cargo@v1
         with:
           working-directory: libsignal-protocol
           command: test
           args: --manifest-path libsignal-protocol/Cargo.toml --no-default-features --features="crypto-native"
-      - name: valgrind (check for memory bugs)
+      - name: Run valgrind (check for memory bugs)
         run: python3 ./scripts/valgrind.py
