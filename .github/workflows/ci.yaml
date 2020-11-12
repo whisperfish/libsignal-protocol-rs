@@ -91,5 +91,7 @@ jobs:
           working-directory: libsignal-protocol
           command: test
           args: --manifest-path libsignal-protocol/Cargo.toml --no-default-features --features=crypto-native
+      - name: Install valgrind
+        run: sudo apt-get install valgrind
       - name: Run valgrind (check for memory bugs)
         run: python3 ./scripts/valgrind.py
