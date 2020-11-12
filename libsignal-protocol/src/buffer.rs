@@ -83,15 +83,7 @@ impl Buffer {
 
 impl Ord for Buffer {
     fn cmp(&self, other: &Buffer) -> Ordering {
-        let ret = unsafe { sys::signal_buffer_compare(self.raw, other.raw) };
-
-        if ret < 0 {
-            Ordering::Less
-        } else if ret > 0 {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
-        }
+        unsafe { sys::signal_buffer_compare(self.raw, other.raw) }.cmp(&0)
     }
 }
 

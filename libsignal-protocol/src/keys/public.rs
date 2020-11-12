@@ -109,20 +109,13 @@ impl PublicKey {
 
 impl Ord for PublicKey {
     fn cmp(&self, other: &PublicKey) -> Ordering {
-        let cmp = unsafe {
+        unsafe {
             sys::ec_public_key_compare(
                 self.raw.as_const_ptr(),
                 other.raw.as_const_ptr(),
             )
-        };
-
-        if cmp < 0 {
-            Ordering::Less
-        } else if cmp > 0 {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
         }
+        .cmp(&0)
     }
 }
 

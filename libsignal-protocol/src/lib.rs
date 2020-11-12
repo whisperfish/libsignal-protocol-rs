@@ -58,7 +58,6 @@
     rust_2018_idioms,
     clippy::cargo_common_metadata,
     clippy::fallible_impl_from,
-    clippy::missing_const_for_fn,
     broken_intra_doc_links
 )]
 
