@@ -73,7 +73,8 @@ impl Ord for PrivateKey {
                 self.raw.as_const_ptr(),
                 other.raw.as_const_ptr(),
             )
-        }.cmp(&0)
+        }
+        .cmp(&0)
     }
 }
 
