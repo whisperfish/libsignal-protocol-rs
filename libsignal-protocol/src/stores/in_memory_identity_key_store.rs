@@ -74,6 +74,6 @@ impl IdentityKeyStore for InMemoryIdentityKeyStore {
             .lock()
             .unwrap()
             .get(&addr)
-            .and_then(|i| Some(Buffer::from(i.clone()))))
+            .map(|i| Buffer::from(i.clone())))
     }
 }

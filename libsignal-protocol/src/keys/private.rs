@@ -68,20 +68,12 @@ impl PrivateKey {
 
 impl Ord for PrivateKey {
     fn cmp(&self, other: &PrivateKey) -> Ordering {
-        let cmp = unsafe {
+        unsafe {
             sys::ec_private_key_compare(
                 self.raw.as_const_ptr(),
                 other.raw.as_const_ptr(),
             )
-        };
-
-        if cmp < 0 {
-            Ordering::Less
-        } else if cmp > 0 {
-            Ordering::Greater
-        } else {
-            Ordering::Equal
-        }
+        }.cmp(&0)
     }
 }
 

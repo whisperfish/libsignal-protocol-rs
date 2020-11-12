@@ -55,11 +55,11 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - uses: actions-rs/cargo@v1    
+      - uses: actions-rs/cargo@v1
         with:
           command: build
           args: --workspace
-      - uses: actions-rs/cargo@v1    
+      - uses: actions-rs/cargo@v1
         with:
           command: test
           args: --workspace --all-features
@@ -69,13 +69,13 @@ jobs:
           args: --workspace
       # Run test with feature flags in sub-directory as cargo does not support feature
       # flags in virtual workspace
-      - uses: actions-rs/cargo@v1    
+      - uses: actions-rs/cargo@v1
         env:
           working-directory: libsignal-protocol
         with:
           command: test
           args: --no-default-features --features="crypto-openssl"
-      - uses: actions-rs/cargo@v1    
+      - uses: actions-rs/cargo@v1
         env:
           working-directory: libsignal-protocol
         with:

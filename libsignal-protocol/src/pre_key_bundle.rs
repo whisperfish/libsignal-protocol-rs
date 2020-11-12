@@ -219,7 +219,7 @@ impl PreKeyBundleBuilder {
         let (signed_pre_key_id, signed_pre_key_public) =
             self.get_signed_pre_key();
         let signature =
-            self.signature.as_ref().map(Vec::as_slice).unwrap_or(&[]);
+            self.signature.as_deref().unwrap_or(&[]);
         let identity_key = self.get_identity_key()?;
 
         unsafe {
