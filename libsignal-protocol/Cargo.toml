@@ -16,7 +16,7 @@ libsignal-protocol-sys = { path = "../libsignal-protocol-sys/" }
 #libsignal-protocol-sys = "0.1.0"
 backtrace = "0.3"
 thiserror = "1.0.0"
-rand = "0.7.3"
+rand = "0.8"
 log = "0.4.6"
 static_assertions = "1.1.0"
 libc = "0.2"
