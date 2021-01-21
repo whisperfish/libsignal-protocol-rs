@@ -81,6 +81,12 @@ impl Buffer {
     }
 }
 
+// Internally `signal_buffer` is just a length field followed by data, as long
+// as there is only a single mutable reference (as per Rust's borrow rules)
+// held to this there can be no data races on this.
+unsafe impl Send for Buffer {}
+unsafe impl Sync for Buffer {}
+
 impl Ord for Buffer {
     fn cmp(&self, other: &Buffer) -> Ordering {
         unsafe { sys::signal_buffer_compare(self.raw, other.raw) }.cmp(&0)
