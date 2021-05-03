@@ -11,6 +11,9 @@
 
 A Rust interface to the [Signal Protocol][upstream].
 
+**DEPRECATED** in favour of https://github.com/signalapp/libsignal-client!
+Signal reimplemented the whole thing in Rust, and `libsignal-service-rs` is now based on that.
+
 ## Examples
 
 The simplest thing you can do with this library is generate a private identity
